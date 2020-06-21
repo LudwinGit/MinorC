@@ -206,7 +206,9 @@ def p_sentencia(t):
                                 |   sentencia_if
                                 |   sentencia_for
                                 |   sentencia_etiqueta
-                                |   sentencia_goto'''
+                                |   sentencia_goto
+                                |   sentencia_switch
+                                |   sentencia_break'''
 
 def p_declaracion_variable_array(t):
     'declaracion_variable       :   tipo IDENTIFICADOR ABRECORCHETE CIERRACORCHETE PUNTOCOMA'
@@ -278,6 +280,33 @@ def p_sentencia_etiqueta(t):
 
 def p_sentencia_goto(t):
     'sentencia_goto             :   GOTO IDENTIFICADOR PUNTOCOMA'
+
+def p_sentencia_switch(t):
+    'sentencia_switch           :   SWITCH ABREPARENTESIS exp CIERRAPARENTESIS ABRELLAVE cases CIERRALLAVE'
+
+def p_sentencia_break(t):
+    'sentencia_break            :   BREAK PUNTOCOMA'
+
+def p_cases(t):
+    'cases                      :   lista_case  default_case'
+
+def p_cases_sin_default(t):
+    'cases                      :   lista_case'
+
+def p_cases_default(t):
+    'cases                      :   default_case'
+
+def p_lista_cases(t):
+    'lista_case                 :   lista_case case'
+
+def p_lista_case(t):
+    'lista_case                 :   case'
+
+def p_case(t):
+    'case                       :   CASE exp DOSPUNTOS lista_sentencias'
+
+def p_default_case(t):
+    'default_case               :   DEFAULT DOSPUNTOS lista_sentencias'
 
 def p_exp(t):
     '''exp                      :   exp MAS         exp
