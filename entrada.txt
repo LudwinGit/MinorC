@@ -1,0 +1,84 @@
+int a,b,c,d;
+int e,f,g,h=10;
+char c;
+double d;
+float f;
+
+struct punto 
+{
+    int x,y;
+};
+
+void main(int a){
+    int m1[5][2][3];
+    //int m2[3] ={0,1,2};
+    m1[3][2][3] = m2[2][10];    
+    struct punto 
+    {
+        int x,y;
+    };
+    struct punto puntos[3];
+    struct punto mipunto;
+    mipunto.x = 43;
+    mipunto.y = 24;
+    int i;
+    i = 20+10+20;
+}
+
+int routes(char c){
+    double z;
+    b = abs(20);
+    c = -1;
+    e = 10*b;
+    D1_20 = 20-10;
+}
+
+void funcion1(){
+    int a = 10, *p1,**p2,*p3;
+    p1 = &a;
+    p2 = &p1;
+    p3 = p1;
+    a += 1;
+    a -= 1;
+    a *= 1;
+    a /= 1;
+    a %= 1;
+    a <<= 1;
+    a >>= 1;
+    a &= 1;
+    a ^= 1;
+    a |= 1;
+}
+
+void funcion2(){
+    a = "20";
+    if(a==10){
+        int a;
+        goto etiqueta1;
+    }else if(a=="20"){
+        int b;
+    }else{
+        int c = 10;
+    }
+
+    etiqueta1:
+        int a = 10;
+    
+}
+
+char funcion3(){
+    while(a>20){
+        int a;
+    }
+
+    if(a<10){
+        int a;
+    }
+
+    if(b!=10){
+        int c;
+    }
+    else{
+        int q;
+    }
+}
