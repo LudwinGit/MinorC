@@ -1,0 +1,15 @@
+graph {
+	1 [label=int]
+	2 [label=a]
+	3 [label=b]
+	4 [label=c]
+	5 [label=20]
+	6 [label=d]
+	6 -- 5
+	7 [label="Declaración"]
+	7 -- 1
+	7 -- 2
+	7 -- 3
+	7 -- 4
+	7 -- 6
+}
