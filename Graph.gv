@@ -1,15 +1,54 @@
 graph {
 	1 [label=int]
-	2 [label=a]
-	3 [label=b]
-	4 [label=c]
-	5 [label=20]
-	6 [label=d]
-	6 -- 5
+	2 [label=x]
+	3 [label=y]
+	4 [label="Declaración"]
+	4 -- 1
+	4 -- 2
+	4 -- 3
+	5 [label=float]
+	6 [label=f]
 	7 [label="Declaración"]
-	7 -- 1
-	7 -- 2
-	7 -- 3
-	7 -- 4
+	7 -- 5
 	7 -- 6
+	8 [label="Struct: punto"]
+	8 -- 4
+	8 -- 7
+	9 [label=void]
+	10 [label=int]
+	11 [label=a]
+	12 -- 10
+	12 [label=Parametro]
+	12 -- 11
+	13 [label=b]
+	14 [label=Parametro]
+	14 -- 13
+	15 [label=double]
+	16 [label=c]
+	17 -- 15
+	17 [label=Parametro]
+	17 -- 16
+	18 [label=float]
+	19 [label=d]
+	20 -- 18
+	20 [label=Parametro]
+	20 -- 19
+	21 [label=char]
+	22 [label=i]
+	23 -- 21
+	23 [label=Parametro]
+	23 -- 22
+	24 [label=f]
+	25 [label=Parametro]
+	25 -- 24
+	26 [label=Parametros]
+	26 -- 12
+	26 -- 14
+	26 -- 17
+	26 -- 20
+	26 -- 23
+	26 -- 25
+	27 [label="Función:main"]
+	27 -- 9
+	27 -- 26
 }

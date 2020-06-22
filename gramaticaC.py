@@ -189,25 +189,26 @@ def p_lista_instrucciones_instruccion(t):
 def p_instruccion(t):
     '''instruccion              :   instruccion_funcion
                                 |   declaracion_variable
-                                |   definir_stuct'''
+                                |   definir_struct'''
     t[0] = t[1]
 
-def p_definir_stuct(t):
-    '''definir_stuct            :   STRUCT IDENTIFICADOR declaracion_compuesta PUNTOCOMA'''
-    # id = inc()
-    # t[0] = id
-    # dot.node(str(id),"Struct: "+str(t[2]))
-    # for item in t[3]:
-    #     dot.edge(str(id),str(item))
+def p_definir_struct(t):
+    '''definir_struct            :   STRUCT IDENTIFICADOR declaracion_compuesta PUNTOCOMA'''
+    id = inc()
+    t[0] = Struct(id,t.lexer.lineno,t[2],t[3])
+    dot.node(str(id),"Struct: "+str(t[2]))
+    for item in t[3]:
+        dot.edge(str(id),str(item.id_dot))
 
-def p_instruccion_funcion(t):
+def p_instruccion_funcion_con_params(t):
     'instruccion_funcion        :   tipo IDENTIFICADOR ABREPARENTESIS params CIERRAPARENTESIS declaracion_compuesta'
-    # id = inc()
-    # t[0] = id
-    # dot.node(str(id),"Función:"+str(t[2]))
-    # dot.edge(str(id),str(t[1]))
-    # for item in t[6]:
-    #     dot.edge(str(id),str(item))
+    id = inc()
+    t[0] = Funcion(id,t.lexer.lineno,t[1],str(t[2]),t[6],t[4].valor)
+    dot.node(str(id),"Función:"+str(t[2]))
+    dot.edge(str(id),str(t[1].id_dot))
+    dot.edge(str(id),str(t[4].id_dot))
+    for item in t[6]:
+        dot.edge(str(id),str(item.id_dot))
 
 #Sin parametros
 def p_instruccion_funcion_sin_params(t):
@@ -225,9 +226,7 @@ def p_declaracion_compuesta(t):
 
 def p_declaracion_compuesta_empty(t):
     'declaracion_compuesta      :   ABRELLAVE CIERRALLAVE'
-    # id = inc()
-    # t[0] = [id]
-    # dot.node(str(id),"Vacío")
+    t[0] = []
 
 def p_lista_sentencias(t):
     'lista_sentencias           :   lista_sentencias sentencia'
@@ -240,7 +239,7 @@ def p_lista_sentencias_sentencia(t):
 
 def p_sentencia(t):
     '''sentencia                :   declaracion_variable
-                                |   definir_stuct
+                                |   definir_struct
                                 |   declaracion_struct
                                 |   sentencia_asignacion PUNTOCOMA
                                 |   sentencia_asignacion_struct
@@ -289,13 +288,13 @@ def p_lista_identificadores_identificador(t):
 def p_declaracion_identificador(t):
     'declaracion_identificador    :   IDENTIFICADOR'
     id = inc()
-    t[0] = Variable(id,str(t[1]))
+    t[0] = Variable(id,t.lexer.lineno,str(t[1]))
     dot.node(str(id),str(t[1]))
 
 def p_declaracion_identificador_inicializado(t):
     'declaracion_identificador    :   IDENTIFICADOR IGUAL exp'
     id = inc()
-    t[0] = Variable(id,str(t[1]),t[3])
+    t[0] = Variable(id,t.lexer.lineno,str(t[1]),t[3])
     dot.node(str(id),str(t[1]))
     dot.edge(str(id),str(t[3].id_dot))
 
@@ -454,6 +453,9 @@ def p_exp_num(t):
 
 def p_exp_variable(t):
     '''exp                      :   IDENTIFICADOR'''
+    id = inc()
+    t[0] = ExpIdentificador(id,t.lexer.lineno,t[1])
+    dot.node(str(id),t[1])
 
 def p_exp_puntero(t):
     '''exp                      :   AMPERSAN IDENTIFICADOR'''
@@ -490,18 +492,43 @@ def p_exp_struct_arreglo(t):
 
 def p_params(t):
     'params                     :   param_list'
+    id = inc()
+    t[0] = Valor(id,t[1])
+    dot.node(str(id),"Parametros")
+    for item in t[1]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_param_list(t):
     'param_list                 :   param_list COMA param'
+    t[1].append(t[3])
+    t[0] = t[1]
 
 def p_param_list_param(t):
     'param_list                 :   param'
+    t[0] = [t[1]]
 
 def p_param(t):
-    '''param                    :   tipo IDENTIFICADOR
-                                |   IDENTIFICADOR
-                                |   tipo IDENTIFICADOR ABRECORCHETE CIERRACORCHETE
-                                |   exp'''
+    '''param                    :   exp'''
+    id = inc()
+    t[0] = Parametro(id,t.lexer.lineno,t[1])
+    dot.node(str(id),"Parametro")
+    dot.edge(str(id),str(t[1].id_dot))
+
+def p_param_tipo(t):
+    'param                      :   tipo exp'
+    id = inc()
+    t[0] = Parametro(id,t.lexer.lineno,t[2],t[1])
+    dot.edge(str(id),str(t[1].id_dot))
+    dot.node(str(id),"Parametro")
+    dot.edge(str(id),str(t[2].id_dot))
+
+
+# def p_param(t):
+#     '''param                    :   tipo IDENTIFICADOR
+#                                 |   IDENTIFICADOR
+#                                 |   tipo IDENTIFICADOR ABRECORCHETE CIERRACORCHETE
+#                                 |   exp'''
+#     t[0] = t[1]
 
 def p_indices_listado(t):
     'indices                    :   indices indice'
@@ -573,5 +600,4 @@ dot.edge_attr.update(color="blue4")
 def parse(input):
     dot.clear()
     resultado = parser.parse(input)
-    dot.view()
     return resultado

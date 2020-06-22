@@ -1,26 +1,14 @@
-int a,b,c,d=20;
-/*int e,f,g,h=10;
+/*int a,b,c,d;
+int e,f,g,h=10;
 char c;
 double d;
-float f;
-
+float f;*/
 struct punto 
 {
     int x,y;
+    float f;
 };
 
-void main(int a){
-    // int m1[5][2][3];
-    // //int m2[3] ={0,1,2};
-    // m1[3][2][3] = m2[2][10];    
-    struct punto 
-    {
-        int x,y;
-    };
-    // struct punto puntos[3];
-    // struct punto mipunto;
-    // mipunto.x = 43;
-    // mipunto.y = 24;
-    int i;
-    i = 20+10+20;
-}*/
+void main(int a,b,double c, float d,char i,f){
+
+}
