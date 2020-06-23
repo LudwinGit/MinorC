@@ -257,8 +257,8 @@ def p_sentencia(t):
                                 '''
     t[0] = t[1]
 
-def p_declaracion_variable_array(t):
-    'declaracion_variable       :   tipo IDENTIFICADOR ABRECORCHETE CIERRACORCHETE PUNTOCOMA'
+# def p_declaracion_variable_array(t):
+#     'declaracion_variable       :   tipo IDENTIFICADOR ABRECORCHETE CIERRACORCHETE PUNTOCOMA'
 
 def p_declaracion_variable_array(t):
     'declaracion_variable       :   tipo IDENTIFICADOR indices PUNTOCOMA'
@@ -270,8 +270,20 @@ def p_declaracion_variable_array(t):
     for item in t[3]:
         dot.edge(str(id),str(item.id_dot),"indice")
 
+def p_declaracion_variable_array(t):
+    'declaracion_variable       :   tipo IDENTIFICADOR indices IGUAL exp PUNTOCOMA'
+    id = inc()
+    t[0] = DeclaracionArray(id,t.lexer.lineno,t[1].valor,t[2],t[3],t[5])
+    dot.node(str(id),"Declaración array:")
+    dot.edge(str(id),str(t[2]),"tipo")
+    dot.edge(str(id),str(t[1].id_dot),"variable")
+    dot.edge(str(id),str(t[5].id_dot),"valor")
+    for item in t[3]:
+        dot.edge(str(id),str(item.id_dot),"indice")
+
 def p_declaracion_variable_array_inicializado(t):
     'declaracion_variable       :   tipo IDENTIFICADOR indices IGUAL ABRELLAVE lista_expresiones CIERRALLAVE PUNTOCOMA'
+    print(3)
     id = inc()
     t[0] = DeclaracionArray(id,t.lexer.lineno,t[1].valor,t[2],t[3],t[6])
     dot.node(str(id),"Declaración array:")
@@ -790,6 +802,11 @@ def p_indice(t):
     'indice                     :   ABRECORCHETE exp  CIERRACORCHETE'
     t[0] = t[2]
     # addGramatical('indice -> ABRECORCHETE expresion_general CIERRACORCHETE')
+
+def p_indice_empty(t):
+    'indice                     :   ABRECORCHETE CIERRACORCHETE'
+    id = inc()
+    t[0] = Valor(id,"Vacío")
 
 def p_tipo(t):
     '''tipo                     :   INT
