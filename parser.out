@@ -65,8 +65,8 @@ Rule 48    ifelse -> ELSE IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_com
 Rule 49    sentencia_for -> FOR ABREPARENTESIS sentencia exp PUNTOCOMA sentencia_asignacion CIERRAPARENTESIS declaracion_compuesta
 Rule 50    declaracion_struct -> STRUCT IDENTIFICADOR IDENTIFICADOR PUNTOCOMA
 Rule 51    declaracion_struct -> STRUCT IDENTIFICADOR IDENTIFICADOR indices PUNTOCOMA
-Rule 52    sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
-Rule 53    sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
+Rule 52    sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
+Rule 53    sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
 Rule 54    sentencia_etiqueta -> IDENTIFICADOR DOSPUNTOS
 Rule 55    sentencia_goto -> GOTO IDENTIFICADOR PUNTOCOMA
 Rule 56    sentencia_switch -> SWITCH ABREPARENTESIS exp CIERRAPARENTESIS ABRELLAVE cases CIERRALLAVE
@@ -194,7 +194,7 @@ FOR                  : 49
 GOTO                 : 55
 IDENTIFICADOR        : 7 8 9 30 35 36 37 38 39 40 50 50 51 51 52 52 53 53 54 55 98 99 100 103 104 107 107 108 108 122
 IF                   : 43 44 48
-IGUAL                : 36 52 53 127
+IGUAL                : 36 127
 INCREMENTO           : 128
 INT                  : 117 123
 LEFTSHIFTAND         : 133
@@ -234,7 +234,7 @@ error                :
 
 Nonterminals, with rules where they appear
 
-asignacion_compuesta : 39 40
+asignacion_compuesta : 39 40 52 53
 case                 : 68 69
 cases                : 56
 declaracion_compuesta : 7 8 9 41 42 43 44 47 48 49
@@ -960,8 +960,8 @@ state 32
     (51) declaracion_struct -> . STRUCT IDENTIFICADOR IDENTIFICADOR indices PUNTOCOMA
     (39) sentencia_asignacion -> . IDENTIFICADOR asignacion_compuesta exp
     (40) sentencia_asignacion -> . IDENTIFICADOR indices asignacion_compuesta exp
-    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
-    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
     (41) sentencia_while -> . WHILE ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
     (42) sentencia_dowhile -> . DO declaracion_compuesta WHILE ABREPARENTESIS exp CIERRAPARENTESIS PUNTOCOMA
     (43) sentencia_if -> . IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
@@ -1868,8 +1868,8 @@ state 59
     (51) declaracion_struct -> . STRUCT IDENTIFICADOR IDENTIFICADOR indices PUNTOCOMA
     (39) sentencia_asignacion -> . IDENTIFICADOR asignacion_compuesta exp
     (40) sentencia_asignacion -> . IDENTIFICADOR indices asignacion_compuesta exp
-    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
-    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
     (41) sentencia_while -> . WHILE ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
     (42) sentencia_dowhile -> . DO declaracion_compuesta WHILE ABREPARENTESIS exp CIERRAPARENTESIS PUNTOCOMA
     (43) sentencia_if -> . IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
@@ -2562,8 +2562,8 @@ state 79
 
     (39) sentencia_asignacion -> IDENTIFICADOR . asignacion_compuesta exp
     (40) sentencia_asignacion -> IDENTIFICADOR . indices asignacion_compuesta exp
-    (52) sentencia_asignacion_struct -> IDENTIFICADOR . PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
-    (53) sentencia_asignacion_struct -> IDENTIFICADOR . indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> IDENTIFICADOR . PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> IDENTIFICADOR . indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
     (54) sentencia_etiqueta -> IDENTIFICADOR . DOSPUNTOS
     (122) tipo -> IDENTIFICADOR .
     (127) asignacion_compuesta -> . IGUAL
@@ -2582,10 +2582,10 @@ state 79
     (116) indice -> . ABRECORCHETE exp CIERRACORCHETE
 
     PUNTO           shift and go to state 137
-    DOSPUNTOS       shift and go to state 139
+    DOSPUNTOS       shift and go to state 138
     IDENTIFICADOR   reduce using rule 122 (tipo -> IDENTIFICADOR .)
     MUL             reduce using rule 122 (tipo -> IDENTIFICADOR .)
-    IGUAL           shift and go to state 138
+    IGUAL           shift and go to state 139
     INCREMENTO      shift and go to state 140
     DECREMENTO      shift and go to state 141
     MULTIPLYAND     shift and go to state 142
@@ -4795,7 +4795,7 @@ state 135
 state 136
 
     (40) sentencia_asignacion -> IDENTIFICADOR indices . asignacion_compuesta exp
-    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices . PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices . PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
     (114) indices -> indices . indice
     (127) asignacion_compuesta -> . IGUAL
     (128) asignacion_compuesta -> . INCREMENTO
@@ -4811,7 +4811,7 @@ state 136
     (116) indice -> . ABRECORCHETE exp CIERRACORCHETE
 
     PUNTO           shift and go to state 193
-    IGUAL           shift and go to state 138
+    IGUAL           shift and go to state 139
     INCREMENTO      shift and go to state 140
     DECREMENTO      shift and go to state 141
     MULTIPLYAND     shift and go to state 142
@@ -4829,29 +4829,12 @@ state 136
 
 state 137
 
-    (52) sentencia_asignacion_struct -> IDENTIFICADOR PUNTO . IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> IDENTIFICADOR PUNTO . IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
 
     IDENTIFICADOR   shift and go to state 194
 
 
 state 138
-
-    (127) asignacion_compuesta -> IGUAL .
-
-    MENOS           reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-    ABS             reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-    NOT             reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-    NOTBIT          reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-    ABREPARENTESIS  reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-    ENTERO          reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-    DECIMAL         reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-    IDENTIFICADOR   reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-    AMPERSAN        reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-    SIZEOF          reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-    CADENA          reduce using rule 127 (asignacion_compuesta -> IGUAL .)
-
-
-state 139
 
     (54) sentencia_etiqueta -> IDENTIFICADOR DOSPUNTOS .
 
@@ -4885,6 +4868,23 @@ state 139
     CADENA          reduce using rule 54 (sentencia_etiqueta -> IDENTIFICADOR DOSPUNTOS .)
     DEFAULT         reduce using rule 54 (sentencia_etiqueta -> IDENTIFICADOR DOSPUNTOS .)
     CASE            reduce using rule 54 (sentencia_etiqueta -> IDENTIFICADOR DOSPUNTOS .)
+
+
+state 139
+
+    (127) asignacion_compuesta -> IGUAL .
+
+    MENOS           reduce using rule 127 (asignacion_compuesta -> IGUAL .)
+    ABS             reduce using rule 127 (asignacion_compuesta -> IGUAL .)
+    NOT             reduce using rule 127 (asignacion_compuesta -> IGUAL .)
+    NOTBIT          reduce using rule 127 (asignacion_compuesta -> IGUAL .)
+    ABREPARENTESIS  reduce using rule 127 (asignacion_compuesta -> IGUAL .)
+    ENTERO          reduce using rule 127 (asignacion_compuesta -> IGUAL .)
+    DECIMAL         reduce using rule 127 (asignacion_compuesta -> IGUAL .)
+    IDENTIFICADOR   reduce using rule 127 (asignacion_compuesta -> IGUAL .)
+    AMPERSAN        reduce using rule 127 (asignacion_compuesta -> IGUAL .)
+    SIZEOF          reduce using rule 127 (asignacion_compuesta -> IGUAL .)
+    CADENA          reduce using rule 127 (asignacion_compuesta -> IGUAL .)
 
 
 state 140
@@ -5214,8 +5214,8 @@ state 154
     (51) declaracion_struct -> . STRUCT IDENTIFICADOR IDENTIFICADOR indices PUNTOCOMA
     (39) sentencia_asignacion -> . IDENTIFICADOR asignacion_compuesta exp
     (40) sentencia_asignacion -> . IDENTIFICADOR indices asignacion_compuesta exp
-    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
-    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
     (41) sentencia_while -> . WHILE ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
     (42) sentencia_dowhile -> . DO declaracion_compuesta WHILE ABREPARENTESIS exp CIERRAPARENTESIS PUNTOCOMA
     (43) sentencia_if -> . IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
@@ -7613,17 +7613,39 @@ state 192
 
 state 193
 
-    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO . IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO . IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
 
     IDENTIFICADOR   shift and go to state 214
 
 
 state 194
 
-    (52) sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR . IGUAL exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR . asignacion_compuesta exp PUNTOCOMA
+    (127) asignacion_compuesta -> . IGUAL
+    (128) asignacion_compuesta -> . INCREMENTO
+    (129) asignacion_compuesta -> . DECREMENTO
+    (130) asignacion_compuesta -> . MULTIPLYAND
+    (131) asignacion_compuesta -> . DIVIDEAND
+    (132) asignacion_compuesta -> . MODULUSAND
+    (133) asignacion_compuesta -> . LEFTSHIFTAND
+    (134) asignacion_compuesta -> . RIGHTSHIFTAND
+    (135) asignacion_compuesta -> . BITWISEAND
+    (136) asignacion_compuesta -> . BITWISEEXCLUSIVE
+    (137) asignacion_compuesta -> . BITWISEINCLUSIVE
 
-    IGUAL           shift and go to state 215
+    IGUAL           shift and go to state 139
+    INCREMENTO      shift and go to state 140
+    DECREMENTO      shift and go to state 141
+    MULTIPLYAND     shift and go to state 142
+    DIVIDEAND       shift and go to state 143
+    MODULUSAND      shift and go to state 144
+    LEFTSHIFTAND    shift and go to state 145
+    RIGHTSHIFTAND   shift and go to state 146
+    BITWISEAND      shift and go to state 147
+    BITWISEEXCLUSIVE shift and go to state 148
+    BITWISEINCLUSIVE shift and go to state 149
 
+    asignacion_compuesta           shift and go to state 215
 
 state 195
 
@@ -8308,14 +8330,36 @@ state 213
 
 state 214
 
-    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR . IGUAL exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR . asignacion_compuesta exp PUNTOCOMA
+    (127) asignacion_compuesta -> . IGUAL
+    (128) asignacion_compuesta -> . INCREMENTO
+    (129) asignacion_compuesta -> . DECREMENTO
+    (130) asignacion_compuesta -> . MULTIPLYAND
+    (131) asignacion_compuesta -> . DIVIDEAND
+    (132) asignacion_compuesta -> . MODULUSAND
+    (133) asignacion_compuesta -> . LEFTSHIFTAND
+    (134) asignacion_compuesta -> . RIGHTSHIFTAND
+    (135) asignacion_compuesta -> . BITWISEAND
+    (136) asignacion_compuesta -> . BITWISEEXCLUSIVE
+    (137) asignacion_compuesta -> . BITWISEINCLUSIVE
 
-    IGUAL           shift and go to state 226
+    IGUAL           shift and go to state 139
+    INCREMENTO      shift and go to state 140
+    DECREMENTO      shift and go to state 141
+    MULTIPLYAND     shift and go to state 142
+    DIVIDEAND       shift and go to state 143
+    MODULUSAND      shift and go to state 144
+    LEFTSHIFTAND    shift and go to state 145
+    RIGHTSHIFTAND   shift and go to state 146
+    BITWISEAND      shift and go to state 147
+    BITWISEEXCLUSIVE shift and go to state 148
+    BITWISEINCLUSIVE shift and go to state 149
 
+    asignacion_compuesta           shift and go to state 226
 
 state 215
 
-    (52) sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL . exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta . exp PUNTOCOMA
     (72) exp -> . exp MAS exp
     (73) exp -> . exp MENOS exp
     (74) exp -> . exp MUL exp
@@ -8703,7 +8747,7 @@ state 225
 
 state 226
 
-    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL . exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta . exp PUNTOCOMA
     (72) exp -> . exp MAS exp
     (73) exp -> . exp MENOS exp
     (74) exp -> . exp MUL exp
@@ -8758,7 +8802,7 @@ state 226
 
 state 227
 
-    (52) sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp . PUNTOCOMA
+    (52) sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp . PUNTOCOMA
     (72) exp -> exp . MAS exp
     (73) exp -> exp . MENOS exp
     (74) exp -> exp . MUL exp
@@ -9041,7 +9085,7 @@ state 235
 
 state 236
 
-    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp . PUNTOCOMA
+    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp . PUNTOCOMA
     (72) exp -> exp . MAS exp
     (73) exp -> exp . MENOS exp
     (74) exp -> exp . MUL exp
@@ -9088,38 +9132,38 @@ state 236
 
 state 237
 
-    (52) sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .
+    (52) sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .
 
-    CIERRALLAVE     reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    STRUCT          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    IDENTIFICADOR   reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    WHILE           reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    DO              reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    IF              reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    FOR             reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    GOTO            reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    SWITCH          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    BREAK           reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    CONTINUE        reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    RETURN          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    PRINTF          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    INT             reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    VOID            reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    CHAR            reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    DOUBLE          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    FLOAT           reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    MENOS           reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    ABS             reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    NOT             reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    NOTBIT          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    ABREPARENTESIS  reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    ENTERO          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    DECIMAL         reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    AMPERSAN        reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    SIZEOF          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    CADENA          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    DEFAULT         reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    CASE            reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
+    CIERRALLAVE     reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    STRUCT          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    IDENTIFICADOR   reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    WHILE           reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    DO              reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    IF              reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    FOR             reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    GOTO            reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    SWITCH          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    BREAK           reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    CONTINUE        reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    RETURN          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    PRINTF          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    INT             reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    VOID            reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    CHAR            reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    DOUBLE          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    FLOAT           reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    MENOS           reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    ABS             reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    NOT             reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    NOTBIT          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    ABREPARENTESIS  reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    ENTERO          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    DECIMAL         reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    AMPERSAN        reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    SIZEOF          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    CADENA          reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    DEFAULT         reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    CASE            reduce using rule 52 (sentencia_asignacion_struct -> IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
 
 
 state 238
@@ -9245,7 +9289,7 @@ state 243
     (115) indices -> . indice
     (116) indice -> . ABRECORCHETE exp CIERRACORCHETE
 
-    IGUAL           shift and go to state 138
+    IGUAL           shift and go to state 139
     INCREMENTO      shift and go to state 140
     DECREMENTO      shift and go to state 141
     MULTIPLYAND     shift and go to state 142
@@ -9364,38 +9408,38 @@ state 249
 
 state 250
 
-    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .
+    (53) sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .
 
-    CIERRALLAVE     reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    STRUCT          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    IDENTIFICADOR   reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    WHILE           reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    DO              reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    IF              reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    FOR             reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    GOTO            reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    SWITCH          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    BREAK           reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    CONTINUE        reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    RETURN          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    PRINTF          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    INT             reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    VOID            reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    CHAR            reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    DOUBLE          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    FLOAT           reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    MENOS           reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    ABS             reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    NOT             reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    NOTBIT          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    ABREPARENTESIS  reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    ENTERO          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    DECIMAL         reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    AMPERSAN        reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    SIZEOF          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    CADENA          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    DEFAULT         reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
-    CASE            reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA .)
+    CIERRALLAVE     reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    STRUCT          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    IDENTIFICADOR   reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    WHILE           reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    DO              reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    IF              reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    FOR             reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    GOTO            reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    SWITCH          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    BREAK           reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    CONTINUE        reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    RETURN          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    PRINTF          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    INT             reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    VOID            reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    CHAR            reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    DOUBLE          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    FLOAT           reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    MENOS           reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    ABS             reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    NOT             reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    NOTBIT          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    ABREPARENTESIS  reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    ENTERO          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    DECIMAL         reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    AMPERSAN        reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    SIZEOF          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    CADENA          reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    DEFAULT         reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
+    CASE            reduce using rule 53 (sentencia_asignacion_struct -> IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA .)
 
 
 state 251
@@ -9542,7 +9586,7 @@ state 256
     (137) asignacion_compuesta -> . BITWISEINCLUSIVE
     (116) indice -> . ABRECORCHETE exp CIERRACORCHETE
 
-    IGUAL           shift and go to state 138
+    IGUAL           shift and go to state 139
     INCREMENTO      shift and go to state 140
     DECREMENTO      shift and go to state 141
     MULTIPLYAND     shift and go to state 142
@@ -9638,8 +9682,8 @@ state 260
     (51) declaracion_struct -> . STRUCT IDENTIFICADOR IDENTIFICADOR indices PUNTOCOMA
     (39) sentencia_asignacion -> . IDENTIFICADOR asignacion_compuesta exp
     (40) sentencia_asignacion -> . IDENTIFICADOR indices asignacion_compuesta exp
-    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
-    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
     (41) sentencia_while -> . WHILE ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
     (42) sentencia_dowhile -> . DO declaracion_compuesta WHILE ABREPARENTESIS exp CIERRAPARENTESIS PUNTOCOMA
     (43) sentencia_if -> . IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
@@ -9862,8 +9906,8 @@ state 264
     (51) declaracion_struct -> . STRUCT IDENTIFICADOR IDENTIFICADOR indices PUNTOCOMA
     (39) sentencia_asignacion -> . IDENTIFICADOR asignacion_compuesta exp
     (40) sentencia_asignacion -> . IDENTIFICADOR indices asignacion_compuesta exp
-    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
-    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
     (41) sentencia_while -> . WHILE ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
     (42) sentencia_dowhile -> . DO declaracion_compuesta WHILE ABREPARENTESIS exp CIERRAPARENTESIS PUNTOCOMA
     (43) sentencia_if -> . IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
@@ -9949,8 +9993,8 @@ state 265
     (51) declaracion_struct -> . STRUCT IDENTIFICADOR IDENTIFICADOR indices PUNTOCOMA
     (39) sentencia_asignacion -> . IDENTIFICADOR asignacion_compuesta exp
     (40) sentencia_asignacion -> . IDENTIFICADOR indices asignacion_compuesta exp
-    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
-    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
     (41) sentencia_while -> . WHILE ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
     (42) sentencia_dowhile -> . DO declaracion_compuesta WHILE ABREPARENTESIS exp CIERRAPARENTESIS PUNTOCOMA
     (43) sentencia_if -> . IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
@@ -10082,8 +10126,8 @@ state 267
     (51) declaracion_struct -> . STRUCT IDENTIFICADOR IDENTIFICADOR indices PUNTOCOMA
     (39) sentencia_asignacion -> . IDENTIFICADOR asignacion_compuesta exp
     (40) sentencia_asignacion -> . IDENTIFICADOR indices asignacion_compuesta exp
-    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
-    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA
+    (52) sentencia_asignacion_struct -> . IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
+    (53) sentencia_asignacion_struct -> . IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA
     (41) sentencia_while -> . WHILE ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta
     (42) sentencia_dowhile -> . DO declaracion_compuesta WHILE ABREPARENTESIS exp CIERRAPARENTESIS PUNTOCOMA
     (43) sentencia_if -> . IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta

@@ -1,54 +1,408 @@
 graph {
 	1 [label=int]
 	2 [label=x]
-	3 [label=y]
-	4 [label="Declaración"]
-	4 -- 1
-	4 -- 2
+	3 [label=20]
+	4 [label=y]
 	4 -- 3
-	5 [label=float]
-	6 [label=f]
-	7 [label="Declaración"]
-	7 -- 5
-	7 -- 6
-	8 [label="Struct: punto"]
-	8 -- 4
+	5 [label="Declaración"]
+	5 -- 1
+	5 -- 2
+	5 -- 4
+	6 [label=float]
+	7 [label=f]
+	8 [label="Declaración"]
+	8 -- 6
 	8 -- 7
-	9 [label=void]
-	10 [label=int]
-	11 [label=a]
-	12 -- 10
-	12 [label=Parametro]
-	12 -- 11
-	13 [label=b]
-	14 [label=Parametro]
-	14 -- 13
-	15 [label=double]
-	16 [label=c]
-	17 -- 15
-	17 [label=Parametro]
-	17 -- 16
-	18 [label=float]
-	19 [label=d]
-	20 -- 18
-	20 [label=Parametro]
-	20 -- 19
-	21 [label=char]
-	22 [label=i]
-	23 -- 21
-	23 [label=Parametro]
-	23 -- 22
-	24 [label=f]
-	25 [label=Parametro]
-	25 -- 24
-	26 [label=Parametros]
-	26 -- 12
-	26 -- 14
-	26 -- 17
-	26 -- 20
-	26 -- 23
+	9 [label="Struct: punto"]
+	9 -- 5
+	9 -- 8
+	10 [label=void]
+	11 [label=int]
+	12 [label=a]
+	13 -- 11
+	13 [label=Parametro]
+	13 -- 12
+	14 [label=b]
+	15 [label=Parametro]
+	15 -- 14
+	16 [label=double]
+	17 [label=c]
+	18 -- 16
+	18 [label=Parametro]
+	18 -- 17
+	19 [label=float]
+	20 [label=d]
+	21 -- 19
+	21 [label=Parametro]
+	21 -- 20
+	22 [label=char]
+	23 [label=i]
+	24 -- 22
+	24 [label=Parametro]
+	24 -- 23
+	25 [label=f]
+	26 [label=Parametro]
 	26 -- 25
-	27 [label="Función:main"]
-	27 -- 9
+	27 [label=Parametros]
+	27 -- 13
+	27 -- 15
+	27 -- 18
+	27 -- 21
+	27 -- 24
 	27 -- 26
+	28 [label=int]
+	29 [label=5]
+	30 [label=2]
+	31 [label=3]
+	32 [label="Declaración array:"]
+	32 -- m1
+	32 -- 28
+	32 -- 29
+	32 -- 30
+	32 -- 31
+	33 [label=3]
+	34 [label=2]
+	35 [label=3]
+	36 [label="+="]
+	37 [label=2]
+	38 [label=10]
+	39 [label="Array: m2"]
+	39 -- 37
+	39 -- 38
+	40 [label="Asignación Array"]
+	40 -- 33
+	40 -- 34
+	40 -- 35
+	40 -- 36
+	40 -- 39
+	41 [label="="]
+	42 [label=20]
+	43 [label="Asignación: a"]
+	43 -- 41
+	43 -- 42
+	44 [label=int]
+	45 [label=x]
+	46 [label=y]
+	47 [label="Declaración"]
+	47 -- 44
+	47 -- 45
+	47 -- 46
+	48 [label="Struct: punto"]
+	48 -- 47
+	49 [label="Asignacion Struct"]
+	49 -- punto
+	49 -- mipunto
+	50 [label=3]
+	51 [label=5]
+	52 [label="Asignacion Struct"]
+	52 -- punto
+	52 -- puntos
+	52 -- 50
+	52 -- 51
+	53 [label="+="]
+	54 [label=43]
+	55 -- 54
+	55 -- 53
+	55 [label="Asignacion struct"]
+	55 -- "mipunto.x"
+	56 [label="="]
+	57 [label=24]
+	58 -- 57
+	58 -- 56
+	58 [label="Asignacion struct"]
+	58 -- "mipunto.y"
+	59 [label=int]
+	60 [label=i]
+	61 [label="Declaración"]
+	61 -- 59
+	61 -- 60
+	62 [label="="]
+	63 [label=20]
+	64 [label=10]
+	65 -- 63
+	65 [label="+"]
+	65 -- 64
+	66 [label=10]
+	67 [label=20]
+	68 -- 66
+	68 [label="*"]
+	68 -- 67
+	69 [label=30]
+	70 -- 68
+	70 [label="/"]
+	70 -- 69
+	71 -- 65
+	71 [label="-"]
+	71 -- 70
+	72 [label=20]
+	73 -- 71
+	73 [label="%"]
+	73 -- 72
+	74 [label="Asignación: i"]
+	74 -- 62
+	74 -- 73
+	75 [label="Función: main"]
+	75 -- 10
+	75 -- 27
+	75 -- 32
+	75 -- 40
+	75 -- 43
+	75 -- 48
+	75 -- 49
+	75 -- 52
+	75 -- 55
+	75 -- 58
+	75 -- 61
+	75 -- 74
+	76 [label=int]
+	77 [label=char]
+	78 [label=c]
+	79 -- 77
+	79 [label=Parametro]
+	79 -- 78
+	80 [label=Parametros]
+	80 -- 79
+	81 [label=double]
+	82 [label=z]
+	83 [label="Declaración"]
+	83 -- 81
+	83 -- 82
+	84 [label="="]
+	85 [label=20]
+	86 [label=ABS]
+	86 -- 85
+	87 [label="Asignación: b"]
+	87 -- 84
+	87 -- 86
+	88 [label="="]
+	89 [label=1]
+	90 [label="-"]
+	90 -- 89
+	91 [label="Asignación: c"]
+	91 -- 88
+	91 -- 90
+	92 [label="="]
+	93 [label=10]
+	94 [label=b]
+	95 -- 93
+	95 [label="*"]
+	95 -- 94
+	96 [label="Asignación: e"]
+	96 -- 92
+	96 -- 95
+	97 [label="="]
+	98 [label=20]
+	99 [label=10]
+	100 -- 98
+	100 [label="-"]
+	100 -- 99
+	101 [label="Asignación: D1_20"]
+	101 -- 97
+	101 -- 100
+	102 [label="Función: routes"]
+	102 -- 76
+	102 -- 80
+	102 -- 83
+	102 -- 87
+	102 -- 91
+	102 -- 96
+	102 -- 101
+	103 [label=void]
+	104 [label=int]
+	105 [label=10]
+	106 [label=a]
+	106 -- 105
+	107 [label="Declaración"]
+	107 -- 104
+	107 -- 106
+	108 [label="="]
+	109 [label="&"]
+	109 -- a
+	110 [label="Asignación: p1"]
+	110 -- 108
+	110 -- 109
+	111 [label="="]
+	112 [label="&"]
+	112 -- p1
+	113 [label="Asignación: p2"]
+	113 -- 111
+	113 -- 112
+	114 [label="="]
+	115 [label=p1]
+	116 [label="Asignación: p3"]
+	116 -- 114
+	116 -- 115
+	117 [label="+="]
+	118 [label=1]
+	119 [label="Asignación: a"]
+	119 -- 117
+	119 -- 118
+	120 [label="-="]
+	121 [label=1]
+	122 [label="Asignación: a"]
+	122 -- 120
+	122 -- 121
+	123 [label="*="]
+	124 [label=1]
+	125 [label="Asignación: a"]
+	125 -- 123
+	125 -- 124
+	126 [label="/="]
+	127 [label=1]
+	128 [label="Asignación: a"]
+	128 -- 126
+	128 -- 127
+	129 [label="%="]
+	130 [label=1]
+	131 [label="Asignación: a"]
+	131 -- 129
+	131 -- 130
+	132 [label="<<="]
+	133 [label=1]
+	134 [label="Asignación: a"]
+	134 -- 132
+	134 -- 133
+	135 [label=">>="]
+	136 [label=1]
+	137 [label="Asignación: a"]
+	137 -- 135
+	137 -- 136
+	138 [label="&="]
+	139 [label=1]
+	140 [label="Asignación: a"]
+	140 -- 138
+	140 -- 139
+	141 [label="^="]
+	142 [label=1]
+	143 [label="Asignación: a"]
+	143 -- 141
+	143 -- 142
+	144 [label="|="]
+	145 [label=1]
+	146 [label="Asignación: a"]
+	146 -- 144
+	146 -- 145
+	147 [label="Función: funcion1"]
+	147 -- 103
+	147 -- 107
+	147 -- 110
+	147 -- 113
+	147 -- 116
+	147 -- 119
+	147 -- 122
+	147 -- 125
+	147 -- 128
+	147 -- 131
+	147 -- 134
+	147 -- 137
+	147 -- 140
+	147 -- 143
+	147 -- 146
+	148 [label=void]
+	149 [label="="]
+	150 [label=20]
+	151 [label="Asignación: a"]
+	151 -- 149
+	151 -- 150
+	152 [label=a]
+	153 [label=10]
+	154 -- 152
+	154 [label="=="]
+	154 -- 153
+	155 [label=int]
+	156 [label=a]
+	157 [label="Declaración"]
+	157 -- 155
+	157 -- 156
+	158 [label=a]
+	159 [label=20]
+	160 -- 158
+	160 [label="=="]
+	160 -- 159
+	161 [label=int]
+	162 [label=b]
+	163 [label="Declaración"]
+	163 -- 161
+	163 -- 162
+	164 [label="Else If"]
+	164 -- 160
+	164 -- 163
+	165 [label=a]
+	166 [label=30]
+	167 -- 165
+	167 [label="=="]
+	167 -- 166
+	168 [label=int]
+	169 [label=c]
+	170 [label="Declaración"]
+	170 -- 168
+	170 -- 169
+	171 [label="Else If"]
+	171 -- 167
+	171 -- 170
+	172 [label=int]
+	173 [label=10]
+	174 [label=c]
+	174 -- 173
+	175 [label="Declaración"]
+	175 -- 172
+	175 -- 174
+	176 [label=Else]
+	176 -- 175
+	177 [label=IF]
+	177 -- 154
+	177 -- 157
+	178 [label="IF-ELSE"]
+	178 -- 164
+	178 -- 171
+	178 -- 176
+	178 -- 177
+	179 [label=a]
+	180 [label=30]
+	181 -- 179
+	181 [label="=="]
+	181 -- 180
+	182 [label=int]
+	183 [label=b]
+	184 [label="Declaración"]
+	184 -- 182
+	184 -- 183
+	185 [label=int]
+	186 [label=f]
+	187 [label="Declaración"]
+	187 -- 185
+	187 -- 186
+	188 [label=Else]
+	188 -- 187
+	189 [label=IF]
+	189 -- 181
+	189 -- 184
+	190 [label="IF-ELSE"]
+	190 -- 188
+	190 -- 189
+	191 [label=a]
+	192 [label=40]
+	193 -- 191
+	193 [label="=="]
+	193 -- 192
+	194 [label=int]
+	195 [label=e]
+	196 [label="Declaración"]
+	196 -- 194
+	196 -- 195
+	197 [label=IF]
+	197 -- 193
+	197 -- 196
+	198 [label="Función: funcion2"]
+	198 -- 148
+	198 -- 151
+	198 -- 178
+	198 -- 190
+	198 -- 197
+	199 [label=Inicio]
+	199 -- 9
+	199 -- 75
+	199 -- 102
+	199 -- 147
+	199 -- 198
 }

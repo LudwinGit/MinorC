@@ -26,5 +26,7 @@ class Analizador:
         return None
 
     def procesar_funcion(self,instruccion):
-        for parametro in instruccion.parametros:
-            print(parametro.identificador)
+        if instruccion.parametros != None:
+            print(".....")
+            # for parametro in instruccion.parametros:
+            #     print(parametro.identificador)

@@ -171,11 +171,11 @@ from expresiones import *
 
 def p_inicio(t):
     'inicio                     :   lista_instrucciones'
-    # id =  inc()
+    id =  inc()
     t[0] = t[1]
-    # dot.node(str(id),"Inicio")
-    # for item in t[1]:
-    #     dot.edge(str(id),str(item))
+    dot.node(str(id),"Inicio")
+    for item in t[1]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_lista_instrucciones(t):
     'lista_instrucciones        :   lista_instrucciones instruccion'
@@ -204,7 +204,7 @@ def p_instruccion_funcion_con_params(t):
     'instruccion_funcion        :   tipo IDENTIFICADOR ABREPARENTESIS params CIERRAPARENTESIS declaracion_compuesta'
     id = inc()
     t[0] = Funcion(id,t.lexer.lineno,t[1],str(t[2]),t[6],t[4].valor)
-    dot.node(str(id),"Función:"+str(t[2]))
+    dot.node(str(id),"Función: "+str(t[2]))
     dot.edge(str(id),str(t[1].id_dot))
     dot.edge(str(id),str(t[4].id_dot))
     for item in t[6]:
@@ -213,12 +213,12 @@ def p_instruccion_funcion_con_params(t):
 #Sin parametros
 def p_instruccion_funcion_sin_params(t):
     'instruccion_funcion        :   tipo IDENTIFICADOR ABREPARENTESIS CIERRAPARENTESIS declaracion_compuesta'
-    # id = inc()
-    # t[0] = id
-    # dot.node(str(id),"Función:"+str(t[2]))
-    # dot.edge(str(id),str(t[1]))
-    # for item in t[5]:
-    #     dot.edge(str(id),str(item))
+    id = inc()
+    t[0] = Funcion(id,t.lexer.lineno,t[1],str(t[2]),t[5])
+    dot.node(str(id),"Función: "+str(t[2]))
+    dot.edge(str(id),str(t[1].id_dot))
+    for item in t[5]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_declaracion_compuesta(t):
     'declaracion_compuesta      :   ABRELLAVE lista_sentencias CIERRALLAVE'
@@ -262,6 +262,13 @@ def p_declaracion_variable_array(t):
 
 def p_declaracion_variable_array(t):
     'declaracion_variable       :   tipo IDENTIFICADOR indices PUNTOCOMA'
+    id = inc()
+    t[0] = DeclaracionArray(id,t.lexer.lineno,t[1].valor,t[2],t[3])
+    dot.node(str(id),"Declaración array:")
+    dot.edge(str(id),str(t[2]))
+    dot.edge(str(id),str(t[1].id_dot))
+    for item in t[3]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_multiple_declaracion(t):
     'declaracion_variable       :   tipo identificadores PUNTOCOMA'
@@ -304,15 +311,21 @@ def p_declaracion_identificador_puntero(t):
 
 def p_sentencia_asignacion(t):
     'sentencia_asignacion       :   IDENTIFICADOR asignacion_compuesta exp'
-    # id = inc()
-    # t[0] = id
-    # dot.edge(str(id),str(t[1]))
-    # dot.node(str(id),"Asignación")
-    # dot.edge(str(id),str(t[2]))
-    # dot.edge(str(id),str(t[3]))
+    id = inc()
+    t[0] = Asignacion(id,t.lexer.lineno,t[1],t[2].valor,t[3])
+    dot.node(str(id),"Asignación: "+str(t[1]))
+    dot.edge(str(id),str(t[2].id_dot))
+    dot.edge(str(id),str(t[3].id_dot))
 
 def p_sentencia_asignacion_arreglo(t):
     'sentencia_asignacion       :   IDENTIFICADOR indices asignacion_compuesta exp'
+    id = inc()
+    t[0] = AsignacionArray(id,t.lexer.lineno,t[1],t[3].valor,t[2],t[4])
+    dot.node(str(id),"Asignación Array")
+    for item in t[2]:
+        dot.edge(str(id),str(item.id_dot))
+    dot.edge(str(id),str(t[3].id_dot))
+    dot.edge(str(id),str(t[4].id_dot))
 
 def p_sentencia_while(t):
     'sentencia_while            :   WHILE ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
@@ -322,36 +335,86 @@ def p_sentencia_dowhile(t):
 
 def p_sentencia_if(t):
     'sentencia_if               :   IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
+    id = inc()
+    t[0] = If(id,t.lexer.lineno,t[3],t[5])
+    dot.node(str(id),"IF")
+    dot.edge(str(id),str(t[3].id_dot))
+    for item in t[5]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_sentencia_else(t):
     'sentencia_if               :   IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta listado_else'
+    id = inc()
+    t[6].append(If(id,t.lexer.lineno,t[3],t[5]))
+    dot.node(str(id),"IF")
+    dot.edge(str(id),str(t[3].id_dot))
+    for item in t[5]:
+        dot.edge(str(id),str(item.id_dot))
+
+    id = inc()
+    t[0] = Ifelse(id,t.lexer.lineno,t[6])
+    dot.node(str(id),"IF-ELSE")
+    for item in t[6]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_listado_else(t):
     'listado_else               :   listado_else  ifelse'
+    t[1].append(t[2])
+    t[0] = t[1]
 
 def p_listado_else_(t):
     'listado_else               :   ifelse'
+    t[0] = [t[1]]
 
 def p_ifelse(t):
     'ifelse                     :   ELSE declaracion_compuesta'
+    id = inc()
+    t[0] = If(id,t.lexer.lineno,None,t[2])
+    dot.node(str(id),"Else")
+    for item in t[2]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_ifelse_(t):
     'ifelse                     :   ELSE IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
+    id = inc()
+    t[0] = If(id,t.lexer.lineno,t[4],t[6])
+    dot.node(str(id),"Else If")
+    dot.edge(str(id),str(t[4].id_dot))
+    for item in t[6]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_sentencia_for(t):
     'sentencia_for              :   FOR ABREPARENTESIS sentencia exp PUNTOCOMA sentencia_asignacion CIERRAPARENTESIS declaracion_compuesta'
 
 def p_declaracion_struct(t):
     'declaracion_struct         :   STRUCT IDENTIFICADOR IDENTIFICADOR PUNTOCOMA'
+    id = inc()
+    t[0] = DeclaracionStruct(id,t.lexer.lineno,t[3],t[2])
+    dot.node(str(id),"Asignacion Struct")
+    dot.edge(str(id),str(t[2]))
+    dot.edge(str(id),str(t[3]))
 
 def p_declaracion_struct_arreglo(t):
     'declaracion_struct         :   STRUCT IDENTIFICADOR IDENTIFICADOR indices PUNTOCOMA'
+    id = inc()
+    t[0] = DeclaracionStructArray(id,t.lexer.lineno,t[3],t[2],t[4])
+    dot.node(str(id),"Asignacion Struct")
+    dot.edge(str(id),str(t[2]))
+    dot.edge(str(id),str(t[3]))
+    for item in t[4]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_sentencia_asignacion_struct(t):
-    'sentencia_asignacion_struct    :   IDENTIFICADOR PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA'
+    'sentencia_asignacion_struct    :   IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA'
+    id   = inc()
+    t[0] = AsignacionStruct(id,t.lexer.lineno,t[1],t[3],t[4],t[5])
+    dot.edge(str(id),str(t[5].id_dot))
+    dot.edge(str(id),str(t[4].id_dot))
+    dot.node(str(id),"Asignacion struct")
+    dot.edge(str(id),str(t[1])+"."+str(t[3]))
 
 def p_sentencia_asignacion_struct_arreglo(t):
-    'sentencia_asignacion_struct    :   IDENTIFICADOR indices PUNTO IDENTIFICADOR IGUAL exp PUNTOCOMA'
+    'sentencia_asignacion_struct    :   IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA'
 
 def p_sentencia_etiqueta(t):
     'sentencia_etiqueta         :   IDENTIFICADOR DOSPUNTOS'
@@ -428,12 +491,37 @@ def p_exp(t):
                                 |   exp SHIFTIZQ    exp
                                 |   exp SHIFTDER    exp
                                 '''
+    id = inc()
+    if t[2] == "+":
+        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.SUMA,t[2])
+    elif t[2] == "-":
+        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.RESTA,t[2])
+    elif t[2] == "*":
+        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.MULTIPLICACION,t[2])
+    elif t[2] == "/":
+        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.DIVISION,t[2])    
+    elif t[2] == "%":
+        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.RESIDUO,t[2])
+    elif t[2] == "==":
+        t[0] = ExpresionRelacional(id,t.lexer.lineno,t[1],RELACIONAL.COMPARACION,t[2])
+
+    dot.edge(str(id),str(t[1].id_dot))
+    dot.node(str(id),str(t[2]))
+    dot.edge(str(id),str(t[3].id_dot))
 
 def p_exp_negativo(t):
     'exp                        :   MENOS exp %prec NEGATIVO'
+    id = inc()
+    t[0] = ExpresionNegativo(id,t.lexer.lineno,t[2])
+    dot.node(str(id),str("-"))
+    dot.edge(str(id),str(t[2].id_dot))
 
 def p_exp_absoluto(t):
     'exp                        :   ABS ABREPARENTESIS exp CIERRAPARENTESIS %prec ABSOLUTO'
+    id = inc()
+    t[0] = ExpresionAbsoluto(id,t.lexer.lineno,t[3])
+    dot.node(str(id),str("ABS"))
+    dot.edge(str(id),str(t[3].id_dot))
 
 def p_exp_not(t):
     'exp                        :   NOT exp'''
@@ -459,9 +547,18 @@ def p_exp_variable(t):
 
 def p_exp_puntero(t):
     '''exp                      :   AMPERSAN IDENTIFICADOR'''
+    id = inc()
+    t[0] = ExpresionPuntero(id,t.lexer.lineno,t[2])
+    dot.node(str(id),str(t[1]))
+    dot.edge(str(id),str(t[2]))
 
 def p_exp_array_index(t):
     'exp                        :   IDENTIFICADOR indices'
+    id = inc()
+    t[0] = ExpArray(id,t.lexer.lineno,t[1],t[2])
+    dot.node(str(id),"Array: "+str(t[1]))
+    for item in t[2]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_exp_sizeof(t):
     'exp                        :   SIZEOF ABREPARENTESIS exp CIERRAPARENTESIS'
@@ -480,9 +577,9 @@ def p_exp_ternario(t):
 
 def p_exp_cadena(t):
     'exp                        :   CADENA'
-    # id = inc()
-    # t[0] = id
-    # dot.node(str(id),str(t[1]))
+    id = inc()
+    t[0] = ExpresionCadena(id,t.lexer.lineno,t[1])
+    dot.node(str(id),str(t[1]))
 
 def p_exp_struct(t):
     'exp                        :   IDENTIFICADOR PUNTO IDENTIFICADOR'
@@ -532,18 +629,18 @@ def p_param_tipo(t):
 
 def p_indices_listado(t):
     'indices                    :   indices indice'
-    # t[1].append(t[2])
-    # t[0] = t[1]
+    t[1].append(t[2])
+    t[0] = t[1]
     # addGramatical('indices -> indices indice')
 
 def p_indices(t):
     'indices                    :   indice'
-    # t[0] = [t[1]]
+    t[0] = [t[1]]
     # addGramatical('indices -> indice')
 
 def p_indice(t):
     'indice                     :   ABRECORCHETE exp  CIERRACORCHETE'
-    # t[0] = t[2]
+    t[0] = t[2]
     # addGramatical('indice -> ABRECORCHETE expresion_general CIERRACORCHETE')
 
 def p_tipo(t):
@@ -577,9 +674,9 @@ def p_asignacion_compuesta(t):
                                 |   BITWISEAND
                                 |   BITWISEEXCLUSIVE
                                 |   BITWISEINCLUSIVE'''
-    # id = inc()
-    # t[0] = id 
-    # dot.node(str(id),str(t[1]))
+    id = inc()
+    t[0] = Valor(id,t[1]) 
+    dot.node(str(id),str(t[1]))
 
 def p_error(t):
     print("Error sintáctico en '%s'" % t.value)
