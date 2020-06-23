@@ -29,6 +29,14 @@ class LOGICO(Enum):
     XOR = 3
     NEGACION = 4
 
+class BIT(Enum):
+    AND = 1
+    OR = 2
+    XOR = 3
+    SHIFTIZQUIERDA = 4
+    SHIFTDERECHA = 5
+    NOT = 6
+
 class Expresion:
     '''Clase abstracta'''
 
@@ -84,6 +92,29 @@ class ExpresionCadena(Expresion):
         self.expresion = expresion
 
 class ExpresionRelacional(Expresion):
+    def __init__(self,id_dot,linea,expresion1,operador,expresion2):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.expresion1 = expresion1
+        self.operador = operador
+        self.expresion2 = expresion2
+
+class ExpFuncion(Expresion):
+    def __init__(self,id_dot,linea,nombre,parametros=None):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.nombre = nombre
+        self.parametros = parametros
+
+class ExpresionLogica(Expresion):
+    def __init__(self,id_dot,linea,expresion1,operador,expresion2):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.expresion1 = expresion1
+        self.operador = operador
+        self.expresion2 = expresion2
+
+class ExpresionBit(Expresion):
     def __init__(self,id_dot,linea,expresion1,operador,expresion2):
         self.id_dot = id_dot
         self.linea = linea

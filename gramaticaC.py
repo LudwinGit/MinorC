@@ -329,9 +329,21 @@ def p_sentencia_asignacion_arreglo(t):
 
 def p_sentencia_while(t):
     'sentencia_while            :   WHILE ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
+    id = inc()
+    t[0] = While(id,t.lexer.lineno,t[3],t[5])
+    dot.node(str(id),"While")
+    dot.edge(str(id),str(t[3].id_dot))
+    for item in t[5]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_sentencia_dowhile(t):
     'sentencia_dowhile          :   DO declaracion_compuesta WHILE ABREPARENTESIS exp CIERRAPARENTESIS PUNTOCOMA'
+    id = inc()
+    t[0] = DoWhile(id,t.lexer.lineno,t[5],t[2])
+    dot.node(str(id),"Do while")
+    dot.edge(str(id),str(t[5].id_dot))
+    for item in t[2]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_sentencia_if(t):
     'sentencia_if               :   IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
@@ -418,57 +430,103 @@ def p_sentencia_asignacion_struct_arreglo(t):
 
 def p_sentencia_etiqueta(t):
     'sentencia_etiqueta         :   IDENTIFICADOR DOSPUNTOS'
+    id = inc()
+    t[0] = Etiqueta(id,t.lexer.lineno,t[1])
+    dot.node(str(id),"Etiqueta: "+str(t[1]))
 
 def p_sentencia_goto(t):
     'sentencia_goto             :   GOTO IDENTIFICADOR PUNTOCOMA'
 
 def p_sentencia_switch(t):
     'sentencia_switch           :   SWITCH ABREPARENTESIS exp CIERRAPARENTESIS ABRELLAVE cases CIERRALLAVE'
+    id = inc()
+    t[0] = Switch(id,t.lexer.lineno,t[3],t[6])
+    dot.node(str(id),"Switch")
+    for item in t[6]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_sentencia_break(t):
     'sentencia_break            :   BREAK PUNTOCOMA'
+    id = inc()
+    t[0] = Break(id,t.lexer.lineno)
+    dot.node(str(id),"Break")
 
 def p_sentencia_continue(t):
     'sentencia_continue         :   CONTINUE PUNTOCOMA'
 
 def p_sentencia_return(t):
     'sentencia_return           :   RETURN exp PUNTOCOMA'
+    id = inc()
+    t[0] = Return(id,t.lexer.lineno,t[2])
+    dot.node(str(id),"Return")
+    dot.edge(str(id),str(t[2].id_dot))
 
 def p_sentencia_print(t):
     'sentencia_print            :   PRINTF ABREPARENTESIS prints CIERRAPARENTESIS PUNTOCOMA'
+    id = inc()
+    t[0] = Print(id,t.lexer.lineno,t[3])
+    dot.node(str(id),"Print")
+    for item in t[3]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_prints(t):
     'prints                     :   print_list'
+    t[0] = t[1]
 
 def p_print_list(t):
     'print_list                 :   print_list COMA print'
+    t[1].append(t[3])
+    t[0] = t[1]
 
 def p_print_list_print(t):
     'print_list                 :   print'
+    t[0] = [t[1]]
 
 def p_print(t):
     '''print                    :   exp'''
+    id = inc()
+    t[0] = Valor(id,t[1])
+    dot.node(str(id),"Valor")
+    dot.edge(str(id),str(t[1].id_dot))
 
-def p_cases(t):
+def p_cases_con_default(t):
     'cases                      :   lista_case  default_case'
+    t[1].append(t[2])
+    t[0] = t[1]
 
 def p_cases_sin_default(t):
     'cases                      :   lista_case'
+    t[0] = t[1]
 
 def p_cases_default(t):
     'cases                      :   default_case'
+    t[0] = [t[1]]
 
 def p_lista_cases(t):
     'lista_case                 :   lista_case case'
+    t[1].append(t[2])
+    t[0] = t[1]
 
 def p_lista_case(t):
     'lista_case                 :   case'
+    t[0] = [t[1]]
 
 def p_case(t):
     'case                       :   CASE exp DOSPUNTOS lista_sentencias'
+    id = inc()
+    t[0] = Case(id,t.lexer.lineno,t[2],t[4])
+    dot.node(str(id),"Case")
+    dot.edge(str(id),str(t[2].id_dot))
+    for item in t[4]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_default_case(t):
     'default_case               :   DEFAULT DOSPUNTOS lista_sentencias'
+    id = inc()
+    t[0] = Case(id,t.lexer.lineno,None,t[3])
+    dot.node(str(id),"Default")
+    for item in t[3]:
+        dot.edge(str(id),str(item.id_dot))
 
 def p_exp(t):
     '''exp                      :   exp MAS         exp
@@ -492,18 +550,51 @@ def p_exp(t):
                                 |   exp SHIFTDER    exp
                                 '''
     id = inc()
+    #Aritmeticas
     if t[2] == "+":
-        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.SUMA,t[2])
+        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.SUMA,t[3])
     elif t[2] == "-":
-        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.RESTA,t[2])
+        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.RESTA,t[3])
     elif t[2] == "*":
-        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.MULTIPLICACION,t[2])
+        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.MULTIPLICACION,t[3])
     elif t[2] == "/":
-        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.DIVISION,t[2])    
+        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.DIVISION,t[3])    
     elif t[2] == "%":
-        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.RESIDUO,t[2])
+        t[0] = ExpresionAritmetica(id,t.lexer.lineno,t[1],OPERACION.RESIDUO,t[3])
+
+    #Logicas
+    elif t[2] == "&&":
+        t[0] = ExpresionLogica(id,t.lexer.lineno,t[1],LOGICO.AND,t[3])
+    elif t[2] == "||":
+        t[0] = ExpresionLogica(id,t.lexer.lineno,t[1],LOGICO.OR,t[3])
+    elif t[2] == "xor":
+        t[0] = ExpresionLogica(id,t.lexer.lineno,t[1],LOGICO.XOR,t[3])
+    
+    #Relacionales
     elif t[2] == "==":
-        t[0] = ExpresionRelacional(id,t.lexer.lineno,t[1],RELACIONAL.COMPARACION,t[2])
+        t[0] = ExpresionRelacional(id,t.lexer.lineno,t[1],RELACIONAL.COMPARACION,t[3])
+    elif t[2] == "!=":
+        t[0] = ExpresionRelacional(id,t.lexer.lineno,t[1],RELACIONAL.DIFERENTE,t[3])
+    elif t[2] == ">=":
+        t[0] = ExpresionRelacional(id,t.lexer.lineno,t[1],RELACIONAL.MAYORIGUAL,t[3])
+    elif t[2] == "<=":
+        t[0] = ExpresionRelacional(id,t.lexer.lineno,t[1],RELACIONAL.MENORIGUAL,t[3])
+    elif t[2] == ">":
+        t[0] = ExpresionRelacional(id,t.lexer.lineno,t[1],RELACIONAL.MAYOR,t[3])
+    elif t[2] == "<":
+        t[0] = ExpresionRelacional(id,t.lexer.lineno,t[1],RELACIONAL.MENOR,t[3])
+
+    #Bit a Bit
+    elif t[2] == "&":
+        t[0] = ExpresionBit(id,t.lexer.lineno,t[1],BIT.AND,t[3])
+    elif t[2] == "|":
+        t[0] = ExpresionBit(id,t.lexer.lineno,t[1],BIT.OR,t[3])
+    elif t[2] == "^":
+        t[0] = ExpresionBit(id,t.lexer.lineno,t[1],BIT.XOR,t[3])
+    elif t[2] == "<<":
+        t[0] = ExpresionBit(id,t.lexer.lineno,t[1],BIT.SHIFTIZQUIERDA,t[3])
+    elif t[2] == ">>":
+        t[0] = ExpresionBit(id,t.lexer.lineno,t[1],BIT.SHIFTDERECHA,t[3])
 
     dot.edge(str(id),str(t[1].id_dot))
     dot.node(str(id),str(t[2]))
@@ -525,9 +616,17 @@ def p_exp_absoluto(t):
 
 def p_exp_not(t):
     'exp                        :   NOT exp'''
+    id = inc()
+    t[0] = ExpresionLogica(id,t.lexer.lineno,t[2],LOGICO.AND,None)
+    dot.node(str(id),"Not")
+    dot.edge(str(id),str(t[2].id_dot))
 
 def p_exp_not_bit(t):
     'exp                        :   NOTBIT exp'''
+    id = inc()
+    t[0] = ExpresionBit(id,t.lexer.lineno,t[2],BIT.NOT,None)
+    dot.node(str(id),str(t[1]))
+    dot.edge(str(id),str(t[2].id_dot))
 
 def p_exp_parentesis(t):
     'exp                        :   ABREPARENTESIS exp CIERRAPARENTESIS'
@@ -571,6 +670,11 @@ def p_exp_funcion(t):
 
 def p_exp_funcion_con_parametros(t):
     'exp                        :   IDENTIFICADOR ABREPARENTESIS params CIERRAPARENTESIS'
+    id = inc()
+    t[0] = ExpFuncion(id,t.lexer.lineno,t[1],t[3])
+    dot.node(str(id),str(t[1]))
+    dot.edge(str(id),str(t[3].id_dot))
+        
 
 def p_exp_ternario(t):
     'exp                        :   exp TERNARIO exp DOSPUNTOS exp'

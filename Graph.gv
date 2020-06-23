@@ -393,16 +393,411 @@ graph {
 	197 [label=IF]
 	197 -- 193
 	197 -- 196
-	198 [label="Función: funcion2"]
-	198 -- 148
-	198 -- 151
-	198 -- 178
-	198 -- 190
-	198 -- 197
-	199 [label=Inicio]
-	199 -- 9
-	199 -- 75
-	199 -- 102
-	199 -- 147
-	199 -- 198
+	198 [label="Etiqueta: etiqueta1"]
+	199 [label=int]
+	200 [label=10]
+	201 [label=a]
+	201 -- 200
+	202 [label="Declaración"]
+	202 -- 199
+	202 -- 201
+	203 [label=a]
+	204 [label=20]
+	205 [label=int]
+	206 [label=20]
+	207 [label=c]
+	207 -- 206
+	208 [label="Declaración"]
+	208 -- 205
+	208 -- 207
+	209 [label=Break]
+	210 [label=Case]
+	210 -- 204
+	210 -- 208
+	210 -- 209
+	211 [label=20]
+	212 [label=int]
+	213 [label=20]
+	214 [label=c]
+	214 -- 213
+	215 [label="Declaración"]
+	215 -- 212
+	215 -- 214
+	216 [label=Break]
+	217 [label=Case]
+	217 -- 211
+	217 -- 215
+	217 -- 216
+	218 [label=int]
+	219 [label=20]
+	220 [label=b]
+	220 -- 219
+	221 [label="Declaración"]
+	221 -- 218
+	221 -- 220
+	222 [label=Break]
+	223 [label=Default]
+	223 -- 221
+	223 -- 222
+	224 [label=Switch]
+	224 -- 210
+	224 -- 217
+	224 -- 223
+	225 [label="Función: funcion2"]
+	225 -- 148
+	225 -- 151
+	225 -- 178
+	225 -- 190
+	225 -- 197
+	225 -- 198
+	225 -- 202
+	225 -- 224
+	226 [label=int]
+	227 [label=int]
+	228 [label=a]
+	229 -- 227
+	229 [label=Parametro]
+	229 -- 228
+	230 [label=b]
+	231 [label=Parametro]
+	231 -- 230
+	232 [label=Parametros]
+	232 -- 229
+	232 -- 231
+	233 [label="esto es un print"]
+	234 [label=Valor]
+	234 -- 233
+	235 [label=2]
+	236 [label=Valor]
+	236 -- 235
+	237 [label=12.4]
+	238 [label=Valor]
+	238 -- 237
+	239 [label=Print]
+	239 -- 234
+	239 -- 236
+	239 -- 238
+	240 [label=a]
+	241 [label=Parametro]
+	241 -- 240
+	242 [label=b]
+	243 [label=Parametro]
+	243 -- 242
+	244 [label=Parametros]
+	244 -- 241
+	244 -- 243
+	245 [label=suma]
+	245 -- 244
+	246 [label=Return]
+	246 -- 245
+	247 [label="Función: suma"]
+	247 -- 226
+	247 -- 232
+	247 -- 239
+	247 -- 246
+	248 [label=int]
+	249 [label=int]
+	250 [label=0]
+	251 [label=x]
+	251 -- 250
+	252 [label="Declaración"]
+	252 -- 249
+	252 -- 251
+	253 [label=int]
+	254 [label=0]
+	255 [label=a]
+	255 -- 254
+	256 [label="Declaración"]
+	256 -- 253
+	256 -- 255
+	257 [label="="]
+	258 [label=x]
+	259 [label=Not]
+	259 -- 258
+	260 [label="Asignación: a"]
+	260 -- 257
+	260 -- 259
+	261 [label=x]
+	262 [label=4]
+	263 -- 261
+	263 [label="<"]
+	263 -- 262
+	264 [label="="]
+	265 [label=a]
+	266 [label=x]
+	267 -- 265
+	267 [label="+"]
+	267 -- 266
+	268 [label="Asignación: a"]
+	268 -- 264
+	268 -- 267
+	269 [label="="]
+	270 [label=x]
+	271 [label=1]
+	272 -- 270
+	272 [label="+"]
+	272 -- 271
+	273 [label="Asignación: x"]
+	273 -- 269
+	273 -- 272
+	274 [label=While]
+	274 -- 263
+	274 -- 268
+	274 -- 273
+	275 [label="%d"]
+	276 [label=Valor]
+	276 -- 275
+	277 [label=a]
+	278 [label=Valor]
+	278 -- 277
+	279 [label=Print]
+	279 -- 276
+	279 -- 278
+	280 [label="Función: funcion4"]
+	280 -- 248
+	280 -- 252
+	280 -- 256
+	280 -- 260
+	280 -- 274
+	280 -- 279
+	281 [label=int]
+	282 [label=int]
+	283 [label=a]
+	284 -- 282
+	284 [label=Parametro]
+	284 -- 283
+	285 [label=Parametros]
+	285 -- 284
+	286 [label=a]
+	287 [label=a]
+	288 -- 286
+	288 [label="*"]
+	288 -- 287
+	289 [label=Return]
+	289 -- 288
+	290 [label="Función: f2"]
+	290 -- 281
+	290 -- 285
+	290 -- 289
+	291 [label=int]
+	292 [label=int]
+	293 [label=a]
+	294 -- 292
+	294 [label=Parametro]
+	294 -- 293
+	295 [label=Parametros]
+	295 -- 294
+	296 [label=int]
+	297 [label=10]
+	298 [label=a]
+	298 -- 297
+	299 [label=20]
+	300 [label=b]
+	300 -- 299
+	301 [label="Declaración"]
+	301 -- 296
+	301 -- 298
+	301 -- 300
+	302 [label="="]
+	303 [label=10]
+	304 [label=Parametro]
+	304 -- 303
+	305 [label=20]
+	306 [label=Parametro]
+	306 -- 305
+	307 [label=Parametros]
+	307 -- 304
+	307 -- 306
+	308 [label=suma]
+	308 -- 307
+	309 [label=Parametro]
+	309 -- 308
+	310 [label=1]
+	311 [label=Parametro]
+	311 -- 310
+	312 [label=2]
+	313 [label=Parametro]
+	313 -- 312
+	314 [label=Parametros]
+	314 -- 311
+	314 -- 313
+	315 [label=suma]
+	315 -- 314
+	316 [label=Parametro]
+	316 -- 315
+	317 [label=Parametros]
+	317 -- 309
+	317 -- 316
+	318 [label=suma]
+	318 -- 317
+	319 [label="Asignación: a"]
+	319 -- 302
+	319 -- 318
+	320 [label="%d"]
+	321 [label=Valor]
+	321 -- 320
+	322 [label=3]
+	323 [label=Parametro]
+	323 -- 322
+	324 [label=Parametros]
+	324 -- 323
+	325 [label=fact]
+	325 -- 324
+	326 [label=Valor]
+	326 -- 325
+	327 [label=Print]
+	327 -- 321
+	327 -- 326
+	328 [label=a]
+	329 [label=Parametro]
+	329 -- 328
+	330 [label=Parametros]
+	330 -- 329
+	331 [label=f2]
+	331 -- 330
+	332 [label=Return]
+	332 -- 331
+	333 [label="Función: f1"]
+	333 -- 291
+	333 -- 295
+	333 -- 301
+	333 -- 319
+	333 -- 327
+	333 -- 332
+	334 [label=int]
+	335 [label=int]
+	336 [label=a]
+	337 -- 335
+	337 [label=Parametro]
+	337 -- 336
+	338 [label=Parametros]
+	338 -- 337
+	339 [label=a]
+	340 [label=1]
+	341 -- 339
+	341 [label=">"]
+	341 -- 340
+	342 [label=a]
+	343 [label=a]
+	344 [label=1]
+	345 -- 343
+	345 [label="-"]
+	345 -- 344
+	346 [label=Parametro]
+	346 -- 345
+	347 [label=Parametros]
+	347 -- 346
+	348 [label=fact]
+	348 -- 347
+	349 -- 342
+	349 [label="*"]
+	349 -- 348
+	350 [label=Return]
+	350 -- 349
+	351 [label=IF]
+	351 -- 341
+	351 -- 350
+	352 [label=1]
+	353 [label=Return]
+	353 -- 352
+	354 [label="Función: fact"]
+	354 -- 334
+	354 -- 338
+	354 -- 351
+	354 -- 353
+	355 [label=char]
+	356 [label=a]
+	357 [label=20]
+	358 -- 356
+	358 [label=">"]
+	358 -- 357
+	359 [label=int]
+	360 [label=a]
+	361 [label="Declaración"]
+	361 -- 359
+	361 -- 360
+	362 [label=While]
+	362 -- 358
+	362 -- 361
+	363 [label=int]
+	364 [label=5]
+	365 [label=z]
+	365 -- 364
+	366 [label="Declaración"]
+	366 -- 363
+	366 -- 365
+	367 [label="="]
+	368 [label=20]
+	369 [label="Asignación: a"]
+	369 -- 367
+	369 -- 368
+	370 [label="-="]
+	371 [label=1]
+	372 [label="Asignación: z"]
+	372 -- 370
+	372 -- 371
+	373 [label=z]
+	374 [label=0]
+	375 -- 373
+	375 [label=">"]
+	375 -- 374
+	376 [label="Do while"]
+	376 -- 375
+	376 -- 369
+	376 -- 372
+	377 [label=a]
+	378 [label=10]
+	379 -- 377
+	379 [label="<"]
+	379 -- 378
+	380 [label=int]
+	381 [label=a]
+	382 [label="Declaración"]
+	382 -- 380
+	382 -- 381
+	383 [label=IF]
+	383 -- 379
+	383 -- 382
+	384 [label=b]
+	385 [label=10]
+	386 -- 384
+	386 [label="!="]
+	386 -- 385
+	387 [label=int]
+	388 [label=c]
+	389 [label="Declaración"]
+	389 -- 387
+	389 -- 388
+	390 [label=int]
+	391 [label=q]
+	392 [label="Declaración"]
+	392 -- 390
+	392 -- 391
+	393 [label=Else]
+	393 -- 392
+	394 [label=IF]
+	394 -- 386
+	394 -- 389
+	395 [label="IF-ELSE"]
+	395 -- 393
+	395 -- 394
+	396 [label="Función: funcion3"]
+	396 -- 355
+	396 -- 362
+	396 -- 366
+	396 -- 376
+	396 -- 383
+	396 -- 395
+	397 [label=Inicio]
+	397 -- 9
+	397 -- 75
+	397 -- 102
+	397 -- 147
+	397 -- 225
+	397 -- 247
+	397 -- 280
+	397 -- 290
+	397 -- 333
+	397 -- 354
+	397 -- 396
 }

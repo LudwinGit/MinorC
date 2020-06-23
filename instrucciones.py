@@ -104,3 +104,54 @@ class Ifelse(Instruccion):
         self.id_dot = id_dot
         self.linea = linea
         self.lista_if =lista_if
+
+class Etiqueta(Instruccion):
+    def __init__(self,id_dot,linea,nombre):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.nombre =nombre
+
+class Switch(Instruccion):
+    def __init__(self,id_dot,linea,expresion,casos):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.expresion = expresion
+        self.casos = casos    
+
+class Case(Instruccion):
+    def __init__(self,id_dot,linea,expresion,instrucciones):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.expresion = expresion
+        self.instrucciones = instrucciones    
+
+class Break(Instruccion):
+    def __init__(self,id_dot,linea):
+        self.id_dot  = id_dot
+        self.linea = linea
+
+class Print(Instruccion):
+    def __init__(self,id_dot,linea,prints):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.prints = prints
+
+class Return(Instruccion):
+    def __init__(self,id_dot,linea,expresion):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.expresion = expresion
+
+class While(Instruccion):
+    def __init__(self,id_dot,linea,expresion,instrucciones):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.expresion = expresion
+        self.instrucciones = instrucciones
+
+class DoWhile(Instruccion):
+    def __init__(self,id_dot,linea,expresion,instrucciones):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.expresion = expresion
+        self.instrucciones = instrucciones
