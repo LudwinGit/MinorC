@@ -146,19 +146,19 @@ char funcion3(){
     } while(z > 0);
 
 
-    // for( int y = 0; a>20; y+=1)
-    // {
-    //     a = 25;
-    // }
+    for( int y = 0; a>20; y+=1)
+    {
+        a = 25;
+    }
 
-    // for(y = 0; a>20; y+=1)
-    // {
-    //     a = 25;
-    //     for(y = 0; a>20; y+=1)
-    //     {
-    //         a = 25;
-    //     }
-    // }
+    for(y = 0; a>20; y+=1)
+    {
+        a = 25;
+        for(y = 0; a>20; y+=1)
+        {
+            a = 25;
+        }
+    }
 
     if(a<10){
         int a;
@@ -170,4 +170,20 @@ char funcion3(){
     else{
         int q;
     }
+}
+
+struct estructura{
+    int x,y;
+};
+
+int funcion5(){
+    int arr2[3] = {1,2,3};
+    estructura lista[2];
+    lista[0].x = 0;
+    lista[0].y = 0;
+    lista[1].x = 5;
+    lista[1].y = 5;
+    printf(lista.x);
+    printf(lista[0][1].x,lista[0].y);
+    printf(lista[1].x,lista[1].y);
 }

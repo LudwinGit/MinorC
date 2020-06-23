@@ -121,3 +121,11 @@ class ExpresionBit(Expresion):
         self.expresion1 = expresion1
         self.operador = operador
         self.expresion2 = expresion2
+
+class ExpresionStruct(Expresion):
+    def __init__(self,id_dot,linea,variable,atributo,indices=None):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.variable = variable
+        self.atributo = atributo
+        self.indices = indices

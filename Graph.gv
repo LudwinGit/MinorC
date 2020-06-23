@@ -55,11 +55,11 @@ graph {
 	30 [label=2]
 	31 [label=3]
 	32 [label="Declaración array:"]
-	32 -- m1
-	32 -- 28
-	32 -- 29
-	32 -- 30
-	32 -- 31
+	32 -- m1 [label=tipo]
+	32 -- 28 [label=variable]
+	32 -- 29 [label=indice]
+	32 -- 30 [label=indice]
+	32 -- 31 [label=indice]
 	33 [label=3]
 	34 [label=2]
 	35 [label=3]
@@ -101,16 +101,16 @@ graph {
 	52 -- 51
 	53 [label="+="]
 	54 [label=43]
-	55 -- 54
+	55 -- 54 [label=valor]
 	55 -- 53
 	55 [label="Asignacion struct"]
-	55 -- "mipunto.x"
+	55 -- "[55]mipunto.x" [label=variable]
 	56 [label="="]
 	57 [label=24]
-	58 -- 57
+	58 -- 57 [label=valor]
 	58 -- 56
 	58 [label="Asignacion struct"]
-	58 -- "mipunto.y"
+	58 -- "[58]mipunto.y" [label=variable]
 	59 [label=int]
 	60 [label=i]
 	61 [label="Declaración"]
@@ -745,59 +745,245 @@ graph {
 	376 -- 375
 	376 -- 369
 	376 -- 372
-	377 [label=a]
-	378 [label=10]
-	379 -- 377
-	379 [label="<"]
+	377 [label=int]
+	378 [label=0]
+	379 [label=y]
 	379 -- 378
-	380 [label=int]
+	380 [label="Declaración"]
+	380 -- 377
+	380 -- 379
 	381 [label=a]
-	382 [label="Declaración"]
-	382 -- 380
-	382 -- 381
-	383 [label=IF]
-	383 -- 379
+	382 [label=20]
+	383 -- 381
+	383 [label=">"]
 	383 -- 382
-	384 [label=b]
-	385 [label=10]
+	384 [label="+="]
+	385 [label=1]
+	386 [label="Asignación: y"]
 	386 -- 384
-	386 [label="!="]
 	386 -- 385
-	387 [label=int]
-	388 [label=c]
-	389 [label="Declaración"]
+	387 [label="="]
+	388 [label=25]
+	389 [label="Asignación: a"]
 	389 -- 387
 	389 -- 388
-	390 [label=int]
-	391 [label=q]
-	392 [label="Declaración"]
-	392 -- 390
-	392 -- 391
-	393 [label=Else]
+	390 [label=For]
+	390 -- 380
+	390 -- 383
+	390 -- 386
+	390 -- 389
+	391 [label="="]
+	392 [label=0]
+	393 [label="Asignación: y"]
+	393 -- 391
 	393 -- 392
-	394 [label=IF]
-	394 -- 386
-	394 -- 389
-	395 [label="IF-ELSE"]
-	395 -- 393
-	395 -- 394
-	396 [label="Función: funcion3"]
-	396 -- 355
-	396 -- 362
-	396 -- 366
-	396 -- 376
-	396 -- 383
+	394 [label=a]
+	395 [label=20]
+	396 -- 394
+	396 [label=">"]
 	396 -- 395
-	397 [label=Inicio]
-	397 -- 9
-	397 -- 75
-	397 -- 102
-	397 -- 147
-	397 -- 225
-	397 -- 247
-	397 -- 280
-	397 -- 290
-	397 -- 333
-	397 -- 354
-	397 -- 396
+	397 [label="+="]
+	398 [label=1]
+	399 [label="Asignación: y"]
+	399 -- 397
+	399 -- 398
+	400 [label="="]
+	401 [label=25]
+	402 [label="Asignación: a"]
+	402 -- 400
+	402 -- 401
+	403 [label="="]
+	404 [label=0]
+	405 [label="Asignación: y"]
+	405 -- 403
+	405 -- 404
+	406 [label=a]
+	407 [label=20]
+	408 -- 406
+	408 [label=">"]
+	408 -- 407
+	409 [label="+="]
+	410 [label=1]
+	411 [label="Asignación: y"]
+	411 -- 409
+	411 -- 410
+	412 [label="="]
+	413 [label=25]
+	414 [label="Asignación: a"]
+	414 -- 412
+	414 -- 413
+	415 [label=For]
+	415 -- 405
+	415 -- 408
+	415 -- 411
+	415 -- 414
+	416 [label=For]
+	416 -- 393
+	416 -- 396
+	416 -- 399
+	416 -- 402
+	416 -- 415
+	417 [label=a]
+	418 [label=10]
+	419 -- 417
+	419 [label="<"]
+	419 -- 418
+	420 [label=int]
+	421 [label=a]
+	422 [label="Declaración"]
+	422 -- 420
+	422 -- 421
+	423 [label=IF]
+	423 -- 419
+	423 -- 422
+	424 [label=b]
+	425 [label=10]
+	426 -- 424
+	426 [label="!="]
+	426 -- 425
+	427 [label=int]
+	428 [label=c]
+	429 [label="Declaración"]
+	429 -- 427
+	429 -- 428
+	430 [label=int]
+	431 [label=q]
+	432 [label="Declaración"]
+	432 -- 430
+	432 -- 431
+	433 [label=Else]
+	433 -- 432
+	434 [label=IF]
+	434 -- 426
+	434 -- 429
+	435 [label="IF-ELSE"]
+	435 -- 433
+	435 -- 434
+	436 [label="Función: funcion3"]
+	436 -- 355
+	436 -- 362
+	436 -- 366
+	436 -- 376
+	436 -- 390
+	436 -- 416
+	436 -- 423
+	436 -- 435
+	437 [label=int]
+	438 [label=x]
+	439 [label=y]
+	440 [label="Declaración"]
+	440 -- 437
+	440 -- 438
+	440 -- 439
+	441 [label="Struct: estructura"]
+	441 -- 440
+	442 [label=int]
+	443 [label=int]
+	444 [label=3]
+	445 [label=1]
+	446 [label=2]
+	447 [label=3]
+	448 [label="Declaración array:"]
+	448 -- arr2 [label=variable]
+	448 -- 443 [label=tipo]
+	448 -- 444 [label=indice]
+	448 -- 445 [label=valor]
+	448 -- 446 [label=valor]
+	448 -- 447 [label=valor]
+	449 [label=estructura]
+	450 [label=2]
+	451 [label="Declaración array:"]
+	451 -- lista [label=tipo]
+	451 -- 449 [label=variable]
+	451 -- 450 [label=indice]
+	452 [label=0]
+	453 [label="="]
+	454 [label=0]
+	455 -- 454 [label=valor]
+	455 -- 453
+	455 [label="Asignacion struct"]
+	455 -- "[455]lista.x" [label=variable]
+	455 -- 452 [label=indice]
+	456 [label=0]
+	457 [label="="]
+	458 [label=0]
+	459 -- 458 [label=valor]
+	459 -- 457
+	459 [label="Asignacion struct"]
+	459 -- "[459]lista.y" [label=variable]
+	459 -- 456 [label=indice]
+	460 [label=1]
+	461 [label="="]
+	462 [label=5]
+	463 -- 462 [label=valor]
+	463 -- 461
+	463 [label="Asignacion struct"]
+	463 -- "[463]lista.x" [label=variable]
+	463 -- 460 [label=indice]
+	464 [label=1]
+	465 [label="="]
+	466 [label=5]
+	467 -- 466 [label=valor]
+	467 -- 465
+	467 [label="Asignacion struct"]
+	467 -- "[467]lista.y" [label=variable]
+	467 -- 464 [label=indice]
+	468 [label="lista.x"]
+	469 [label=Valor]
+	469 -- 468
+	470 [label=Print]
+	470 -- 469
+	471 [label=0]
+	472 [label=1]
+	473 [label="lista.x"]
+	473 -- 471 [label=indice]
+	473 -- 472 [label=indice]
+	474 [label=Valor]
+	474 -- 473
+	475 [label=0]
+	476 [label="lista.y"]
+	476 -- 475 [label=indice]
+	477 [label=Valor]
+	477 -- 476
+	478 [label=Print]
+	478 -- 474
+	478 -- 477
+	479 [label=1]
+	480 [label="lista.x"]
+	480 -- 479 [label=indice]
+	481 [label=Valor]
+	481 -- 480
+	482 [label=1]
+	483 [label="lista.y"]
+	483 -- 482 [label=indice]
+	484 [label=Valor]
+	484 -- 483
+	485 [label=Print]
+	485 -- 481
+	485 -- 484
+	486 [label="Función: funcion5"]
+	486 -- 442
+	486 -- 448
+	486 -- 451
+	486 -- 455
+	486 -- 459
+	486 -- 463
+	486 -- 467
+	486 -- 470
+	486 -- 478
+	486 -- 485
+	487 [label=Inicio]
+	487 -- 9
+	487 -- 75
+	487 -- 102
+	487 -- 147
+	487 -- 225
+	487 -- 247
+	487 -- 280
+	487 -- 290
+	487 -- 333
+	487 -- 354
+	487 -- 436
+	487 -- 441
+	487 -- 486
 }

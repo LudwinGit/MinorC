@@ -35,13 +35,13 @@ class Declaracion(Instruccion):
         self.variables = variables
 
 class DeclaracionArray(Declaracion):
-    def __init__(self,id_dot,linea,tipo,identificador,indices,valor=None):
+    def __init__(self,id_dot,linea,tipo,identificador,indices,valores=None):
         self.id_dot = id_dot
         self.linea = linea
         self.tipo = tipo
         self.identificador = identificador
         self.indices = indices
-        self.valor = valor
+        self.valores = valores
 
 class DeclaracionStruct(Instruccion):
     def __init__(self,id_dot,linea,identificador,struct):
@@ -75,7 +75,7 @@ class AsignacionArray(Asignacion):
         self.valor = valor
 
 class AsignacionStruct(Asignacion):
-    def __init__(self,id_dot,linea,identificador,atributo,simbolo_asignacion,valor):
+    def __init__(self,id_dot,linea,identificador,atributo,simbolo_asignacion,valor,indices=None):
         self.id_dot = id_dot
         self.linea = linea
         self.identificador = identificador
@@ -154,4 +154,13 @@ class DoWhile(Instruccion):
         self.id_dot = id_dot
         self.linea = linea
         self.expresion = expresion
+        self.instrucciones = instrucciones
+
+class For(Instruccion):
+    def __init__(self,id_dot,linea,inicializacion,condicion,cambio,instrucciones):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.inicializacion=inicializacion
+        self.condicion = condicion
+        self.cambio = cambio
         self.instrucciones = instrucciones

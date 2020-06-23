@@ -265,10 +265,22 @@ def p_declaracion_variable_array(t):
     id = inc()
     t[0] = DeclaracionArray(id,t.lexer.lineno,t[1].valor,t[2],t[3])
     dot.node(str(id),"Declaración array:")
-    dot.edge(str(id),str(t[2]))
-    dot.edge(str(id),str(t[1].id_dot))
+    dot.edge(str(id),str(t[2]),"tipo")
+    dot.edge(str(id),str(t[1].id_dot),"variable")
     for item in t[3]:
-        dot.edge(str(id),str(item.id_dot))
+        dot.edge(str(id),str(item.id_dot),"indice")
+
+def p_declaracion_variable_array_inicializado(t):
+    'declaracion_variable       :   tipo IDENTIFICADOR indices IGUAL ABRELLAVE lista_expresiones CIERRALLAVE PUNTOCOMA'
+    id = inc()
+    t[0] = DeclaracionArray(id,t.lexer.lineno,t[1].valor,t[2],t[3],t[6])
+    dot.node(str(id),"Declaración array:")
+    dot.edge(str(id),str(t[2]),"variable")
+    dot.edge(str(id),str(t[1].id_dot),"tipo")
+    for item in t[3]:
+        dot.edge(str(id),str(item.id_dot),"indice")
+    for item in t[6]:
+        dot.edge(str(id),str(item.id_dot),"valor")
 
 def p_multiple_declaracion(t):
     'declaracion_variable       :   tipo identificadores PUNTOCOMA'
@@ -397,6 +409,15 @@ def p_ifelse_(t):
 
 def p_sentencia_for(t):
     'sentencia_for              :   FOR ABREPARENTESIS sentencia exp PUNTOCOMA sentencia_asignacion CIERRAPARENTESIS declaracion_compuesta'
+    id = inc()
+    t[0] = For(id,t.lexer.lineno,t[3],t[4],t[6],t[8])
+    dot.node(str(id),"For")
+    dot.edge(str(id),str(t[3].id_dot))
+    dot.edge(str(id),str(t[4].id_dot))
+    dot.edge(str(id),str(t[6].id_dot))
+    for item in t[8]:
+        dot.edge(str(id),str(item.id_dot))
+
 
 def p_declaracion_struct(t):
     'declaracion_struct         :   STRUCT IDENTIFICADOR IDENTIFICADOR PUNTOCOMA'
@@ -420,13 +441,21 @@ def p_sentencia_asignacion_struct(t):
     'sentencia_asignacion_struct    :   IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA'
     id   = inc()
     t[0] = AsignacionStruct(id,t.lexer.lineno,t[1],t[3],t[4],t[5])
-    dot.edge(str(id),str(t[5].id_dot))
+    dot.edge(str(id),str(t[5].id_dot),"valor")
     dot.edge(str(id),str(t[4].id_dot))
     dot.node(str(id),"Asignacion struct")
-    dot.edge(str(id),str(t[1])+"."+str(t[3]))
+    dot.edge(str(id),"["+str(id)+"]"+str(t[1])+"."+str(t[3]),"variable")
 
 def p_sentencia_asignacion_struct_arreglo(t):
     'sentencia_asignacion_struct    :   IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp PUNTOCOMA'
+    id   = inc()
+    t[0] = AsignacionStruct(id,t.lexer.lineno,t[1],t[4],t[5],t[6],t[2])
+    dot.edge(str(id),str(t[6].id_dot),"valor")
+    dot.edge(str(id),str(t[5].id_dot))
+    dot.node(str(id),"Asignacion struct")
+    dot.edge(str(id),"["+str(id)+"]"+str(t[1])+"."+str(t[4]),"variable")
+    for item in t[2]:
+        dot.edge(str(id),str(item.id_dot),"indice")
 
 def p_sentencia_etiqueta(t):
     'sentencia_etiqueta         :   IDENTIFICADOR DOSPUNTOS'
@@ -674,7 +703,6 @@ def p_exp_funcion_con_parametros(t):
     t[0] = ExpFuncion(id,t.lexer.lineno,t[1],t[3])
     dot.node(str(id),str(t[1]))
     dot.edge(str(id),str(t[3].id_dot))
-        
 
 def p_exp_ternario(t):
     'exp                        :   exp TERNARIO exp DOSPUNTOS exp'
@@ -687,9 +715,17 @@ def p_exp_cadena(t):
 
 def p_exp_struct(t):
     'exp                        :   IDENTIFICADOR PUNTO IDENTIFICADOR'
+    id = inc()
+    t[0] = ExpresionStruct(id,t.lexer.lineno,t[1],t[3])
+    dot.node(str(id),str(t[1])+"."+str(t[3]))
 
 def p_exp_struct_arreglo(t):
     'exp                        :   IDENTIFICADOR indices PUNTO IDENTIFICADOR'
+    id = inc()
+    t[0] = ExpresionStruct(id,t.lexer.lineno,t[1],t[4],t[2])
+    dot.node(str(id),str(t[1])+"."+str(t[4]))
+    for item in t[2]:
+        dot.edge(str(id),str(item.id_dot),"indice")
 
 def p_params(t):
     'params                     :   param_list'
@@ -730,6 +766,14 @@ def p_param_tipo(t):
 #                                 |   tipo IDENTIFICADOR ABRECORCHETE CIERRACORCHETE
 #                                 |   exp'''
 #     t[0] = t[1]
+def p_lista_expresiones(t):
+    'lista_expresiones          :   lista_expresiones COMA exp'
+    t[1].append(t[3])
+    t[0] = t[1]
+
+def p_lista_expresiones_expresion(t):
+    'lista_expresiones                :   exp'
+    t[0] = [t[1]]
 
 def p_indices_listado(t):
     'indices                    :   indices indice'
