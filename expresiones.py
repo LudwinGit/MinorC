@@ -129,3 +129,36 @@ class ExpresionStruct(Expresion):
         self.variable = variable
         self.atributo = atributo
         self.indices = indices
+
+class ExpresionDecremento(Expresion):
+    def __init__(self,id_dot,linea,variable):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.variable = variable
+
+class ExpresionIncremento(Expresion):
+    def __init__(self,id_dot,linea,variable):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.variable = variable
+
+class ExpresionSizeof(Expresion):
+    def __init__(self,id_dot,linea,valor):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.valor = valor
+
+class ExpresionCasteo(Expresion):
+    def __init__(self,id_dot,linea,tipo,valor):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.tipo = tipo
+        self.valor = valor
+
+class ExpresionTernario(Expresion):
+    def __init__(self,id_dot,linea,condicion,expVerdadera,expFalsa):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.condicion = condicion
+        self.expVerdadera = expVerdadera
+        self.expFalsa = expFalsa

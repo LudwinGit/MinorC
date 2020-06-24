@@ -28,6 +28,9 @@ class Struct(Instruccion):
         self.atributos = atributos
 
 class Declaracion(Instruccion):
+    'Clase abstracta para declaracion'
+
+class DeclaracionSimple(Declaracion):
     def __init__(self,id_dot,linea,tipo,variables):
         self.id_dot = id_dot
         self.linea = linea
@@ -43,14 +46,14 @@ class DeclaracionArray(Declaracion):
         self.indices = indices
         self.valores = valores
 
-class DeclaracionStruct(Instruccion):
+class DeclaracionStruct(Declaracion):
     def __init__(self,id_dot,linea,identificador,struct):
         self.id_dot = id_dot
         self.linea = linea
         self.identificador = identificador
         self.struct = struct
 
-class DeclaracionStructArray(DeclaracionStruct):
+class DeclaracionStructArray(Declaracion):
     def __init__(self,id_dot,linea,identificador,struct,indices):
         self.id_dot = id_dot
         self.linea = linea
@@ -164,3 +167,14 @@ class For(Instruccion):
         self.condicion = condicion
         self.cambio = cambio
         self.instrucciones = instrucciones
+
+class Goto(Instruccion):
+    def __init__(self,id_dot,linea,etiqueta):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.etiqueta = etiqueta
+
+class Continue(Instruccion):
+    def __init__(self,id_dot,linea):
+        self.id_dot  = id_dot
+        self.linea = linea

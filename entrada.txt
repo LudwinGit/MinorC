@@ -1,10 +1,10 @@
 int entero = 10;
-float decimal1 = 10.1;
+/*float decimal1 = 10.1;
 double decimal2 = 10.2;
 char caracter = 'a';
 char cadena[] = "HOLA";
 
-/*int arreglo[1] = 10;
+int arreglo[1] = 10;
 int arreglo2[2] = {1,2};
 int arreglo3[] = {1,2,3};
 
@@ -15,15 +15,15 @@ char caracter, caracter2 = 'a';
 char cadena, cadena2 [] = "HOLA";
 
 int arreglo, arreglo2[1] = 10;
-int arreglo2, arreglo21 [2] = {1,2};
-int arreglo3, arreglo23[] = {1,2,3};
+// int arreglo2, arreglo21[2] = {1,2};
+//int arreglo3, arreglo23[] = {1,2,3};
 
 int entero = 10, entero2 = 11;
 float decimal1 = 11.2, decimal2 = 10.1;
 double decimal2 = 11.2, decila21 = 10.2;
-char caracter = 'b', caracter2 = 'a';*/
+char caracter = 'b', caracter2 = 'a';
 
-/*id = 10;
+a = 10;
 id[1] = 100;
 
 id += 1;
@@ -37,10 +37,15 @@ id &= 1;
 id ^= 1;
 id |= 1;
 
+
 id++;
-id--;
 ++id;
+id--;
 --id;
+id = ++id;
+id = id++;
+id = --id;
+id = id--;
 
 id = 10 == 10;
 id = 10 != 10;
@@ -108,12 +113,9 @@ while(10){
 
 do{
 
-}while(10)
+}while(10);
 
 for(int id = 0; id<10; id++){
-}
-
-for(id = 0; id<10; id++){
 }
 
 goto prueba;
@@ -135,6 +137,9 @@ void metodo(int a, char b, float c){}
 int funcion(){}
 
 char funcion(int a, char b, float c){}
+a = llamada();
+b = llamada(id, 1, 2, 'a');
+b = (int) a;
 
-llamada();
-llamada(id, 1, 2, 'a');*/
+b = (10+20)+a;
+c = (a<20) ? ( (b>20) ? 10 : 5 ) : 10;*/

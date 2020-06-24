@@ -13,10 +13,19 @@ class Analizador:
             if isinstance(instruccion,Declaracion): self.procesar_declaracion(instruccion)
             if isinstance(instruccion,Struct):      self.procesar_struct(instruccion)
             if isinstance(instruccion,Funcion):     self.procesar_funcion(instruccion)
+            if isinstance(instruccion,Declaracion): self.procesar_asignacion(instruccion)
         return None
 
     def procesar_declaracion(self,instruccion):
         return None
+        if isinstance(instruccion,DeclaracionArray):
+            print(1)
+        if isinstance(instruccion,DeclaracionStruct):
+            print(1)
+        if isinstance(instruccion,DeclaracionStructArray):
+            print(1)
+        if isinstance(instruccion,DeclaracionArray):
+            print(1)
         # for var in instruccion.variables:
         #     print(str(var.identificador))
 
@@ -30,3 +39,9 @@ class Analizador:
             print(".....")
             # for parametro in instruccion.parametros:
             #     print(parametro.identificador)
+
+    def procesar_asignacion(self,instruccion):
+        if isinstance(instruccion,AsignacionArray):
+            print(1)
+        if isinstance(instruccion,AsignacionStruct):
+            print(2)

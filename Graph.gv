@@ -6,38 +6,6 @@ graph {
 	4 [label="Declaración"]
 	4 -- 1
 	4 -- 3
-	5 [label=float]
-	6 [label=10.1]
-	7 [label=decimal1]
-	7 -- 6
-	8 [label="Declaración"]
-	8 -- 5
-	8 -- 7
-	9 [label=double]
-	10 [label=10.2]
-	11 [label=decimal2]
-	11 -- 10
-	12 [label="Declaración"]
-	12 -- 9
-	12 -- 11
-	13 [label=char]
-	14 [label=a]
-	15 [label=caracter]
-	15 -- 14
-	16 [label="Declaración"]
-	16 -- 13
-	16 -- 15
-	17 [label=char]
-	19 [label=HOLA]
-	20 [label="Declaración array:"]
-	20 -- cadena [label=tipo]
-	20 -- 17 [label=variable]
-	20 -- 19 [label=valor]
-	20 -- 18 [label=indice]
-	21 [label=Inicio]
-	21 -- 4
-	21 -- 8
-	21 -- 12
-	21 -- 16
-	21 -- 20
+	5 [label=Inicio]
+	5 -- 4
 }
