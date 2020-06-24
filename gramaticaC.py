@@ -942,7 +942,18 @@ def p_tipo(t):
                                 |   FLOAT
                                 |   IDENTIFICADOR'''
     id = inc()
-    t[0] = Valor(id,t[1])
+    if t[1] == "int":        
+        t[0] = Valor(id,TIPO_DATO.INT)
+    elif t[1] == "void":        
+        t[0] = Valor(id,TIPO_DATO.VOID)
+    elif t[1] == "char":        
+        t[0] = Valor(id,TIPO_DATO.CHAR)
+    elif t[1] == "double":        
+        t[0] = Valor(id,TIPO_DATO.DOUBLE)
+    elif t[1] == "float":        
+        t[0] = Valor(id,TIPO_DATO.FLOAT)
+    else:
+        t[0] = Valor(id,TIPO_DATO.IDENTIFICADOR)
     dot.node(str(id),str(t[1]))
 
 

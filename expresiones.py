@@ -1,12 +1,12 @@
 from enum import Enum
 
-# class TIPO_VARIABLE(Enum):
-#     INT = 1
-#     VOID = 2
-#     CHAR = 3
-#     DOUBLE=4
-#     FLOAT=5
-#     IDENTIFICADOR=6
+class TIPO_DATO(Enum):
+    INT = 1
+    VOID = 2
+    CHAR = 3
+    DOUBLE=4
+    FLOAT=5
+    IDENTIFICADOR=6
 
 class OPERACION(Enum):
     SUMA = 1
