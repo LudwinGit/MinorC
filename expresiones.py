@@ -80,10 +80,10 @@ class ExpresionNegativo(Expresion):
         self.expresion = expresion
 
 class ExpresionPuntero(Expresion):
-    def __init__(self,id_dot,linea,expresion):
+    def __init__(self,id_dot,linea,identificador):
         self.id_dot = id_dot
         self.linea = linea
-        self.expresion = expresion
+        self.identificador = identificador
 
 class ExpresionCadena(Expresion):
     def __init__(self,id_dot,linea,valor):

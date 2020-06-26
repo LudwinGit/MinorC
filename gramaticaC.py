@@ -814,7 +814,7 @@ def p_exp_funcion_con_parametros(t):
 def p_exp_ternario(t):
     'exp                        :   exp TERNARIO exp DOSPUNTOS exp'
     id = inc()
-    t[0] = ExpresionTernario(id,t.lexer.lineno,t[1],[3],t[5])
+    t[0] = ExpresionTernario(id,t.lexer.lineno,t[1],t[3],t[5])
     dot.node(str(id),"Ternario")
     dot.edge(str(id),str(t[1].id_dot),"condición")
     dot.edge(str(id),str(t[3].id_dot),"verdadero")
