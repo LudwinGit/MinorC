@@ -81,9 +81,12 @@ id = 10 >> 10;
 id = 10 << 10;
 id ^= 5;
 
-/*
-id = sizeof(19);
+id = 10+5;
 
+id = sizeof("hola");
+
+id2 = id5;
+/*
 if ( hola){
 id = 10;
 }

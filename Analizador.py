@@ -3,6 +3,7 @@ from expresiones import *
 from instrucciones import *
 import tablasimbolos as TS
 from ContenedorError import *
+import sys
 
 
 class Analizador:
@@ -287,7 +288,48 @@ class Analizador:
             return resultado
         elif isinstance(exp, ExpresionBit):
             return self.resolver_bit(exp, ts, ambito)
-        return None
+        elif isinstance(exp, ExpresionAritmetica):
+            return self.resolver_aritmetica(exp,ts,ambito)
+        elif isinstance(exp, ExpresionSizeof):
+            valor = self.resolver_expresion(exp.valor,ts,ambito)
+            return sys.getsizeof(valor)
+        elif isinstance(exp, ExpIdentificador):
+            simbolo = ts.obtener(exp.identificador)
+            if simbolo!=None:
+                return simbolo.valor
+            error = Error(
+                    "SEMANTICO", "La variable \'"+str(exp.identificador)+"\' no ha sido declarada.", exp.linea)
+        return 0
+
+    def resolver_aritmetica(self,exp,ts,ambito):
+        valor1 = self.resolver_expresion(exp.expresion1,ts,ambito)
+        valor2 = self.resolver_expresion(exp.expresion2,ts,ambito)
+        if exp.operador == OPERACION.SUMA:
+            try:
+                return valor1 + valor2
+            except:
+                return 0
+        elif exp.operador == OPERACION.RESTA:
+            try:
+                return valor1 - valor2
+            except:
+                return 0
+        elif exp.operador == OPERACION.MULTIPLICACION:
+            try:
+                return valor1 * valor2
+            except:
+                return 0
+        elif exp.operador == OPERACION.DIVISION:
+            try:
+                return valor1 / valor2
+            except:
+                return 0
+        elif exp.operador == OPERACION.RESIDUO:
+            try:
+                return valor1 % valor2
+            except:
+                return 0
+        return 0
 
     def resolver_bit(self, exp, ts, ambito):
         valor1 = self.resolver_expresion(exp.expresion1,ts,ambito)
