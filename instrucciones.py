@@ -61,6 +61,9 @@ class DeclaracionStructArray(Declaracion):
         self.struct = struct
 
 class Asignacion(Instruccion):
+    'clase abstracta para asignacion'
+
+class AsignacionSimple(Asignacion):
     def __init__(self,id_dot,linea,identificador,simbolo_asignacion,valor):
         self.id_dot = id_dot
         self.linea = linea

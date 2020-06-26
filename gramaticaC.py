@@ -39,7 +39,8 @@ reservadas = {
     'printf'    :   'PRINTF',
     'scanf'     :   'SCANF',
     'true'      :   'TRUE',
-    'false'     :   'FALSE'
+    'false'     :   'FALSE',
+    'xor'       :   'XOR'
 }
 
 tokens = [
@@ -55,7 +56,7 @@ tokens = [
     'INCREMENT','DECREMENT',
 
     'DOSPUNTOS','PUNTOCOMA','ABREPARENTESIS','CIERRAPARENTESIS','ABRELLAVE','CIERRALLAVE','MENOS',
-    'MAS','MUL','DIV','AMPERSAN','RESIDUO','NOT','AND','OR','XOR','COMPARACION',
+    'MAS','MUL','DIV','AMPERSAN','RESIDUO','NOT','AND','OR','COMPARACION',
     'DIFERENTE','MAYORIGUAL','MENORIGUAL','MAYOR','MENOR','ABRECORCHETE','CIERRACORCHETE','COMA','PUNTO','TERNARIO',
 
     #bit
@@ -78,7 +79,6 @@ t_AND =                 r'&&'
 t_AMPERSAN =            r'&'
 t_NOT =                 r'\!'
 t_OR =                  r'\|\|'
-t_XOR =                 r'xor'
 t_COMPARACION=          r'\=\='
 t_DIFERENTE=            r'\!\='
 t_MAYORIGUAL=           r'\>\='
@@ -112,7 +112,7 @@ t_ignore = " \t"
 
 def t_CADENA(t):
     r'\'.*?\'|\".*?\"'
-    t.value = t.value[1:-1] # remuevo las comillas
+    # t.value = t.value[1:-1] # remuevo las comillas
     return t 
 
 def t_IDENTIFICADOR(t):
@@ -312,7 +312,7 @@ def p_sentencia_decremento_d(t):
 # def p_declaracion_variable_array(t):
 #     'declaracion_variable       :   tipo IDENTIFICADOR ABRECORCHETE CIERRACORCHETE PUNTOCOMA'
 
-def p_declaracion_variable_array(t):
+def p_declaracion_variable_array_empty(t):
     'declaracion_variable       :   tipo IDENTIFICADOR indices'
     id = inc()
     t[0] = DeclaracionArray(id,t.lexer.lineno,t[1].valor,t[2],t[3])
@@ -405,7 +405,7 @@ def p_declaracion_identificador_array_inicializado(t):
 def p_sentencia_asignacion(t):
     'sentencia_asignacion       :   IDENTIFICADOR asignacion_compuesta exp'
     id = inc()
-    t[0] = Asignacion(id,t.lexer.lineno,t[1],t[2].valor,t[3])
+    t[0] = AsignacionSimple(id,t.lexer.lineno,t[1],t[2].valor,t[3])
     dot.node(str(id),"Asignación: "+str(t[1]))
     dot.edge(str(id),str(t[2].id_dot))
     dot.edge(str(id),str(t[3].id_dot))

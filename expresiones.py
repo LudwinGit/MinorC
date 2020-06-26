@@ -86,10 +86,10 @@ class ExpresionPuntero(Expresion):
         self.expresion = expresion
 
 class ExpresionCadena(Expresion):
-    def __init__(self,id_dot,linea,expresion):
+    def __init__(self,id_dot,linea,valor):
         self.id_dot = id_dot
         self.linea = linea
-        self.expresion = expresion
+        self.valor = valor
 
 class ExpresionRelacional(Expresion):
     def __init__(self,id_dot,linea,expresion1,operador,expresion2):

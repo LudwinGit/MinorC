@@ -1,70 +1,87 @@
-int entero = 10,a;
-float decimal1 = 10.1;
-double decimal2 = 10.2;
-char caracter = 'a';
-/*char cadena[] = "HOLA";
+// int entero = 10,a;
+// float decimal1 = 10.1;
+// double decimal2 = 10.2;
+// char caracter = 'a';
+// int entero = 20;
 
-int arreglo[1] = 10;
-int arreglo2[2] = {1,2};
-int arreglo3[] = {1,2,3};
+// int arreglo[1] = 10;
+// int arreglo[2] = 10;
+// int arreglo2[4] = {1,2};
+// int areglo3[3];
+// // int areglo3[1][2][1];
 
-int entero, entero2 = 10;
-float decimal1, decimal2 = 10.1;
-double decimal2, decila21 = 10.2;
-char caracter, caracter2 = 'a';
-char cadena, cadena2 [] = "HOLA";
+// int entero, entero2 = 10;
+// float decimal1, decimal2 = 10.1;
+// double decimal2, decila21 = 10.2;
+// char caracter, caracter2 = 'a';
+// // char cadena, cadena2 [4] = "HOLA"; #Aun no
+// char cadena;
+// char cadena2 [4] = "HOLA";
 
-int arreglo, arreglo2[1] = 10;
-// int arreglo2, arreglo21[2] = {1,2};
-//int arreglo3, arreglo23[] = {1,2,3};
+// int arreglo, arreglo2[1] = 10;
+// // int arreglo2, arreglo21[2] = {1,2};
+// //int arreglo3, arreglo23[] = {1,2,3};
 
-int entero = 10, entero2 = 11;
-float decimal1 = 11.2, decimal2 = 10.1;
-double decimal2 = 11.2, decila21 = 10.2;
-char caracter = 'b', caracter2 = 'a';
+// int entero = 10, entero2 = 11;
+// float decimal1 = 11.2, decimal2 = 10.1;
+// double decimal2 = 11.2, decila21 = 10.2;
+// char caracter = 'b', caracter2 = 'a';
 
-a = 10;
+int a;
+a = 15;
+b=20;
+int id[2];
 id[1] = 100;
+iddd[3] = 20;
 
+// int id;
 id += 1;
+// id -= 1+1; #Aun no
 id -= 1;
-id *= 1;
+id *= 1.0;
 id /= 1;
 id %= 1;
+id2 %= 2;
 id <<= 1;
 id >>= 1;
-id &= 1;
+id &= '1';
 id ^= 1;
 id |= 1;
 
 
+id = 1;
 id++;
 ++id;
 id--;
 --id;
+
 id = ++id;
 id = id++;
 id = --id;
 id = id--;
 
-id = 10 == 10;
-id = 10 != 10;
-id = 10 >= 10;
-id = 10 <= 10;
-id = 10 > 10;
-id = 10 < 10;
+id3 = 10 == 10;
+id3 = 10 != 10;
+id3 = 10 >= 10;
+id3 = 10 <= 10;
+id3 = 10 > 10;
+id3 = 10 < 10;
 
-id = !10;
-id = 10 || 10;
-id = 10 && 10;
+
+id4 = !10;
+id4 = 10 || 10;
+id4 = 10 && 10;
+id4 = 10 xor 9;
 
 id = ~10;
 id = 10 & 10;
 id = 10 | 10;
-id = 10 ^ 10;
+id = 1 ^ 5;
 id = 10 >> 10;
 id = 10 << 10;
+id ^= 5;
 
+/*
 id = sizeof(19);
 
 if ( hola){
