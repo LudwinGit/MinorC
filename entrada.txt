@@ -1,11 +1,11 @@
+int a[2][3];
 struct punto 
 {
     int x,y;
     int radio=5;
-    int d[2];
 };
 
 
-// struct punto mipunto;
+struct punto mipunto;
 struct punto mipunto2[2];
 int o = 10;

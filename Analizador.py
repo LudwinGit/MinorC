@@ -60,6 +60,9 @@ class Analizador:
                             traduccion = str(simbolo.referencia)+";"
                         self.agregarTraduccion(traduccion)
         elif isinstance(instruccion,DeclaracionStruct):
+            if traducir:
+                traduccion = "$t" + str(self.indice_temporal) + "=" + "array();"
+                self.agregarTraduccion(traduccion, False)
             if instruccion.struct in self.structs:
                 struct = self.structs[instruccion.struct]
                 for i in struct:
@@ -91,6 +94,9 @@ class Analizador:
                                 self.agregarTraduccion(traduccion,False)
             self.indice_temporal += 1  # Para cambiar de variable al finalizar
         elif isinstance(instruccion,DeclaracionStructArray):
+            if traducir:
+                traduccion = "$t" + str(self.indice_temporal) + "=" + "array();"
+                self.agregarTraduccion(traduccion, False)
             indices = self.resolver_expresion(instruccion.indices[0],ts,ambito)
             indice = 0
             while indice<indices:
@@ -126,33 +132,45 @@ class Analizador:
                 indice +=1
             self.indice_temporal += 1  # Para cambiar de variable al finalizar
         elif isinstance(instruccion, DeclaracionArray):
+            if traducir:
+                traduccion = "$t" + str(self.indice_temporal) + "=" + "array();"
+                self.agregarTraduccion(traduccion, False)
             if len(instruccion.indices) > 1:
-                print("Aun no, indices > 1")
-                # for index in instruccion.indices:
-                # i = self.resolver_expresion(index)
-                # if instruccion.valores != None:
-                #     if type(instruccion.valores) == list:
-                #         valor = self.resolver_expresion(instruccion.valores.pop(0))
-                #     else:
-                #         valor = self.resolver_expresion(instruccion.valores)
-                # else:
-                #     valor = 0
-                # simbolo = self.agregarSimbolo(TS.Simbolo(str(instruccion.identificador)+str(i),"$t"+str(self.indice_temporal),instruccion.tipo,valor,self.ambito),ts)
+                #solo se permite 2 indices
+                indice = 0
+                indices = self.resolver_expresion(instruccion.indices[0],ts,ambito)
+                valor = 0
+                while indice < indices:
+                    subindice = 0
+                    subindices = self.resolver_expresion(instruccion.indices[1],ts,ambito)
+                    while subindice < subindices:
+                        referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"+"["+str(subindice)+"]"
+                        id = str(instruccion.identificador)+",["+str(indice)+"]"+"["+str(subindice)+"]"
+                        simbolo = TS.Simbolo(id,referencia, instruccion.tipo, valor, ambito,TS.TIPO.ARRAY)
+                        if simbolo == None:
+                            error = Error(
+                                "SEMANTICO", "La variable \'"+instruccion.identificador+"\' ya ha sido declarada ya ha sido definida", instruccion.linea)
+                        if traducir:
+                            if simbolo.valor != None:
+                                traduccion = str(simbolo.referencia) + \
+                                    "="+str(simbolo.valor)+";"
+                            else:
+                                traduccion = str(simbolo.referencia)+";"
+                        self.agregarTraduccion(traduccion, False)
+                        subindice +=1
+                    indice += 1
             else:
                 indice = 0
-                indices = self.resolver_expresion(
-                    instruccion.indices.pop(0), ts, ambito)
+                indices = self.resolver_expresion(instruccion.indices.pop(0), ts, ambito)
                 while indice < indices:
                     if instruccion.valores != None:
                         if type(instruccion.valores) == list:
                             try:
-                                valor = self.resolver_expresion(
-                                    instruccion.valores.pop(0))
+                                valor = self.resolver_expresion(instruccion.valores.pop(0))
                             except:
                                 valor = 0
                         else:
-                            valor = self.resolver_expresion(
-                                instruccion.valores)
+                            valor = self.resolver_expresion(instruccion.valores)
                             valor = valor[1:-1]
                             if instruccion.tipo == TIPO_DATO.CHAR and valor != None:
                                 try:
@@ -162,22 +180,19 @@ class Analizador:
                     else:
                         valor = 0
 
-                    referencia = "$t" + \
-                        str(self.indice_temporal)+"["+str(indice)+"]"
+                    referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"
                     simbolo = self.agregarSimbolo(TS.Simbolo(str(
                         instruccion.identificador)+",["+str(indice)+"]", referencia, instruccion.tipo, valor, ambito,TS.TIPO.ARRAY), ts)
                     if simbolo == None:
                         error = Error(
-                            "SEMANTICO", "La variable ya ha sido declarada ya ha sido definida", instruccion.linea)
-                        return
-                    else:
-                        if traducir:
-                            if simbolo.valor != None:
-                                traduccion = str(simbolo.referencia) + \
-                                    "="+str(simbolo.valor)+";"
-                            else:
-                                traduccion = str(simbolo.referencia)+";"
-                            self.agregarTraduccion(traduccion, False)
+                            "SEMANTICO", "La variable \'"+instruccion.identificador+"\' ya ha sido declarada ya ha sido definida", instruccion.linea)
+                    if traducir:
+                        if simbolo.valor != None:
+                            traduccion = str(simbolo.referencia) + \
+                                "="+str(simbolo.valor)+";"
+                        else:
+                            traduccion = str(simbolo.referencia)+";"
+                        self.agregarTraduccion(traduccion, False)
                     indice += 1
                 self.indice_temporal += 1  # Para cambiar de variable al finalizar
 
