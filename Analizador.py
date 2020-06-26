@@ -90,10 +90,41 @@ class Analizador:
                                 traduccion = str(simbolo.referencia)+"="+str(valor)+";"
                                 self.agregarTraduccion(traduccion,False)
             self.indice_temporal += 1  # Para cambiar de variable al finalizar
-
-
-        if isinstance(instruccion,DeclaracionStructArray):
-            print(2)
+        elif isinstance(instruccion,DeclaracionStructArray):
+            indices = self.resolver_expresion(instruccion.indices[0],ts,ambito)
+            indice = 0
+            while indice<indices:
+                if instruccion.struct in self.structs:
+                    struct = self.structs[instruccion.struct]
+                    for i in struct:
+                        valor = struct[i]['valor']
+                        if struct[i]['tipo'] == TS.TIPO.VARIABLE:
+                            referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"+ "[\'"+str(i)+"\']"
+                            id = str(instruccion.identificador)+str(indice)+str(i)
+                            simbolo = TS.Simbolo(id, referencia, instruccion.struct, valor, ambito,TS.TIPO.VARIABLE)
+                            resultado = self.agregarSimbolo(simbolo, ts)
+                            
+                            if resultado == None:
+                                error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
+                            else:
+                                if traducir:
+                                    traduccion = str(simbolo.referencia)+"="+str(valor)+";"
+                                    self.agregarTraduccion(traduccion,False)
+                        elif struct[i]['tipo'] == TS.TIPO.ARRAY:
+                            ref = i.split(",")
+                            referencia = "$t" + str(self.indice_temporal) +"["+str(indice)+"]"+ "[\'"+str(ref[0])+"\']" + str(ref[1])
+                            id = str(instruccion.identificador)+str(indice)+str(i)
+                            simbolo = TS.Simbolo(id, referencia, instruccion.struct, valor, ambito,TS.TIPO.VARIABLE)
+                            resultado = self.agregarSimbolo(simbolo, ts)
+                            
+                            if resultado == None:
+                                error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
+                            else:
+                                if traducir:
+                                    traduccion = str(simbolo.referencia)+"="+str(valor)+";"
+                                    self.agregarTraduccion(traduccion,False)
+                indice +=1
+            self.indice_temporal += 1  # Para cambiar de variable al finalizar
         elif isinstance(instruccion, DeclaracionArray):
             if len(instruccion.indices) > 1:
                 print("Aun no, indices > 1")

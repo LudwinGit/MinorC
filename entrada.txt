@@ -6,6 +6,6 @@ struct punto
 };
 
 
-struct punto mipunto;
-// struct punto mipunto2;
+// struct punto mipunto;
+struct punto mipunto2[2];
 int o = 10;

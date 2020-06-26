@@ -59,6 +59,7 @@ class DeclaracionStructArray(Declaracion):
         self.linea = linea
         self.identificador = identificador
         self.struct = struct
+        self.indices = indices
 
 class Asignacion(Instruccion):
     'clase abstracta para asignacion'
