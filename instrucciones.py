@@ -106,7 +106,7 @@ class If(Instruccion):
         self.expresion = expresion
         self.instrucciones = instrucciones
 
-class Ifelse(Instruccion):
+class Ifelse(If):
     def __init__(self,id_dot,linea,lista_if):
         self.id_dot = id_dot
         self.linea = linea

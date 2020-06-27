@@ -19,18 +19,27 @@ class TablaDeSimbolos() :
         self.simbolos = simbolos
 
     def agregar(self, simbolo) :
-        self.simbolos[simbolo.id] = simbolo
+        self.simbolos[len(self.simbolos)] = simbolo
     
     def obtener(self, id) :
-        if not id in self.simbolos :
-            return None
-        return self.simbolos[id]
+        for indice in reversed(self.simbolos):
+            simbolo = self.simbolos[indice]
+            if simbolo.id == id:
+                return simbolo
+        return None
 
     def actualizar(self, simbolo) :
-        if not simbolo.id in self.simbolos :
-            print('Error: variable ', simbolo.id, ' no definida.')
-        else :
-            self.simbolos[simbolo.id] = simbolo
+        for indice in reversed(self.simbolos):
+            s = self.simbolos[indice]
+            if s.id == simbolo.id:
+                self.simbolos[indice] = simbolo
+                return 
+        print('Error: variable ', simbolo.id, ' no definida en la tabla de simbolos.')
+
+        # if not simbolo.id in self.simbolos :
+        #     print('Error: variable ', simbolo.id, ' no definida.')
+        # else :
+        #     self.simbolos[simbolo.id] = simbolo
 
     def eliminar(self, simbolo):
         if not simbolo.id in self.simbolos :

@@ -14,7 +14,8 @@ class Analizador:
         self.structs = {}
         self.traducciones[len(self.traducciones)] = "main:"
         self.indice_temporal = 0
-        self.procesar_instrucciones(self.ast, self.ts_global, None)
+        self.indice_etiqueta = 0
+        self.procesar_instrucciones(self.ast, self.ts_global,None)
         self.getTraduccion()
 
     def generarView(self):
@@ -36,6 +37,8 @@ class Analizador:
                 self.procesar_asignacion(instruccion, ts, ambito)
             elif isinstance(instruccion, Expresion):
                 self.resolver_expresion(instruccion, ts, ambito)
+            elif isinstance(instruccion, If):
+                self.procesar_if(instruccion,ts,ambito)
 
     def procesar_declaracion(self, instruccion, ts, ambito,traducir=True):
         if isinstance(instruccion, DeclaracionSimple):
@@ -139,7 +142,10 @@ class Analizador:
                 #solo se permite 2 indices
                 indice = 0
                 indices = self.resolver_expresion(instruccion.indices[0],ts,ambito)
-                valor = 0
+                if(type(instruccion.valores) == list):
+                    valor = 0
+                else:
+                    valor = self.resolver_expresion(instruccion.valores,ts,ambito)
                 while indice < indices:
                     subindice = 0
                     subindices = self.resolver_expresion(instruccion.indices[1],ts,ambito)
@@ -166,16 +172,16 @@ class Analizador:
                     if instruccion.valores != None:
                         if type(instruccion.valores) == list:
                             try:
-                                valor = self.resolver_expresion(instruccion.valores.pop(0))
+                                valor = self.resolver_expresion(instruccion.valores[indice],ts,ambito)
                             except:
                                 valor = 0
                         else:
-                            valor = self.resolver_expresion(instruccion.valores)
-                            valor = valor[1:-1]
+                            valor = self.resolver_expresion(instruccion.valores,ts,ambito)
                             if instruccion.tipo == TIPO_DATO.CHAR and valor != None:
+                                valor = valor[1:-1]
                                 try:
                                     valor = "\'"+str(valor[indice])+"\'"
-                                except expression as identifier:
+                                except:
                                     valor = 0
                     else:
                         valor = 0
@@ -210,6 +216,18 @@ class Analizador:
         else:self.structs.setdefault(identificador,struct)
         return None
 
+    def procesar_if(self,instruccion,ts,ambito):
+        ts_local = TS.TablaDeSimbolos(ts.simbolos)
+        ambito = "if"
+        if isinstance(instruccion,If):
+            condicion = self.resolver_expresion(instruccion.expresion,ts_local,ambito)
+            if condicion != 0:
+                traduccion = "\nif"+str(self.indice_etiqueta)+":"
+                self.indice_etiqueta +=1
+                self.agregarTraduccion(traduccion)
+                self.procesar_instrucciones(instruccion.instrucciones,ts_local,ambito)
+
+
     def procesar_funcion(self, instruccion):
         if instruccion.parametros != None:
             print(".....")
@@ -221,9 +239,8 @@ class Analizador:
             valor = self.resolver_expresion(instruccion.valor, ts, ambito)
             simbolo = ts.obtener(instruccion.identificador)
             if simbolo == None:
-                simbolo = TS.Simbolo(
-                    instruccion.identificador, "$t"+str(self.indice_temporal), None, 0, ambito)
-                self.agregarSimbolo(simbolo, ts,TS.TIPO.VARIABLE)
+                simbolo = TS.Simbolo(instruccion.identificador, "$t"+str(self.indice_temporal), None, 0, ambito,TS.TIPO.VARIABLE)
+                self.agregarSimbolo(simbolo, ts)
                 traduccion = str(simbolo.referencia)+"=0;"
                 self.agregarTraduccion(traduccion)
             self.procesar_simbolo_asignacion(
@@ -240,8 +257,8 @@ class Analizador:
                 if simbolo == None:
                     referencia = "$t" + \
                         str(self.indice_temporal)+"["+str(indice)+"]"
-                    simbolo = TS.Simbolo(id, referencia, None, valor, ambito)
-                    self.agregarSimbolo(simbolo, ts,TS.TIPO.ARRAY)
+                    simbolo = TS.Simbolo(id, referencia, None, valor, ambito,TS.TIPO.ARRAY)
+                    self.agregarSimbolo(simbolo, ts)
                 else:
                     simbolo.valor = valor
                     ts.actualizar(simbolo)
@@ -359,19 +376,17 @@ class Analizador:
             simbolo = ts.obtener(identificador)
             traduccion = simbolo.referencia+"="+str(simbolo.referencia)+"+1;"
             self.agregarTraduccion(traduccion)
-            return (simbolo.valor+1)
+            return simbolo.referencia
         elif isinstance(exp, ExpresionDecremento):
             identificador = exp.variable
             simbolo = ts.obtener(identificador)
             traduccion = simbolo.referencia+"="+str(simbolo.referencia)+"-1;"
             self.agregarTraduccion(traduccion)
-            return (simbolo.valor-1)
+            return simbolo.referencia
         elif isinstance(exp, ExpresionRelacional):
-            resultado = 1 if self.resolver_relacional(exp, ts, ambito) else 0
-            return resultado
+            return self.resolver_relacional(exp, ts, ambito)
         elif isinstance(exp, ExpresionLogica):
-            resultado = 1 if self.resolver_logica(exp, ts, ambito) else 0
-            return resultado
+            return self.resolver_logica(exp, ts, ambito)
         elif isinstance(exp, ExpresionBit):
             return self.resolver_bit(exp, ts, ambito)
         elif isinstance(exp, ExpresionAritmetica):
@@ -389,10 +404,10 @@ class Analizador:
             identificador = exp.identificador
             for i in exp.indices:
                 index = self.resolver_expresion(i,ts,ambito)
-                identificador += str(index)
+                identificador += ",["+str(index)+"]"
             simbolo = ts.obtener(identificador)
             if simbolo != None:
-                return simbolo.valor
+                return simbolo.referencia
             error = Error(
                 "SEMANTICO", "La variable \'"+str(exp.identificador)+"\' no ha sido declarada.", exp.linea)
         elif isinstance(exp, ExpresionAbsoluto):
@@ -433,117 +448,67 @@ class Analizador:
         valor1 = self.resolver_expresion(exp.expresion1,ts,ambito)
         valor2 = self.resolver_expresion(exp.expresion2,ts,ambito)
         if exp.operador == OPERACION.SUMA:
-            try:
-                return valor1 + valor2
-            except:
-                return 0
+            referencia = "$t"+str(self.indice_temporal)
+            traduccion = referencia+"="+str(valor1)+"+"+str(valor2)+";"
         elif exp.operador == OPERACION.RESTA:
-            try:
-                return valor1 - valor2
-            except:
-                return 0
+            referencia = "$t"+str(self.indice_temporal)
+            traduccion = referencia+"="+str(valor1)+"-"+str(valor2)+";"
         elif exp.operador == OPERACION.MULTIPLICACION:
-            try:
-                return valor1 * valor2
-            except:
-                return 0
+            referencia = "$t"+str(self.indice_temporal)
+            traduccion = referencia+"="+str(valor1)+"*"+str(valor2)+";"
         elif exp.operador == OPERACION.DIVISION:
-            try:
-                return valor1 / valor2
-            except:
-                return 0
+            referencia = "$t"+str(self.indice_temporal)
+            traduccion = referencia+"="+str(valor1)+"/"+str(valor2)+";"
         elif exp.operador == OPERACION.RESIDUO:
-            try:
-                return valor1 % valor2
-            except:
-                return 0
-        return 0
+            referencia = "$t"+str(self.indice_temporal)
+            traduccion = referencia+"="+str(valor1)+"%"+str(valor2)+";"
+
+        self.agregarTraduccion(traduccion)
+        return str(referencia)
+        
 
     def resolver_bit(self, exp, ts, ambito):
         valor1 = self.resolver_expresion(exp.expresion1,ts,ambito)
         valor2 = self.resolver_expresion(exp.expresion2,ts,ambito)
         if exp.operador == BIT.SHIFTIZQUIERDA:
-            if type(valor1) != int or type(valor2) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion << en tipos diferentes a int", exp.linea)
-            else:
-                return valor1 << valor2
+            return str(valor1)+"<<"+str(valor2)
         elif exp.operador == BIT.SHIFTDERECHA:
-            if type(valor1) != int or type(valor2) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion >> en tipos diferentes a int", exp.linea)
-            else:
-                return valor1 >> valor2
+            return str(valor1)+">>"+str(valor2)
         elif exp.operador == BIT.AND:
-            if type(valor1) != int or type(valor2) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion & en tipos diferentes a int", exp.linea)
-            else:
-                return valor1 & valor2
+            return str(valor1)+"&"+str(valor2)
         elif exp.operador == BIT.XOR:
-            if type(valor1) != int or type(valor2) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion ^ en tipos diferentes a int", exp.linea)
-            else:
-                return valor1 ^ valor2
+            return str(valor1)+"^"+str(valor2)
         elif exp.operador == BIT.OR:
-            if type(valor1) != int or type(valor2) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion | en tipos diferentes a int", exp.linea)
-            else:
-                return valor1 | valor2
+            return str(valor1)+"|"+str(valor2)
         elif exp.operador == BIT.NOT:
-            if type(valor1) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion ~ en tipos diferentes a int", exp.linea)
-            else:
-                return ~valor1
-        return 0
+            return "~"+str(valor1)
 
     def resolver_logica(self, exp, ts, ambito):
         valor1 = self.resolver_expresion(exp.expresion1, ts, ambito)
         valor2 = self.resolver_expresion(exp.expresion2, ts, ambito)
 
         if exp.operador == LOGICO.AND:
-            resultado = valor1 and valor2
-            if resultado == True:
-                return True
-            return False
+            return str(valor1)+" and "+str(valor2)
         elif exp.operador == LOGICO.OR:
-            resultado = valor1 or valor2
-            if resultado == True:
-                return True
-            return False
+            return str(valor1)+" or "+str(valor2)
         elif exp.operador == LOGICO.XOR:
-            return valor1 != valor2
+            return str(valor1)+" xor "+str(valor2)
         elif exp.operador == LOGICO.NEGACION:
-            return not valor1
+            return  "!"+str(valor1)
 
     def resolver_relacional(self, exp, ts, ambito):
         valor1 = self.resolver_expresion(exp.expresion1, ts, ambito)
         valor2 = self.resolver_expresion(exp.expresion2, ts, ambito)
 
         if exp.operador == RELACIONAL.COMPARACION:
-            return valor1 == valor2
+            return str(valor1)+ "=="+str(valor2)
         elif exp.operador == RELACIONAL.DIFERENTE:
-            return valor1 != valor2
+            return str(valor1)+ "!="+str(valor2)
         elif exp.operador == RELACIONAL.MAYORIGUAL:
-            try:
-                return valor1 >= valor2
-            except:
-                return False
+            return str(valor1)+ ">="+str(valor2)
         elif exp.operador == RELACIONAL.MENORIGUAL:
-            try:
-                return valor1 <= valor2
-            except:
-                return False
+            return str(valor1)+ "<="+str(valor2)
         elif exp.operador == RELACIONAL.MAYOR:
-            try:
-                return valor1 > valor2
-            except:
-                return False
+            return str(valor1)+ ">"+str(valor2)
         elif exp.operador == RELACIONAL.MENOR:
-            try:
-                return valor1 < valor2
-            except:
-                return False
+            return str(valor1)+ "<"+str(valor2)

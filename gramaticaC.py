@@ -739,7 +739,7 @@ def p_exp_absoluto(t):
 def p_exp_not(t):
     'exp                        :   NOT exp'''
     id = inc()
-    t[0] = ExpresionLogica(id,t.lexer.lineno,t[2],LOGICO.AND,None)
+    t[0] = ExpresionLogica(id,t.lexer.lineno,t[2],LOGICO.NEGACION,None)
     dot.node(str(id),"Not")
     dot.edge(str(id),str(t[2].id_dot))
 
