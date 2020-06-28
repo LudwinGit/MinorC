@@ -1,115 +1,31 @@
-// int entero = 10,a;
-// float decimal1 = 10.1;
-// double decimal2 = 10.2;
-// char caracter = 'a';
-// int entero = 20;
-
-
-// int arreglo[1][2] = {1,2};
-// // int arreglo[2][2] = '10';
-// char arreglo10[2] = {'2'};
-
-// int entero, entero2 = 10;
-// float decimal1, decimal2 = 10.1;
-// double decimal2, decila21 = 10.2;
-// char caracter, caracter2 = 'a';
-// char cadena, cadena2 [4] = "HOLA"; #Aun no
-// char cadena;
-// char cadena2 [4] = "HOLA";
-// // int o = 20;
-
-// cadena2[3] = cadena2[0];
-// int a = 10;
-// int b = 20;
-// int id3;
-// id3 = a == b || b>a;
-// id3 = a != b;
-// id3 = a >= b && a==3 && b==4;
-// id3 = a <= b;
-// id3 = a > b;
-// id3 = a < b;
-// int a = 20;
-
-// id4 = !a;
-// id4 = 10 || a;
-// id4 = a && 10;
-// id4 = 10 xor a;
-// int a =10;
-// int a = 1;
-// int b[1][2] = 10;
-
-// b[0][1]="30";
-// a = b[0][0];
 int a = 25;
 int b = 10;
 if (a<20){
-    int o="instancia o";
-    if(b>=10){
-        int z;
+    b = "inicio 1";
+    if(a>=15){
+        b = "inicio 2";
+        if(a>=10){
+            b = "inicio 3 y fin 3";
+        }
+        b = "fin 2";
     }
+    b = "fin 1";
 }
-// punto[1].y = 30;
-
-// id = ~a || a>10;
-// id = 10 & a;
-// id = 10 | a;
-// id = 1 ^ a;
-// id = 10 >> a;
-// id = 10 << a;
-// id ^= 5;
-
-// int a = 5;
-// int id;
-// id = 10+a;
-// id = 10-a;
-// id = 10*a;
-// id = 10/a;
-// id = 10%a;
-// id = 10 + (20*20);
-
-// id += 1;
-// id -= 1+1;
-// id -= 1;
-// id *= 1.0;
-// id /= 1;
-// id %= 1;
-// id2 %= 2;
-// id <<= 1;
-// id >>= 1;
-// id &= '1';
-// id ^= 1;
-// id |= 1;
-// int id = 10;
-// id = 1;
-// id++;
-// ++id;
-// id--;
-// --id;
-// id = ++id;
-// id = id++;
-// id = --id;
-// id = id--;
-
-// int arreglo2[4] = {1,2};
-// int areglo3[3];
-// int areglo3[1][2][1];
-
-// int a[3][4];
-// struct punto 
-// {
-//     int x,y;
-//     int radio=5;
-// };
+b = "sin if";
 
 
-// struct punto mipunto;
-// struct punto mipunto2[2];
-// int o = 10;
-// int p = 20;
-// int i = p;
 
-// if(o == 'hola'){
-//     p = 33;
-//     o = 29;
-//     i = p;
-// }
+int a = 25;
+int b = 10;
+if (a<20){
+    b = "inicio 1";
+    if(a>=15){
+        b = "inicio 2";
+        if(a>=10){
+            b = "inicio 3 y fin 3";
+        }
+        b = "fin 2";
+    }
+    b = "fin 1";
+}
+b = "sin if 2";

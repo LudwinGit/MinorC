@@ -11,10 +11,14 @@ class Analizador:
         self.ast = gramatica.parse(entrada)
         self.ts_global = TS.TablaDeSimbolos()
         self.traducciones = {}
+        self.traducciones2 = {}
+        self.traducciones_salida = {}
         self.structs = {}
-        self.traducciones[len(self.traducciones)] = "main:"
+        self.traducciones[len(self.traducciones)] = { "ambito":0,"traduccion":"main:"}
         self.indice_temporal = 0
         self.indice_etiqueta = 0
+        self.indice_ambito = 0
+        self.indice_ambito_max =0
         self.procesar_instrucciones(self.ast, self.ts_global,0)
         self.getTraduccion()
         # self.imprimir_tabla(self.ts_global)
@@ -23,8 +27,12 @@ class Analizador:
         gramatica.dot.view()
 
     def getTraduccion(self):
-        for traduccion in self.traducciones:
-            print(self.traducciones[traduccion])
+        for traduccion in self.traducciones2:
+            self.traducciones_salida[len(self.traducciones_salida)] = self.traducciones2[traduccion]['traduccion']
+        for traduccion in reversed(self.traducciones):
+            self.traducciones_salida[len(self.traducciones_salida)] = self.traducciones[traduccion]['traduccion']
+        for index in reversed(self.traducciones_salida):
+            print(self.traducciones_salida[index])
     
     def procesar_instrucciones(self,instrucciones,ts,ambito,traducir=True):
         for instruccion in instrucciones:
@@ -226,15 +234,24 @@ class Analizador:
 
     def procesar_if(self,instruccion,ts,ambito):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
-        ambito += 1
         if isinstance(instruccion,If):
             condicion = self.resolver_expresion(instruccion.expresion,ts_local,ambito)
             traduccion = "if ("+condicion+") goto"+" if"+str(self.indice_etiqueta)+";"
             self.agregarTraduccion(traduccion)
+            self.indice_ambito += 1
             traduccion = "\nif"+str(self.indice_etiqueta)+":"
             self.indice_etiqueta +=1
             self.agregarTraduccion(traduccion)
             self.procesar_instrucciones(instruccion.instrucciones,ts_local,ambito)
+            self.reordenar_traducciones(self.indice_ambito)
+        self.indice_ambito -= 1
+
+    def reordenar_traducciones(self,ambito):
+        temporal = self.traducciones.copy()
+        for i in reversed(temporal):
+            traduccion = self.traducciones[i]
+            if traduccion['ambito'] == ambito:
+                self.traducciones2[len(self.traducciones2)] = self.traducciones.pop(i)
 
     def imprimir_tabla(self,ts):
         for i in ts.simbolos:
@@ -361,7 +378,8 @@ class Analizador:
         return None
 
     def agregarTraduccion(self, traduccion, incrementar=True):
-        self.traducciones[len(self.traducciones)] = traduccion
+        t = {'ambito':self.indice_ambito,'traduccion': traduccion}
+        self.traducciones[len(self.traducciones)] = t
         if incrementar:
             self.indice_temporal += 1
 
