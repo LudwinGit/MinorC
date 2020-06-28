@@ -234,17 +234,27 @@ class Analizador:
 
     def procesar_if(self,instruccion,ts,ambito):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
-        if isinstance(instruccion,If):
-            condicion = self.resolver_expresion(instruccion.expresion,ts_local,ambito)
-            traduccion = "if ("+condicion+") goto"+" if"+str(self.indice_etiqueta)+";"
-            self.agregarTraduccion(traduccion)
-            self.indice_ambito += 1
-            traduccion = "\nif"+str(self.indice_etiqueta)+":"
-            self.indice_etiqueta +=1
-            self.agregarTraduccion(traduccion)
-            self.procesar_instrucciones(instruccion.instrucciones,ts_local,ambito)
-            self.reordenar_traducciones(self.indice_ambito)
-        self.indice_ambito -= 1
+        if isinstance(instruccion,Ifsimple):
+            if instruccion.expresion != None: #No es un else
+                condicion = self.resolver_expresion(instruccion.expresion,ts_local,ambito)
+                traduccion = "if ("+str(condicion)+") goto"+" if"+str(self.indice_etiqueta)+";"
+                self.agregarTraduccion(traduccion)
+                self.indice_ambito += 1
+                traduccion = "\nif"+str(self.indice_etiqueta)+":"
+                self.indice_etiqueta +=1
+                self.agregarTraduccion(traduccion)
+                self.procesar_instrucciones(instruccion.instrucciones,ts_local,ambito)
+                self.reordenar_traducciones(self.indice_ambito)
+                self.indice_ambito -= 1
+            else: 
+                print("Aun no > else")
+                # self.procesar_instrucciones(instruccion.instrucciones,ts_local,ambito)
+                # self.reordenar_traducciones(self.indice_ambito)
+        elif isinstance(instruccion,Ifelse):
+            for item in (instruccion.lista_if):
+                self.procesar_if(item,ts,ambito)
+        else:
+            print("If incorrecto....procesar_if")
 
     def reordenar_traducciones(self,ambito):
         temporal = self.traducciones.copy()

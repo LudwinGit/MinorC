@@ -438,55 +438,90 @@ def p_sentencia_dowhile(t):
     for item in t[2]:
         dot.edge(str(id),str(item.id_dot))
 
+
 def p_sentencia_if(t):
-    'sentencia_if               :   IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
-    id = inc()
-    t[0] = If(id,t.lexer.lineno,t[3],t[5])
-    dot.node(str(id),"IF")
-    dot.edge(str(id),str(t[3].id_dot))
-    for item in t[5]:
-        dot.edge(str(id),str(item.id_dot))
+    'sentencia_if                   : if_list'
+    t[0] =t[1]
+    for i in t[0]:
+        t[0] = i
 
-def p_sentencia_else(t):
-    'sentencia_if               :   IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta listado_else'
+def p_sententcia_if_else(t):
+    'sentencia_if                   : if_list ELSE declaracion_compuesta'
     id = inc()
-    t[6].append(If(id,t.lexer.lineno,t[3],t[5]))
-    dot.node(str(id),"IF")
-    dot.edge(str(id),str(t[3].id_dot))
-    for item in t[5]:
-        dot.edge(str(id),str(item.id_dot))
-
+    t[1].append(Ifsimple(id,t.lexer.lineno,None,t[3]))
     id = inc()
-    t[0] = Ifelse(id,t.lexer.lineno,t[6])
+    t[0] = Ifelse(id,t.lexer.lineno,t[1])
     dot.node(str(id),"IF-ELSE")
-    for item in t[6]:
+    for item in t[1]:
         dot.edge(str(id),str(item.id_dot))
 
-def p_listado_else(t):
-    'listado_else               :   listado_else  ifelse'
-    t[1].append(t[2])
+def p_if_listado_k(t):
+    'if_list                        : if_list ELSE if'
+    t[1].append(t[3])
     t[0] = t[1]
 
-def p_listado_else_(t):
-    'listado_else               :   ifelse'
+def p_if_listado(t):
+    'if_list                        : if'
     t[0] = [t[1]]
 
-def p_ifelse(t):
-    'ifelse                     :   ELSE declaracion_compuesta'
+def p_if(t):
+    'if                             :   IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
     id = inc()
-    t[0] = If(id,t.lexer.lineno,None,t[2])
-    dot.node(str(id),"Else")
-    for item in t[2]:
+    t[0] = Ifsimple(id,t.lexer.lineno,t[3],t[5])
+    dot.node(str(id),"If")
+    dot.edge(str(id),str(t[3].id_dot))
+    for item in t[5]:
         dot.edge(str(id),str(item.id_dot))
 
-def p_ifelse_(t):
-    'ifelse                     :   ELSE IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
-    id = inc()
-    t[0] = If(id,t.lexer.lineno,t[4],t[6])
-    dot.node(str(id),"Else If")
-    dot.edge(str(id),str(t[4].id_dot))
-    for item in t[6]:
-        dot.edge(str(id),str(item.id_dot))
+# def p_sentencia_if(t):
+#     'sentencia_if               :   IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
+#     id = inc()
+#     t[0] = Ifsimple(id,t.lexer.lineno,t[3],t[5])
+#     dot.node(str(id),"IF")
+#     dot.edge(str(id),str(t[3].id_dot))
+#     for item in t[5]:
+#         dot.edge(str(id),str(item.id_dot))
+
+# def p_sentencia_else(t):
+#     'sentencia_if               :   IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta listado_else'
+#     id = inc()
+#     t[6].append(Ifsimple(id,t.lexer.lineno,t[3],t[5]))
+#     dot.node(str(id),"IF")
+#     dot.edge(str(id),str(t[3].id_dot))
+#     for item in t[5]:
+#         dot.edge(str(id),str(item.id_dot))
+
+#     id = inc()
+#     t[0] = Ifelse(id,t.lexer.lineno,t[6])
+#     dot.node(str(id),"IF-ELSE")
+#     for item in t[6]:
+#         dot.edge(str(id),str(item.id_dot))
+
+# def p_listado_else(t):
+#     'listado_else               :   listado_else  ifelse'
+#     t[1].append(t[2])
+#     t[0] = t[1]
+
+# def p_listado_else_(t):
+#     'listado_else               :   ifelse'
+#     t[0] = [t[1]]
+
+# def p_ifelse(t):
+#     'ifelse                     :   ELSE declaracion_compuesta'
+#     id = inc()
+#     t[0] = Ifsimple(id,t.lexer.lineno,None,t[2])
+#     dot.node(str(id),"Else")
+#     for item in t[2]:
+#         dot.edge(str(id),str(item.id_dot))
+
+# def p_ifelse_(t):
+#     'ifelse                     :   ELSE IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
+#     id = inc()
+#     t[0] = Ifsimple(id,t.lexer.lineno,t[4],t[6])
+#     dot.node(str(id),"Else If")
+#     dot.edge(str(id),str(t[4].id_dot))
+#     for item in t[6]:
+#         dot.edge(str(id),str(item.id_dot))
 
 def p_sentencia_for(t):
     'sentencia_for              :   FOR ABREPARENTESIS sentencias_for PUNTOCOMA exp PUNTOCOMA sentencias_for CIERRAPARENTESIS declaracion_compuesta'
