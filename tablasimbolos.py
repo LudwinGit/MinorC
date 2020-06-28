@@ -21,17 +21,17 @@ class TablaDeSimbolos() :
     def agregar(self, simbolo) :
         self.simbolos[len(self.simbolos)] = simbolo
     
-    def obtener(self, id) :
+    def obtener(self, id,funcion=TIPO.VARIABLE) :
         for indice in reversed(self.simbolos):
             simbolo = self.simbolos[indice]
-            if simbolo.id == id:
+            if simbolo.id == id and simbolo.funcion == funcion:
                 return simbolo
         return None
     
-    def obtenerConAmbito(self,id,ambito):
+    def obtenerConAmbito(self,id,ambito,funcion=TIPO.VARIABLE):
         for indice in reversed(self.simbolos):
             simbolo = self.simbolos[indice]
-            if simbolo.id == id and simbolo.ambito == ambito:
+            if simbolo.id == id and simbolo.ambito == ambito and simbolo.funcion ==funcion:
                 return simbolo
         return None
 

@@ -1,4 +1,3 @@
-
 int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
 
 int arregloLength = 10;
@@ -16,8 +15,10 @@ int i, j, aux;
 			}
 		}
 	}
-for(  i  = 0; i < arregloLength; i++)
+for( int i  = 0; i < arregloLength; i++)
 	{
 		printf("posicion :", i,"\n", arreglo[i],"\n");
 	}
 printf("fin");
+
+
