@@ -15,8 +15,9 @@ class Analizador:
         self.traducciones[len(self.traducciones)] = "main:"
         self.indice_temporal = 0
         self.indice_etiqueta = 0
-        self.procesar_instrucciones(self.ast, self.ts_global,None)
+        self.procesar_instrucciones(self.ast, self.ts_global,0)
         self.getTraduccion()
+        # self.imprimir_tabla(self.ts_global)
 
     def generarView(self):
         gramatica.dot.view()
@@ -42,26 +43,32 @@ class Analizador:
 
     def procesar_declaracion(self, instruccion, ts, ambito,traducir=True):
         if isinstance(instruccion, DeclaracionSimple):
-            for variable in instruccion.variables:
-                valor = self.resolver_expresion(variable.valor, ts, ambito)
+            if(instruccion.tipo == TIPO_DATO.IDENTIFICADOR):
+                print("Aun no")
+                # variable = instruccion.variables[0]
+                # valor = self.resolver_expresion(variable.valor, ts, ambito)
+                # struct = self.structs[instruccion.tipo]
+            else:
+                for variable in instruccion.variables:
+                    valor = self.resolver_expresion(variable.valor, ts, ambito)
 
-                if valor == None:
-                    simbolo = self.agregarSimbolo(TS.Simbolo(
-                        variable.identificador, "$t"+str(self.indice_temporal), instruccion.tipo, 0, ambito,TS.TIPO.VARIABLE), ts)
-                else:
-                    simbolo = self.agregarSimbolo(TS.Simbolo(
-                        variable.identificador, "$t"+str(self.indice_temporal), instruccion.tipo, valor, ambito,TS.TIPO.VARIABLE), ts)
+                    if valor == None:
+                        simbolo = self.agregarSimbolo(TS.Simbolo(
+                            variable.identificador, "$t"+str(self.indice_temporal), instruccion.tipo, 0, ambito,TS.TIPO.VARIABLE), ts)
+                    else:
+                        simbolo = self.agregarSimbolo(TS.Simbolo(
+                            variable.identificador, "$t"+str(self.indice_temporal), instruccion.tipo, valor, ambito,TS.TIPO.VARIABLE), ts)
 
-                if simbolo == None:
-                    error = Error(
-                        "SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
-                else:
-                    if traducir:
-                        if valor != None:
-                            traduccion = str(simbolo.referencia)+"="+str(valor)+";"
-                        else:
-                            traduccion = str(simbolo.referencia)+";"
-                        self.agregarTraduccion(traduccion)
+                    if simbolo == None:
+                        error = Error(
+                            "SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
+                    else:
+                        if traducir:
+                            if valor != None:
+                                traduccion = str(simbolo.referencia)+"="+str(valor)+";"
+                            else:
+                                traduccion = str(simbolo.referencia)+";"
+                            self.agregarTraduccion(traduccion)
         elif isinstance(instruccion,DeclaracionStruct):
             if traducir:
                 traduccion = "$t" + str(self.indice_temporal) + "=" + "array();"
@@ -153,6 +160,7 @@ class Analizador:
                         referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"+"["+str(subindice)+"]"
                         id = str(instruccion.identificador)+",["+str(indice)+"]"+"["+str(subindice)+"]"
                         simbolo = TS.Simbolo(id,referencia, instruccion.tipo, valor, ambito,TS.TIPO.ARRAY)
+                        simbolo = self.agregarSimbolo(simbolo,ts)
                         if simbolo == None:
                             error = Error(
                                 "SEMANTICO", "La variable \'"+instruccion.identificador+"\' ya ha sido declarada ya ha sido definida", instruccion.linea)
@@ -210,7 +218,7 @@ class Analizador:
         for s in ts_local.simbolos:
             simbolo = ts_local.simbolos[s]
             tipo = simbolo.funcion
-            struct.setdefault(s,{'valor':0,'tipo':tipo,'valor':simbolo.valor})
+            struct.setdefault(simbolo.id,{'valor':0,'tipo':tipo,'valor':simbolo.valor})
         if identificador in self.structs:
                 error = Error("SEMANTICO", "El struct \'"+identificador+"\' ya ha sido declarada ya ha sido definida", instruccion.linea)
         else:self.structs.setdefault(identificador,struct)
@@ -218,15 +226,20 @@ class Analizador:
 
     def procesar_if(self,instruccion,ts,ambito):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
-        ambito = "if"
+        ambito += 1
         if isinstance(instruccion,If):
             condicion = self.resolver_expresion(instruccion.expresion,ts_local,ambito)
-            if condicion != 0:
-                traduccion = "\nif"+str(self.indice_etiqueta)+":"
-                self.indice_etiqueta +=1
-                self.agregarTraduccion(traduccion)
-                self.procesar_instrucciones(instruccion.instrucciones,ts_local,ambito)
+            traduccion = "if ("+condicion+") goto"+" if"+str(self.indice_etiqueta)+";"
+            self.agregarTraduccion(traduccion)
+            traduccion = "\nif"+str(self.indice_etiqueta)+":"
+            self.indice_etiqueta +=1
+            self.agregarTraduccion(traduccion)
+            self.procesar_instrucciones(instruccion.instrucciones,ts_local,ambito)
 
+    def imprimir_tabla(self,ts):
+        for i in ts.simbolos:
+            simbolo = ts.simbolos[i]
+            print(simbolo.id,simbolo.referencia)
 
     def procesar_funcion(self, instruccion):
         if instruccion.parametros != None:
@@ -243,12 +256,27 @@ class Analizador:
                 self.agregarSimbolo(simbolo, ts)
                 traduccion = str(simbolo.referencia)+"=0;"
                 self.agregarTraduccion(traduccion)
-            self.procesar_simbolo_asignacion(
-                instruccion, simbolo, instruccion.simbolo_asignacion, valor, ts)
+            self.procesar_simbolo_asignacion(simbolo, instruccion.simbolo_asignacion, valor, ts)
         elif isinstance(instruccion, AsignacionArray):
             valor = self.resolver_expresion(instruccion.valor, ts, ambito)
             if len(instruccion.indices) > 1:
-                print("Aun no, indices > 1")
+                indices = ""
+                for i in instruccion.indices:
+                    indice = self.resolver_expresion(i,ts,ambito)
+                    indices += "["+str(indice)+"]"
+                id = instruccion.identificador+","+indices
+                simbolo = ts.obtener(id)
+                if simbolo == None:
+                    referencia = "$t" + \
+                        str(self.indice_temporal)+indices
+                    simbolo = TS.Simbolo(id, referencia, None, valor, ambito,TS.TIPO.ARRAY)
+                    self.agregarSimbolo(simbolo, ts)
+                else:
+                    simbolo.valor = valor
+                    ts.actualizar(simbolo)
+                referencia = str(simbolo.referencia)
+                traduccion = referencia+"="+str(valor)+";"
+                self.agregarTraduccion(traduccion)
             else:
                 indice = self.resolver_expresion(
                     instruccion.indices.pop(0), ts, ambito)
@@ -265,91 +293,63 @@ class Analizador:
                 referencia = str(simbolo.referencia)
                 traduccion = referencia+"="+str(valor)+";"
                 self.agregarTraduccion(traduccion)
-        # if isinstance(instruccion,AsignacionStruct):
-        #     print("Asignacion struct")
+        if isinstance(instruccion,AsignacionStruct):
+            valor = self.resolver_expresion(instruccion.valor,ts,ambito)
+            if instruccion.indices == None:
+                identificador = str(instruccion.identificador)+str(instruccion.atributo)
+                simbolo = ts.obtener(identificador)
+                if simbolo != None:
+                    self.procesar_simbolo_asignacion(simbolo,instruccion.simbolo_asignacion, valor, ts)
+                else:
+                    error = Error(
+                    "SEMANTICO", "La variable \'"+str(instruccion.identificador)+"\' no esta definida", instruccion.linea)
+            else:
+                indices = ""
+                for i in instruccion.indices:
+                    indice = self.resolver_expresion(i,ts,ambito)
+                    indices +=str(indice)
+                identificador = str(instruccion.identificador)+str(indices)+str(instruccion.atributo)
+                simbolo = ts.obtener(identificador)
+                if simbolo != None:
+                    self.procesar_simbolo_asignacion(simbolo,instruccion.simbolo_asignacion, valor, ts)
+                else:
+                    error = Error(
+                    "SEMANTICO", "La variable \'"+str(instruccion.identificador)+"\' no esta definida", instruccion.linea)
 
-    def procesar_simbolo_asignacion(self, instruccion, simbolo, simbolo_asignacion, valor, ts):
+    def procesar_simbolo_asignacion(self, simbolo, simbolo_asignacion, valor, ts):
         if simbolo_asignacion == "=":
-            simbolo.valor = valor
             traduccion = str(simbolo.referencia)+"="+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         elif simbolo_asignacion == "+=":
-            simbolo.valor += valor
-            traduccion = str(simbolo.referencia)+"=" + \
-                str(simbolo.referencia)+"+"+str(valor)+";"
+            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"+"+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         elif simbolo_asignacion == "-=":
-            simbolo.valor -= valor
-            traduccion = str(simbolo.referencia)+"=" + \
-                str(simbolo.referencia)+"-"+str(valor)+";"
+            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"-"+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         elif simbolo_asignacion == "*=":
             simbolo.valor *= valor
-            traduccion = str(simbolo.referencia)+"=" + \
-                str(simbolo.referencia)+"*"+str(valor)+";"
+            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"*"+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         elif simbolo_asignacion == "<<=":
-            if type(simbolo.valor) != int or type(valor) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion << en tipos diferentes a int", instruccion.linea)
-            else:
-                simbolo.valor <<= valor
-            traduccion = str(simbolo.referencia)+"=" + \
-                str(simbolo.referencia)+"<<"+str(valor)+";"
+            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"<<"+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         elif simbolo_asignacion == ">>=":
-            if type(simbolo.valor) != int or type(valor) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion >> en tipos diferentes a int", instruccion.linea)
-            else:
-                simbolo.valor >>= valor
-            traduccion = str(simbolo.referencia)+"=" + \
-                str(simbolo.referencia)+">>"+str(valor)+";"
+            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+">>"+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         elif simbolo_asignacion == "&=":
-            if type(simbolo.valor) != int or type(valor) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion & en tipos diferentes a int", instruccion.linea)
-            else:
-                simbolo.valor &= valor
-            traduccion = str(simbolo.referencia)+"=" + \
-                str(simbolo.referencia)+"&"+str(valor)+";"
+            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"&"+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         elif simbolo_asignacion == "^=":
-            if type(simbolo.valor) != int or type(valor) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion ^ en tipos diferentes a int", instruccion.linea)
-            else:
-                simbolo.valor ^= valor
-            traduccion = str(simbolo.referencia)+"=" + \
-                str(simbolo.referencia)+"^"+str(valor)+";"
+            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"^"+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         elif simbolo_asignacion == "|=":
-            if type(simbolo.valor) != int or type(valor) != int:
-                error = Error(
-                    "SEMANTICO", "No se puede realizar la operacion | en tipos diferentes a int", instruccion.linea)
-            else:
-                simbolo.valor |= valor
-            traduccion = str(simbolo.referencia)+"=" + \
-                str(simbolo.referencia)+"|"+str(valor)+";"
+            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"|"+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         elif simbolo_asignacion == "/=":
-            if valor != 0:
-                simbolo.valor /= valor
-            else:
-                error = Error(
-                    "SEMANTICO", "No se puede dividir entre 0", instruccion.linea)
-            traduccion = str(simbolo.referencia)+"=" + \
-                str(simbolo.referencia)+"/"+str(valor)+";"
+            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"/"+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         elif simbolo_asignacion == "%=":
-            if valor != 0:
-                simbolo.valor /= valor
-            else:
-                error = Error(
-                    "SEMANTICO", "No se puede dividir entre 0", instruccion.linea)
-            traduccion = str(simbolo.referencia)+"=" + \
-                str(simbolo.referencia)+"%"+str(valor)+";"
+            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"%"+str(valor)+";"
             self.agregarTraduccion(traduccion, False)
         ts.actualizar(simbolo)
 
@@ -402,9 +402,11 @@ class Analizador:
                     "SEMANTICO", "La variable \'"+str(exp.identificador)+"\' no ha sido declarada.", exp.linea)
         elif isinstance(exp, ExpArray):
             identificador = exp.identificador
+            posiciones = ""
             for i in exp.indices:
                 index = self.resolver_expresion(i,ts,ambito)
-                identificador += ",["+str(index)+"]"
+                posiciones += "["+str(index)+"]"
+            identificador += ","+posiciones
             simbolo = ts.obtener(identificador)
             if simbolo != None:
                 return simbolo.referencia
@@ -412,37 +414,27 @@ class Analizador:
                 "SEMANTICO", "La variable \'"+str(exp.identificador)+"\' no ha sido declarada.", exp.linea)
         elif isinstance(exp, ExpresionAbsoluto):
             valor = self.resolver_expresion(exp.expresion,ts,ambito)
-            try:
-                return abs(valor)
-            except:
-                error = Error(
-                "SEMANTICO", "No se puede realizar abs para \'"+str(valor)+"\' .", exp.linea)
-                return 0
+            return "abs("+str(valor)+")"
         elif isinstance(exp, ExpresionNegativo):
             valor = self.resolver_expresion(exp.expresion,ts,ambito)
-            try:
-                return -1*valor
-            except:
-                error = Error(
-                "SEMANTICO", "No se puede realizar negativo para \'"+str(valor)+"\' .", exp.linea)
-                return 0
+            return "-"+str(valor)
         elif isinstance(exp, ExpresionCasteo):
             valor = self.resolver_expresion(exp.valor,ts,ambito)
-            if valor != None:
-                return "("+str(exp.tipo.valor)+")"+str(valor)
+            return "("+str(exp.tipo.valor)+")"+str(valor)
         elif isinstance(exp, ExpresionPuntero):
             simbolo = ts.obtener(exp.identificador)
-            if simbolo != None:
-                return "&"+str(simbolo.referencia)
-            error = Error(
-                    "SEMANTICO", "La variable \'"+str(exp.identificador)+"\' no ha sido declarada.", exp.linea)
+            valor = 0 if simbolo == None else str(simbolo.referencia)
+            return "&"+str(valor)
         elif isinstance(exp,ExpresionTernario):
             condicion = self.resolver_expresion(exp.condicion,ts,ambito)
+            falso = self.resolver_expresion(exp.expFalsa,ts,ambito)
+            verdadero = self.resolver_expresion(exp.expVerdadera,ts,ambito)
+            print(condicion,"----")
             if condicion == 0:
                 return self.resolver_expresion(exp.expFalsa,ts,ambito)
             return self.resolver_expresion(exp.expVerdadera,ts,ambito)
             # return self.resolver_expresion(exp.expVerdadera,ts,ambito)
-        return None
+        return 0
 
     def resolver_aritmetica(self,exp,ts,ambito):
         valor1 = self.resolver_expresion(exp.expresion1,ts,ambito)
@@ -466,49 +458,61 @@ class Analizador:
         self.agregarTraduccion(traduccion)
         return str(referencia)
         
-
     def resolver_bit(self, exp, ts, ambito):
         valor1 = self.resolver_expresion(exp.expresion1,ts,ambito)
         valor2 = self.resolver_expresion(exp.expresion2,ts,ambito)
+
+        referencia = "$t"+str(self.indice_temporal)
         if exp.operador == BIT.SHIFTIZQUIERDA:
-            return str(valor1)+"<<"+str(valor2)
+            traduccion = referencia+"="+str(valor1)+" << "+str(valor2)+";"
         elif exp.operador == BIT.SHIFTDERECHA:
-            return str(valor1)+">>"+str(valor2)
+            traduccion = referencia+"="+str(valor1)+" >> "+str(valor2)+";"
         elif exp.operador == BIT.AND:
-            return str(valor1)+"&"+str(valor2)
+            traduccion = referencia+"="+str(valor1)+" & "+str(valor2)+";"
         elif exp.operador == BIT.XOR:
-            return str(valor1)+"^"+str(valor2)
+            traduccion = referencia+"="+str(valor1)+" ^ "+str(valor2)+";"
         elif exp.operador == BIT.OR:
-            return str(valor1)+"|"+str(valor2)
+            traduccion = referencia+"="+str(valor1)+" | "+str(valor2)+";"
         elif exp.operador == BIT.NOT:
-            return "~"+str(valor1)
+            traduccion = referencia+"="+"~"+str(valor1)+";"
+
+        self.agregarTraduccion(traduccion)
+        return str(referencia)
 
     def resolver_logica(self, exp, ts, ambito):
         valor1 = self.resolver_expresion(exp.expresion1, ts, ambito)
         valor2 = self.resolver_expresion(exp.expresion2, ts, ambito)
 
+        referencia = "$t"+str(self.indice_temporal)
         if exp.operador == LOGICO.AND:
-            return str(valor1)+" and "+str(valor2)
+            traduccion = referencia+"="+str(valor1)+" && "+str(valor2)+";"
         elif exp.operador == LOGICO.OR:
-            return str(valor1)+" or "+str(valor2)
+            traduccion = referencia+"="+str(valor1)+" || "+str(valor2)+";"
         elif exp.operador == LOGICO.XOR:
-            return str(valor1)+" xor "+str(valor2)
+            traduccion = referencia+"="+str(valor1)+" xor "+str(valor2)+";"
         elif exp.operador == LOGICO.NEGACION:
-            return  "!"+str(valor1)
+            traduccion = referencia+"= !"+str(valor1)+";"
+        
+        self.agregarTraduccion(traduccion)
+        return str(referencia)
 
     def resolver_relacional(self, exp, ts, ambito):
         valor1 = self.resolver_expresion(exp.expresion1, ts, ambito)
         valor2 = self.resolver_expresion(exp.expresion2, ts, ambito)
 
+        referencia = "$t"+str(self.indice_temporal)
         if exp.operador == RELACIONAL.COMPARACION:
-            return str(valor1)+ "=="+str(valor2)
+            traduccion = referencia+"="+str(valor1)+"=="+str(valor2)+";"
         elif exp.operador == RELACIONAL.DIFERENTE:
-            return str(valor1)+ "!="+str(valor2)
+            traduccion = referencia+"="+str(valor1)+"!="+str(valor2)+";"
         elif exp.operador == RELACIONAL.MAYORIGUAL:
-            return str(valor1)+ ">="+str(valor2)
+            traduccion = referencia+"="+str(valor1)+">="+str(valor2)+";"
         elif exp.operador == RELACIONAL.MENORIGUAL:
-            return str(valor1)+ "<="+str(valor2)
+            traduccion = referencia+"="+str(valor1)+"<="+str(valor2)+";"
         elif exp.operador == RELACIONAL.MAYOR:
-            return str(valor1)+ ">"+str(valor2)
+            traduccion = referencia+"="+str(valor1)+">"+str(valor2)+";"
         elif exp.operador == RELACIONAL.MENOR:
-            return str(valor1)+ "<"+str(valor2)
+            traduccion = referencia+"="+str(valor1)+"<"+str(valor2)+";"
+
+        self.agregarTraduccion(traduccion)
+        return str(referencia)

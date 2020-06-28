@@ -89,6 +89,7 @@ class AsignacionStruct(Asignacion):
         self.atributo = atributo
         self.simbolo_asignacion = simbolo_asignacion
         self.valor = valor
+        self.indices = indices
 
 class Funcion(Instruccion):
     def __init__(self,id_dot,linea,tipo,nombre,instrucciones,parametros=None):

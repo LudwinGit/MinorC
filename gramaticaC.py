@@ -521,7 +521,7 @@ def p_declaracion_struct_arreglo(t):
 def p_sentencia_asignacion_struct(t):
     'sentencia_asignacion_struct    :   IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp'
     id   = inc()
-    t[0] = AsignacionStruct(id,t.lexer.lineno,t[1],t[3],t[4],t[5])
+    t[0] = AsignacionStruct(id,t.lexer.lineno,t[1],t[3],t[4].valor,t[5])
     dot.edge(str(id),str(t[5].id_dot),"valor")
     dot.edge(str(id),str(t[4].id_dot))
     dot.node(str(id),"Asignacion struct")
@@ -530,7 +530,7 @@ def p_sentencia_asignacion_struct(t):
 def p_sentencia_asignacion_struct_arreglo(t):
     'sentencia_asignacion_struct    :   IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp'
     id   = inc()
-    t[0] = AsignacionStruct(id,t.lexer.lineno,t[1],t[4],t[5],t[6],t[2])
+    t[0] = AsignacionStruct(id,t.lexer.lineno,t[1],t[4],t[5].valor,t[6],t[2])
     dot.edge(str(id),str(t[6].id_dot),"valor")
     dot.edge(str(id),str(t[5].id_dot))
     dot.node(str(id),"Asignacion struct")
