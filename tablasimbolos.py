@@ -27,6 +27,13 @@ class TablaDeSimbolos() :
             if simbolo.id == id:
                 return simbolo
         return None
+    
+    def obtenerConAmbito(self,id,ambito):
+        for indice in reversed(self.simbolos):
+            simbolo = self.simbolos[indice]
+            if simbolo.id == id and simbolo.ambito == ambito:
+                return simbolo
+        return None
 
     def actualizar(self, simbolo) :
         for indice in reversed(self.simbolos):
