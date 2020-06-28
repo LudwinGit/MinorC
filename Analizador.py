@@ -29,6 +29,8 @@ class Analizador:
     def getTraduccion(self):
         for traduccion in self.traducciones2:
             self.traducciones_salida[len(self.traducciones_salida)] = self.traducciones2[traduccion]['traduccion']
+            
+        self.traducciones_salida[len(self.traducciones_salida)] = "goto main;"
         for traduccion in reversed(self.traducciones):
             self.traducciones_salida[len(self.traducciones_salida)] = self.traducciones[traduccion]['traduccion']
         for index in reversed(self.traducciones_salida):
@@ -48,6 +50,24 @@ class Analizador:
                 self.resolver_expresion(instruccion, ts, ambito)
             elif isinstance(instruccion, If):
                 self.procesar_if(instruccion,ts,ambito)
+            elif isinstance(instruccion,For):
+                self.procesar_for(instruccion,ts,ambito)
+
+    def procesar_instruccion(self,instruccion,ts,ambito,traducir=True):
+        if isinstance(instruccion, Declaracion):
+            self.procesar_declaracion(instruccion, ts, ambito,traducir)
+        elif isinstance(instruccion, Struct):
+            self.procesar_struct(instruccion)
+        elif isinstance(instruccion, Funcion):
+            self.procesar_funcion(instruccion)
+        elif isinstance(instruccion, Asignacion):
+            self.procesar_asignacion(instruccion, ts, ambito)
+        elif isinstance(instruccion, Expresion):
+            self.resolver_expresion(instruccion, ts, ambito)
+        elif isinstance(instruccion, If):
+            self.procesar_if(instruccion,ts,ambito)
+        elif isinstance(instruccion,For):
+            self.procesar_for(instruccion,ts,ambito)
 
     def procesar_declaracion(self, instruccion, ts, ambito,traducir=True):
         if isinstance(instruccion, DeclaracionSimple):
@@ -151,12 +171,19 @@ class Analizador:
             self.indice_temporal += 1  # Para cambiar de variable al finalizar
         elif isinstance(instruccion, DeclaracionArray):
             if traducir:
-                traduccion = "$t" + str(self.indice_temporal) + "=" + "array();"
+                referencia = "$t" + str(self.indice_temporal)
+                id = str(instruccion.identificador)
+                simbolo = TS.Simbolo(id,referencia, instruccion.tipo, 0, ambito,TS.TIPO.ARRAY)
+                simbolo = self.agregarSimbolo(simbolo,ts)
+                if simbolo == None:
+                        error = Error(
+                            "SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
+                traduccion = referencia + "=" + "array();"
                 self.agregarTraduccion(traduccion, False)
+
             if len(instruccion.indices) > 1:
-                #solo se permite 2 indices
                 indice = 0
-                indices = self.resolver_expresion(instruccion.indices[0],ts,ambito)
+                indices = self.resolver_expresion(instruccion.indices[0], ts, ambito)
                 if(type(instruccion.valores) == list):
                     valor = 0
                 else:
@@ -165,22 +192,37 @@ class Analizador:
                     subindice = 0
                     subindices = self.resolver_expresion(instruccion.indices[1],ts,ambito)
                     while subindice < subindices:
-                        referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"+"["+str(subindice)+"]"
-                        id = str(instruccion.identificador)+",["+str(indice)+"]"+"["+str(subindice)+"]"
-                        simbolo = TS.Simbolo(id,referencia, instruccion.tipo, valor, ambito,TS.TIPO.ARRAY)
-                        simbolo = self.agregarSimbolo(simbolo,ts)
-                        if simbolo == None:
-                            error = Error(
-                                "SEMANTICO", "La variable \'"+instruccion.identificador+"\' ya ha sido declarada ya ha sido definida", instruccion.linea)
-                        if traducir:
-                            if simbolo.valor != None:
-                                traduccion = str(simbolo.referencia) + \
-                                    "="+str(simbolo.valor)+";"
-                            else:
-                                traduccion = str(simbolo.referencia)+";"
+                        traduccion = "$t"+ str(self.indice_temporal)+ "[" + str(indice) +"]"+"["+str(subindice)+"]"+ str("=") +str(valor)+";"
                         self.agregarTraduccion(traduccion, False)
                         subindice +=1
                     indice += 1
+                #solo se permite 2 indices
+                # indice = 0
+                # indices = self.resolver_expresion(instruccion.indices[0],ts,ambito)
+                # if(type(instruccion.valores) == list):
+                #     valor = 0
+                # else:
+                #     valor = self.resolver_expresion(instruccion.valores,ts,ambito)
+                # while indice < indices:
+                #     subindice = 0
+                #     subindices = self.resolver_expresion(instruccion.indices[1],ts,ambito)
+                #     while subindice < subindices:
+                #         referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"+"["+str(subindice)+"]"
+                #         id = str(instruccion.identificador)+",["+str(indice)+"]"+"["+str(subindice)+"]"
+                #         simbolo = TS.Simbolo(id,referencia, instruccion.tipo, valor, ambito,TS.TIPO.ARRAY)
+                #         simbolo = self.agregarSimbolo(simbolo,ts)
+                #         if simbolo == None:
+                #             error = Error(
+                #                 "SEMANTICO", "La variable \'"+instruccion.identificador+"\' ya ha sido declarada ya ha sido definida", instruccion.linea)
+                #         if traducir:
+                #             if simbolo.valor != None:
+                #                 traduccion = str(simbolo.referencia) + \
+                #                     "="+str(simbolo.valor)+";"
+                #             else:
+                #                 traduccion = str(simbolo.referencia)+";"
+                #         self.agregarTraduccion(traduccion, False)
+                #         subindice +=1
+                #     indice += 1
             else:
                 indice = 0
                 indices = self.resolver_expresion(instruccion.indices.pop(0), ts, ambito)
@@ -201,21 +243,46 @@ class Analizador:
                                     valor = 0
                     else:
                         valor = 0
-
-                    referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"
-                    simbolo = self.agregarSimbolo(TS.Simbolo(str(
-                        instruccion.identificador)+",["+str(indice)+"]", referencia, instruccion.tipo, valor, ambito,TS.TIPO.ARRAY), ts)
-                    if simbolo == None:
-                        error = Error(
-                            "SEMANTICO", "La variable \'"+instruccion.identificador+"\' ya ha sido declarada ya ha sido definida", instruccion.linea)
-                    if traducir:
-                        if simbolo.valor != None:
-                            traduccion = str(simbolo.referencia) + \
-                                "="+str(simbolo.valor)+";"
-                        else:
-                            traduccion = str(simbolo.referencia)+";"
-                        self.agregarTraduccion(traduccion, False)
+                    traduccion = "$t"+ str(self.indice_temporal)+ "[" + str(indice) +"]"+ str("=") +str(valor)+";"
+                    self.agregarTraduccion(traduccion, False)
                     indice += 1
+                # referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"+"["+str(subindice)+"]"
+                # id = str(instruccion.identificador)+",["+str(indice)+"]"+"["+str(subindice)+"]"
+                # simbolo = TS.Simbolo(id,referencia, instruccion.tipo, valor, ambito,TS.TIPO.ARRAY)
+                # indice = 0
+                # indices = self.resolver_expresion(instruccion.indices.pop(0), ts, ambito)
+                # while indice < indices:
+                #     if instruccion.valores != None:
+                #         if type(instruccion.valores) == list:
+                #             try:
+                #                 valor = self.resolver_expresion(instruccion.valores[indice],ts,ambito)
+                #             except:
+                #                 valor = 0
+                #         else:
+                #             valor = self.resolver_expresion(instruccion.valores,ts,ambito)
+                #             if instruccion.tipo == TIPO_DATO.CHAR and valor != None:
+                #                 valor = valor[1:-1]
+                #                 try:
+                #                     valor = "\'"+str(valor[indice])+"\'"
+                #                 except:
+                #                     valor = 0
+                #     else:
+                #         valor = 0
+
+                #     referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"
+                #     simbolo = self.agregarSimbolo(TS.Simbolo(str(
+                #         instruccion.identificador)+",["+str(indice)+"]", referencia, instruccion.tipo, valor, ambito,TS.TIPO.ARRAY), ts)
+                #     if simbolo == None:
+                #         error = Error(
+                #             "SEMANTICO", "La variable \'"+instruccion.identificador+"\' ya ha sido declarada ya ha sido definida", instruccion.linea)
+                #     if traducir:
+                #         if simbolo.valor != None:
+                #             traduccion = str(simbolo.referencia) + \
+                #                 "="+str(simbolo.valor)+";"
+                #         else:
+                #             traduccion = str(simbolo.referencia)+";"
+                #         self.agregarTraduccion(traduccion, False)
+                #     indice += 1
                 self.indice_temporal += 1  # Para cambiar de variable al finalizar
 
     def procesar_struct(self, instruccion):
@@ -256,6 +323,37 @@ class Analizador:
         else:
             print("If incorrecto....procesar_if")
 
+    def procesar_for(self,instruccion,ts,ambito):
+        ts_local = TS.TablaDeSimbolos(ts.simbolos)
+        self.procesar_instruccion(instruccion.inicializacion,ts_local,ambito)
+        condicion = self.resolver_expresion(instruccion.condicion,ts_local,ambito)
+        etiqueta =str("for")+str(self.indice_etiqueta)
+        self.indice_etiqueta+=1
+        etiquetaIngresa =str("ingresafor")+str(self.indice_etiqueta)
+        self.indice_etiqueta+=1
+        etiquetaSalida =str("salidafor")+str(self.indice_etiqueta)
+        self.indice_etiqueta+=1
+        
+        traduccion = "\n"+str(etiqueta)+":"
+        self.agregarTraduccion(traduccion)
+        
+        traduccion = "if("+str(condicion)+") goto "+etiquetaIngresa +";"
+        self.agregarTraduccion(traduccion)
+
+        traduccion = "goto "+str(etiquetaSalida) +";"
+        self.agregarTraduccion(traduccion)
+
+        traduccion = "\n"+str(etiquetaIngresa)+":"
+        self.agregarTraduccion(traduccion)
+        self.procesar_instrucciones(instruccion.instrucciones,ts,ambito)
+        self.procesar_instruccion(instruccion.cambio,ts,ambito)
+
+        traduccion = "goto "+str(etiqueta)+";"
+        self.agregarTraduccion(traduccion)
+
+
+        
+
     def reordenar_traducciones(self,ambito):
         temporal = self.traducciones.copy()
         for i in reversed(temporal):
@@ -286,40 +384,19 @@ class Analizador:
             self.procesar_simbolo_asignacion(simbolo, instruccion.simbolo_asignacion, valor, ts)
         elif isinstance(instruccion, AsignacionArray):
             valor = self.resolver_expresion(instruccion.valor, ts, ambito)
-            if len(instruccion.indices) > 1:
+            if len(instruccion.indices) > 0:
                 indices = ""
                 for i in instruccion.indices:
                     indice = self.resolver_expresion(i,ts,ambito)
                     indices += "["+str(indice)+"]"
-                id = instruccion.identificador+","+indices
+                id = instruccion.identificador
                 simbolo = ts.obtener(id)
                 if simbolo == None:
-                    referencia = "$t" + \
-                        str(self.indice_temporal)+indices
-                    simbolo = TS.Simbolo(id, referencia, None, valor, ambito,TS.TIPO.ARRAY)
-                    self.agregarSimbolo(simbolo, ts)
+                    error = Error("SEMANTICO", "La variable \'"+str(id)+"\' no existe", instruccion.linea)
                 else:
-                    simbolo.valor = valor
-                    ts.actualizar(simbolo)
-                referencia = str(simbolo.referencia)
-                traduccion = referencia+"="+str(valor)+";"
-                self.agregarTraduccion(traduccion)
-            else:
-                indice = self.resolver_expresion(
-                    instruccion.indices.pop(0), ts, ambito)
-                id = instruccion.identificador+",["+str(indice)+"]"
-                simbolo = ts.obtener(id)
-                if simbolo == None:
-                    referencia = "$t" + \
-                        str(self.indice_temporal)+"["+str(indice)+"]"
-                    simbolo = TS.Simbolo(id, referencia, None, valor, ambito,TS.TIPO.ARRAY)
-                    self.agregarSimbolo(simbolo, ts)
-                else:
-                    simbolo.valor = valor
-                    ts.actualizar(simbolo)
-                referencia = str(simbolo.referencia)
-                traduccion = referencia+"="+str(valor)+";"
-                self.agregarTraduccion(traduccion)
+                    referencia = str(simbolo.referencia)+str(indices)
+                    traduccion = referencia+"="+str(valor)+";"
+                    self.agregarTraduccion(traduccion)
         if isinstance(instruccion,AsignacionStruct):
             valor = self.resolver_expresion(instruccion.valor,ts,ambito)
             if instruccion.indices == None:
@@ -434,10 +511,9 @@ class Analizador:
             for i in exp.indices:
                 index = self.resolver_expresion(i,ts,ambito)
                 posiciones += "["+str(index)+"]"
-            identificador += ","+posiciones
             simbolo = ts.obtener(identificador)
             if simbolo != None:
-                return simbolo.referencia
+                return str(simbolo.referencia)+str(posiciones)
             error = Error(
                 "SEMANTICO", "La variable \'"+str(exp.identificador)+"\' no ha sido declarada.", exp.linea)
         elif isinstance(exp, ExpresionAbsoluto):
@@ -457,7 +533,6 @@ class Analizador:
             condicion = self.resolver_expresion(exp.condicion,ts,ambito)
             falso = self.resolver_expresion(exp.expFalsa,ts,ambito)
             verdadero = self.resolver_expresion(exp.expVerdadera,ts,ambito)
-            print(condicion,"----")
             if condicion == 0:
                 return self.resolver_expresion(exp.expFalsa,ts,ambito)
             return self.resolver_expresion(exp.expVerdadera,ts,ambito)
