@@ -16,7 +16,7 @@ class Analizador:
         self.traducciones_salida = {}
         self.structs = {}
         self.funciones={}
-        self.traducciones[len(self.traducciones)] = { "ambito":0,"traduccion":"main:"}
+        self.traducciones[len(self.traducciones)] = { "ambito":0,"traduccion":TT.Traduccion("","main","","",":")}
         self.salida_funciones={}
         self.indice_temporal = 0
         self.indice_parametro = 0
@@ -36,11 +36,15 @@ class Analizador:
             self.traducciones_salida[len(self.traducciones_salida)] = self.traducciones2[traduccion]['traduccion']
             
         # self.traducciones_salida[len(self.traducciones_salida)] = "goto main;" Pendiente
-        self.traducciones_salida[len(self.traducciones_salida)] = "exit;"
+        self.traducciones_salida[len(self.traducciones_salida)] = TT.Traduccion("","exit","","",";")
         for traduccion in reversed(self.traducciones):
             self.traducciones_salida[len(self.traducciones_salida)] = self.traducciones[traduccion]['traduccion']
         for index in reversed(self.traducciones_salida):
-            print(self.traducciones_salida[index])
+            t = self.traducciones_salida[index]
+            if t.resultado == "":
+                print(str(t.resultado)+str(t.op1)+str(t.operador)+str(t.op2)+str(t.simbolofinaliza))
+            else:                
+                print(str(t.resultado)+"="+str(t.op1)+str(t.operador)+str(t.op2)+str(t.simbolofinaliza))
     
     def procesar_instrucciones(self,instrucciones,ts,ambito,traducir=True):
         for instruccion in instrucciones:
@@ -72,21 +76,21 @@ class Analizador:
                 try:
                     parametro = instruccion.parametros.pop(0)
                     valor = self.resolver_expresion(parametro.identificador,ts,ambito)
-                    traduccion = str(funcion['parametros'][i])+"="+str(valor)
+                    traduccion = TT.Traduccion(str(funcion['parametros'][i]),str(valor),"","",";")
                 except :
                     valor = 0
-                    traduccion = str(funcion['parametros'][i])+"="+str(valor)
+                    traduccion = TT.Traduccion(str(funcion['parametros'][i]),str(valor),"","",";")
                     error = Error("SEMANTICO","PARAMETRO NO SUMINISTRADO",instruccion.linea)
                     gramatica.tablaerrores.agregar(error)
                 self.agregarTraduccion(traduccion,False)
-            traduccion = "$ra="+str(self.indice_ra)+";"
+            traduccion = TT.Traduccion("$ra",str(self.indice_ra),"","",";")
             self.agregarTraduccion(traduccion,False)
             self.indice_ra += 1
 
-            traduccion = "goto "+funcion['etiqueta']+";"
+            traduccion = TT.Traduccion("","goto "+funcion['etiqueta'],"","",";")
             self.agregarTraduccion(traduccion,False)
             
-            traduccion = str(etiquetaFin)+":"
+            traduccion = TT.Traduccion("",str(etiquetaFin),"","",":")
             self.agregarTraduccion(traduccion,False)
         else:
             error = Error("SEMANTICO","la funcion \'"+str(instruccion.funcion)+"\' no existe",instruccion.linea)
@@ -95,7 +99,7 @@ class Analizador:
     def procesar_print(self,instruccion,ts,ambito):
         for index in instruccion.prints:
             valor = self.resolver_expresion(index.valor,ts,ambito)
-            traduccion = "print("+str(valor)+");"
+            traduccion = TT.Traduccion("","print("+str(valor)+")","","",";")
             self.agregarTraduccion(traduccion)
             
 
@@ -139,16 +143,16 @@ class Analizador:
                         gramatica.tablaerrores.agregar(error)
                     if traducir:
                         if valor != None:
-                            traduccion = str(simbolo.referencia)+"="+str(valor)+";"
+                            traduccion = TT.Traduccion(str(simbolo.referencia),str(valor),"","",";")
                         else:
-                            traduccion = str(simbolo.referencia)+";"
+                            traduccion = TT.Traduccion("",str(simbolo.referencia),"","",";")
                         self.agregarTraduccion(traduccion)
         elif isinstance(instruccion,DeclaracionStruct):
             if instruccion.struct in self.structs: #validamos si ya ha sido definido
                 struct = self.structs[instruccion.struct]
                 declarada = ts.obtener(str(instruccion.identificador))
                 if declarada == None:
-                    traduccion = "$t" + str(self.indice_temporal) + "=" + "array();"
+                    traduccion = TT.Traduccion("$t" + str(self.indice_temporal),"array()","","",";")
                     self.agregarTraduccion(traduccion, False)
 
                 for i in struct:
@@ -165,9 +169,9 @@ class Analizador:
                                 "SEMANTICO", "La variable \'"+str(id)+"\' ya ha sido declarada en el mismo ambito", instruccion.linea)
                             gramatica.tablaerrores.agregar(error)
                         if valor != None:
-                            traduccion = str(simbolo.referencia)+ "[\'"+str(i)+"\']"+"="+str(valor)+";"
+                            traduccion = TT.Traduccion(str(simbolo.referencia)+ "[\'"+str(i)+"\']",str(valor),"","",";")
                         else:
-                            traduccion = str(simbolo.referencia)+ "[\'"+str(i)+"\']"+";"
+                            traduccion = TT.Traduccion("",str(simbolo.referencia)+ "[\'"+str(i)+"\']","","",";")
                         self.agregarTraduccion(traduccion)
                     elif struct[i]['tipo'] == TS.TIPO.ARRAY:
                         print("Aun no tipo.array dentro de los atributos")
@@ -192,7 +196,7 @@ class Analizador:
                 struct = self.structs[instruccion.struct]
                 declarada = ts.obtener(str(instruccion.identificador))
                 if declarada == None:
-                    traduccion = "$t" + str(self.indice_temporal) + "=" + "array();"
+                    traduccion = TT.Traduccion("$t" + str(self.indice_temporal),"array()","","",";")
                     self.agregarTraduccion(traduccion, False)
                     
                     referencia = "$t" + str(self.indice_temporal)
@@ -210,28 +214,14 @@ class Analizador:
                         valor = struct[i]['valor']
                         if struct[i]['tipo'] == TS.TIPO.VARIABLE:
                             referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"+ "[\'"+str(i)+"\']"
-                            # id = str(instruccion.identificador)+str(indice)+str(i)
-                            # simbolo = TS.Simbolo(id, referencia, instruccion.struct, valor, ambito,TS.TIPO.VARIABLE)
-                            # resultado = self.agregarSimbolo(simbolo, ts,ambito)
-                            
-                            # if resultado == None:
-                            #     error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
-                            # else:
                             if traducir:
-                                traduccion = str(referencia)+"="+str(valor)+";"
+                                traduccion = TT.Traduccion(str(referencia),str(valor),"","",";")
                                 self.agregarTraduccion(traduccion,False)
                         elif struct[i]['tipo'] == TS.TIPO.ARRAY:
                             ref = i.split(",")
                             referencia = "$t" + str(self.indice_temporal) +"["+str(indice)+"]"+ "[\'"+str(ref[0])+"\']" + str(ref[1])
-                            # id = str(instruccion.identificador)+str(indice)+str(i)
-                            # simbolo = TS.Simbolo(id, referencia, instruccion.struct, valor, ambito,TS.TIPO.VARIABLE)
-                            # resultado = self.agregarSimbolo(simbolo, ts)
-                            
-                            # if resultado == None:
-                            #     error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
-                            # else:
                             if traducir:
-                                traduccion = str(referencia)+"="+str(valor)+";"
+                                traduccion = TT.Traduccion(str(referencia),str(valor),"","",";")
                                 self.agregarTraduccion(traduccion,False)
                 indice +=1
             self.indice_temporal += 1  # Para cambiar de variable al finalizar
@@ -244,7 +234,8 @@ class Analizador:
                 error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
                 gramatica.tablaerrores.agregar(error)
             if traducir:
-                traduccion = referencia + "=" + "array();"
+                # traduccion = referencia + "=" + "array();"
+                traduccion = TT.Traduccion(str(referencia),"array()","","",";")
                 self.agregarTraduccion(traduccion, False)
 
             if len(instruccion.indices) > 1:
@@ -259,7 +250,7 @@ class Analizador:
                     subindices = self.resolver_expresion(instruccion.indices[1],ts,ambito)
                     while subindice < subindices:
                         if traducir:
-                            traduccion = "$t"+ str(self.indice_temporal)+ "[" + str(indice) +"]"+"["+str(subindice)+"]"+ str("=") +str(valor)+";"
+                            traduccion = TT.Traduccion("$t"+ str(self.indice_temporal)+ "[" + str(indice) +"]"+"["+str(subindice)+"]",str(valor),"","",";")
                             self.agregarTraduccion(traduccion, False)
                         subindice +=1
                     indice += 1
@@ -286,7 +277,7 @@ class Analizador:
                     # simbolo = TS.Simbolo(variable.identificador, "$t"+str(self.indice_temporal), instruccion.tipo, valor, ambito,TS.TIPO.VARIABLE)
                     # validarSimbolo = self.agregarSimbolo(simbolo,ts,ambito)
                     if traducir:
-                        traduccion = "$t"+ str(self.indice_temporal)+ "[" + str(indice) +"]"+ str("=") +str(valor)+";"
+                        traduccion = TT.Traduccion("$t"+ str(self.indice_temporal)+ "[" + str(indice) +"]",str(valor),"","",";")
                         self.agregarTraduccion(traduccion, False)
                     indice += 1
                 self.indice_temporal += 1  # Para cambiar de variable al finalizar
@@ -315,15 +306,19 @@ class Analizador:
             self.indice_etiqueta +=1
             if instruccion.expresion != None: #No es un else
                 condicion = self.resolver_expresion(instruccion.expresion,ts_local,ambito)
-                traduccion = "if ("+str(condicion)+") goto "+str(EtiquetaTrue)+";"
+                # traduccion = "if ("+str(condicion)+") goto "+str(EtiquetaTrue)+";"
+                traduccion = TT.Traduccion("","if("+str(condicion)+")"," goto ",str(EtiquetaTrue),";")
                 self.agregarTraduccion(traduccion)
-                traduccion = EtiquetaSalida+":"
+                # traduccion = EtiquetaSalida+":"
+                traduccion = TT.Traduccion("",str(EtiquetaSalida),"","",":")
                 self.agregarTraduccion(traduccion)
                 self.indice_ambito += 1
-                traduccion = "\n"+str(EtiquetaTrue)+":"
+                # traduccion = "\n"+str(EtiquetaTrue)+":"
+                traduccion = TT.Traduccion("","\n"+str(EtiquetaTrue),"","",":")
                 self.agregarTraduccion(traduccion)
                 self.procesar_instrucciones(instruccion.instrucciones,ts_local,EtiquetaTrue)
-                traduccion = "goto "+str(EtiquetaSalida) +";"
+                # traduccion = "goto "+str(EtiquetaSalida) +";"
+                traduccion = TT.Traduccion("","goto "+str(EtiquetaSalida),"","",";")
                 self.agregarTraduccion(traduccion)
                 self.reordenar_traducciones(self.indice_ambito)
                 self.indice_ambito -= 1
@@ -351,31 +346,38 @@ class Analizador:
         etiquetaSalida =str("salidafor")+str(self.indice_etiqueta)
         self.indice_etiqueta+=1
         
-        traduccion = "goto "+str(etiqueta)+";"
+        # traduccion = "goto "+str(etiqueta)+";"
+        traduccion = TT.Traduccion("","goto "+str(etiqueta),"","",";")
         self.agregarTraduccion(traduccion)
 
-        traduccion =  etiquetaSalida+":"
+        # traduccion =  etiquetaSalida+":"
+        traduccion = TT.Traduccion("",etiquetaSalida,"","",":")
         self.agregarTraduccion(traduccion)
 
         self.indice_ambito += 1
 
-        traduccion = "\n"+str(etiqueta)+":"
+        # traduccion = "\n"+str(etiqueta)+":"
+        traduccion = TT.Traduccion("","\n"+str(etiqueta),"","",":")
         self.agregarTraduccion(traduccion)
         
         condicion = self.resolver_expresion(instruccion.condicion,ts_local,ambito)
 
-        traduccion = "if("+str(condicion)+") goto "+etiquetaIngresa +";"
+        # traduccion = "if("+str(condicion)+") goto "+etiquetaIngresa +";"
+        traduccion = TT.Traduccion("","if("+str(condicion)+")"," goto ",etiquetaIngresa,";")
         self.agregarTraduccion(traduccion)
 
-        traduccion = "goto "+str(etiquetaSalida) +";"
+        # traduccion = "goto "+str(etiquetaSalida) +";"
+        traduccion = TT.Traduccion("","goto "+str(etiquetaSalida),"","",";")
         self.agregarTraduccion(traduccion)
 
-        traduccion = "\n"+str(etiquetaIngresa)+":"
+        # traduccion = "\n"+str(etiquetaIngresa)+":"
+        traduccion = TT.Traduccion("","\n"+str(etiquetaIngresa),"","",":")
         self.agregarTraduccion(traduccion)
         self.procesar_instrucciones(instruccion.instrucciones,ts,etiqueta)
         self.procesar_instruccion(instruccion.cambio,ts,etiqueta)
 
-        traduccion = "goto "+str(etiqueta)+";"
+        # traduccion = "goto "+str(etiqueta)+";"
+        traduccion = TT.Traduccion("","goto "+str(etiqueta),"","",";")
         self.agregarTraduccion(traduccion)
 
         self.reordenar_traducciones(self.indice_ambito)
@@ -417,12 +419,14 @@ class Analizador:
                 funcion['parametros'][len(funcion['parametros'])] = referencia
         
         self.indice_ambito += 1
-        traduccion = "\n"+str(etiqueta)+":"
+        # traduccion = "\n"+str(etiqueta)+":"
+        traduccion = TT.Traduccion("","\n"+str(etiqueta),"","",":")
         self.agregarTraduccion(traduccion)        
         self.procesar_instrucciones(instruccion.instrucciones,ts,etiqueta)
         
         #Agregamos goto para el bloque de salidas
-        traduccion = "goto finfuncion;"
+        # traduccion = "goto finfuncion;"
+        traduccion = TT.Traduccion("","goto finfuncion","","",";")
         self.agregarTraduccion(traduccion)        
         
         self.funciones[funcion['nombre']] = funcion
@@ -436,7 +440,8 @@ class Analizador:
             if simbolo == None:
                 simbolo = TS.Simbolo(instruccion.identificador, "$t"+str(self.indice_temporal), None, 0, ambito,TS.TIPO.VARIABLE)
                 self.agregarSimbolo(simbolo, ts)
-                traduccion = str(simbolo.referencia)+"=0;"
+                # traduccion = str(simbolo.referencia)+"=0;"
+                traduccion = TT.Traduccion(str(simbolo.referencia),"0","","",";")
                 self.agregarTraduccion(traduccion)
             self.procesar_simbolo_asignacion(simbolo, instruccion.simbolo_asignacion, valor, ts)
         elif isinstance(instruccion, AsignacionArray):
@@ -453,7 +458,8 @@ class Analizador:
                     gramatica.tablaerrores.agregar(error)
                 else:
                     referencia = str(simbolo.referencia)+str(indices)
-                    traduccion = referencia+"="+str(valor)+";"
+                    # traduccion = referencia+"="+str(valor)+";"
+                    traduccion = TT.Traduccion(str(referencia),str(valor),"","",";")
                     self.agregarTraduccion(traduccion)
         if isinstance(instruccion,AsignacionStruct):
             valor = self.resolver_expresion(instruccion.valor,ts,ambito)
@@ -488,40 +494,40 @@ class Analizador:
 
     def procesar_simbolo_asignacion(self, simbolo, simbolo_asignacion, valor, ts):
         if simbolo_asignacion == "=":
-            traduccion = str(simbolo.referencia)+"="+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
+            # traduccion = str(simbolo.referencia)+"="+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(valor),"","",";")
         elif simbolo_asignacion == "+=":
-            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"+"+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
+            # traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"+"+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"+",str(valor),";")
         elif simbolo_asignacion == "-=":
-            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"-"+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
+            # traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"-"+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"-",str(valor),";")
         elif simbolo_asignacion == "*=":
-            simbolo.valor *= valor
-            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"*"+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
+            # simbolo.valor *= valor
+            # traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"*"+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"*",str(valor),";")
         elif simbolo_asignacion == "<<=":
-            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"<<"+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
+            # traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"<<"+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"<<",str(valor),";")
         elif simbolo_asignacion == ">>=":
-            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+">>"+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
+            # traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+">>"+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),">>",str(valor),";")
         elif simbolo_asignacion == "&=":
-            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"&"+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
+            # traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"&"+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"&",str(valor),";")
         elif simbolo_asignacion == "^=":
-            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"^"+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
+            # traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"^"+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"^",str(valor),";")
         elif simbolo_asignacion == "|=":
-            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"|"+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
+            # traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"|"+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"|",str(valor),";")
         elif simbolo_asignacion == "/=":
-            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"/"+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
+            # traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"/"+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"/",str(valor),";")
         elif simbolo_asignacion == "%=":
-            traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"%"+str(valor)+";"
-            self.agregarTraduccion(traduccion, False)
-        ts.actualizar(simbolo)
+            # traduccion = str(simbolo.referencia)+"=" + str(simbolo.referencia)+"%"+str(valor)+";"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"&",str(valor),";")
+        self.agregarTraduccion(traduccion, False)
 
     def agregarSimbolo(self, simbolo, ts,ambito):
         temporal = ts.obtenerConAmbito(simbolo.id,ambito)
@@ -545,13 +551,15 @@ class Analizador:
         elif isinstance(exp, ExpresionIncremento):
             identificador = exp.variable
             simbolo = ts.obtener(identificador)
-            traduccion = simbolo.referencia+"="+str(simbolo.referencia)+"+1;"
+            # traduccion = simbolo.referencia+"="+str(simbolo.referencia)+"+1;"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"+","1",";")
             self.agregarTraduccion(traduccion)
             return simbolo.referencia
         elif isinstance(exp, ExpresionDecremento):
             identificador = exp.variable
             simbolo = ts.obtener(identificador)
-            traduccion = simbolo.referencia+"="+str(simbolo.referencia)+"-1;"
+            # traduccion = simbolo.referencia+"="+str(simbolo.referencia)+"-1;"
+            traduccion = TT.Traduccion(str(simbolo.referencia),str(simbolo.referencia),"-","1",";")
             self.agregarTraduccion(traduccion)
             return simbolo.referencia
         elif isinstance(exp, ExpresionRelacional):
@@ -626,19 +634,24 @@ class Analizador:
         valor2 = self.resolver_expresion(exp.expresion2,ts,ambito)
         if exp.operador == OPERACION.SUMA:
             referencia = "$t"+str(self.indice_temporal)
-            traduccion = referencia+"="+str(valor1)+"+"+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+"+"+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"+",str(valor2),";")
         elif exp.operador == OPERACION.RESTA:
             referencia = "$t"+str(self.indice_temporal)
-            traduccion = referencia+"="+str(valor1)+"-"+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+"-"+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"-",str(valor2),";")
         elif exp.operador == OPERACION.MULTIPLICACION:
             referencia = "$t"+str(self.indice_temporal)
-            traduccion = referencia+"="+str(valor1)+"*"+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+"*"+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"*",str(valor2),";")
         elif exp.operador == OPERACION.DIVISION:
             referencia = "$t"+str(self.indice_temporal)
-            traduccion = referencia+"="+str(valor1)+"/"+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+"/"+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"/",str(valor2),";")
         elif exp.operador == OPERACION.RESIDUO:
             referencia = "$t"+str(self.indice_temporal)
-            traduccion = referencia+"="+str(valor1)+"%"+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+"%"+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"%",str(valor2),";")
 
         self.agregarTraduccion(traduccion)
         return str(referencia)
@@ -649,17 +662,23 @@ class Analizador:
 
         referencia = "$t"+str(self.indice_temporal)
         if exp.operador == BIT.SHIFTIZQUIERDA:
-            traduccion = referencia+"="+str(valor1)+" << "+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+" << "+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"<<",str(valor2),";")
         elif exp.operador == BIT.SHIFTDERECHA:
-            traduccion = referencia+"="+str(valor1)+" >> "+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+" >> "+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),">>",str(valor2),";")
         elif exp.operador == BIT.AND:
-            traduccion = referencia+"="+str(valor1)+" & "+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+" & "+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"&",str(valor2),";")
         elif exp.operador == BIT.XOR:
-            traduccion = referencia+"="+str(valor1)+" ^ "+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+" ^ "+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"^",str(valor2),";")
         elif exp.operador == BIT.OR:
-            traduccion = referencia+"="+str(valor1)+" | "+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+" | "+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"|",str(valor2),";")
         elif exp.operador == BIT.NOT:
-            traduccion = referencia+"="+"~"+str(valor1)+";"
+            # traduccion = referencia+"="+"~"+str(valor1)+";"
+            traduccion = TT.Traduccion(str(referencia),"~"+str(valor1),"","",";")
 
         self.agregarTraduccion(traduccion)
         return str(referencia)
@@ -670,13 +689,17 @@ class Analizador:
 
         referencia = "$t"+str(self.indice_temporal)
         if exp.operador == LOGICO.AND:
-            traduccion = referencia+"="+str(valor1)+" && "+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+" && "+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"&&",str(valor2),";")
         elif exp.operador == LOGICO.OR:
-            traduccion = referencia+"="+str(valor1)+" || "+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+" || "+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"||",str(valor2),";")
         elif exp.operador == LOGICO.XOR:
-            traduccion = referencia+"="+str(valor1)+" xor "+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+" xor "+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"xor",str(valor2),";")
         elif exp.operador == LOGICO.NEGACION:
-            traduccion = referencia+"= !"+str(valor1)+";"
+            # traduccion = referencia+"= !"+str(valor1)+";"
+            traduccion = TT.Traduccion(str(referencia),"!"+str(valor1),"","",";")
         
         self.agregarTraduccion(traduccion)
         return str(referencia)
@@ -687,17 +710,23 @@ class Analizador:
 
         referencia = "$t"+str(self.indice_temporal)
         if exp.operador == RELACIONAL.COMPARACION:
-            traduccion = referencia+"="+str(valor1)+"=="+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+"=="+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"==",str(valor2),";")
         elif exp.operador == RELACIONAL.DIFERENTE:
-            traduccion = referencia+"="+str(valor1)+"!="+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+"!="+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"!=",str(valor2),";")
         elif exp.operador == RELACIONAL.MAYORIGUAL:
-            traduccion = referencia+"="+str(valor1)+">="+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+">="+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),">=",str(valor2),";")
         elif exp.operador == RELACIONAL.MENORIGUAL:
-            traduccion = referencia+"="+str(valor1)+"<="+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+"<="+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"<=",str(valor2),";")
         elif exp.operador == RELACIONAL.MAYOR:
-            traduccion = referencia+"="+str(valor1)+">"+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+">"+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),">",str(valor2),";")
         elif exp.operador == RELACIONAL.MENOR:
-            traduccion = referencia+"="+str(valor1)+"<"+str(valor2)+";"
+            # traduccion = referencia+"="+str(valor1)+"<"+str(valor2)+";"
+            traduccion = TT.Traduccion(str(referencia),str(valor1),"<",str(valor2),";")
 
         self.agregarTraduccion(traduccion)
         return str(referencia)

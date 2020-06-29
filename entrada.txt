@@ -1,26 +1,26 @@
-int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
+// int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
 
-int arregloLength = 10;
+// int arregloLength = 10;
 
-void burbuja10(a,b)
-{
-	int i, j, aux;
-	for( i = 0; i < arregloLength - 1; i++ )
-	{
-		for( j = 0; j < arregloLength - i - 1; j++ )
-		{
-			if(arreglo[ j + 1 ] < arreglo[ j ] )
-			{
-				aux = arreglo[ j + 1 ];
-				arreglo[ j + 1 ] = arreglo[ j ];
-                    				arreglo[ j ] = aux;
-			}
-		}
-	}
-}
+// void burbuja10(a,b)
+// {
+// 	int i, j, aux;
+// 	for( i = 0; i < arregloLength - 1; i++ )
+// 	{
+// 		for( j = 0; j < arregloLength - i - 1; j++ )
+// 		{
+// 			if(arreglo[ j + 1 ] < arreglo[ j ] )
+// 			{
+// 				aux = arreglo[ j + 1 ];
+// 				arreglo[ j + 1 ] = arreglo[ j ];
+//                     				arreglo[ j ] = aux;
+// 			}
+// 		}
+// 	}
+// }
 
-burbuja10("parametro1","parametro2");
-bu();
+// burbuja10("parametro1","parametro2");
+// bu();
 
 // void imprimirBurbuja10()
 // {
@@ -53,27 +53,27 @@ bu();
 
 // printf("fin");
 
-// int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
+int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
 
-// int arregloLength = 10;
+int arregloLength = 10;
 
-// int i, j, aux;
-// 	for( i = 0; i <= arregloLength - 1; i++ )
-// 	{
-// 		for( j = 0; j < arregloLength - i - 1; j++ )
-// 		{
-// 			if(arreglo[ j + 1 ] < arreglo[ j ] )
-// 			{
-// 				aux = arreglo[ j + 1 ];
-// 				arreglo[ j + 1 ] = arreglo[ j ];
-//                 arreglo[ j ] = aux;
-// 			}
-// 		}
-// 	}
-// for( int i  = 0; i < arregloLength; i++)
-// 	{
-// 		printf("posicion :", i,"\n", arreglo[i],"\n");
-// 	}
-// printf("fin");
+int i, j, aux;
+	for( i = 0; i <= arregloLength - 1; i++ )
+	{
+		for( j = 0; j < arregloLength - i - 1; j++ )
+		{
+			if(arreglo[ j + 1 ] < arreglo[ j ] )
+			{
+				aux = arreglo[ j + 1 ];
+				arreglo[ j + 1 ] = arreglo[ j ];
+                arreglo[ j ] = aux;
+			}
+		}
+	}
+for( int i  = 0; i < arregloLength; i++)
+	{
+		printf("posicion :", i,"\n", arreglo[i],"\n");
+	}
+printf("fin");
 
 
