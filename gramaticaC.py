@@ -1,8 +1,9 @@
-from graphviz import Graph
 #
 #LUDWIN ROMARIO BURRIÓN IMUCHAC
 #201314001
 #
+from graphviz import Graph
+from tablaerrores import *
 
 i=0
 def inc():
@@ -155,9 +156,8 @@ def t_newline(t):
 
 
 def t_error(t):
-    print("Caracter no reconocido '%s'" % t.value[0])
-    # error = Error("LEXICO","Caracter no reconocido '%s'" % t.value[0],t.lexer.lineno)
-    # errores.agregar(error)
+    error = Error("LEXICO","Caracter no reconocido '%s'" % t.value[0],t.lexer.lineno)
+    errores.agregar(error)
     t.lexer.skip(1)
 
 import ply.lex as lex
@@ -205,7 +205,7 @@ def p_lista_instrucciones_instruccion(t):
     t[0] = [t[1]]
 
 def p_instruccion(t):
-    '''instruccion              :   instruccion_funcion
+    '''instruccion              :   declarar_funcion
                                 |   sentencia'''
     t[0] = t[1]
 
@@ -217,8 +217,8 @@ def p_definir_struct(t):
     for item in t[3]:
         dot.edge(str(id),str(item.id_dot))
 
-def p_instruccion_funcion_con_params(t):
-    'instruccion_funcion        :   tipo IDENTIFICADOR ABREPARENTESIS params CIERRAPARENTESIS declaracion_compuesta'
+def p_declarar_funcion_con_params(t):
+    'declarar_funcion        :   tipo IDENTIFICADOR ABREPARENTESIS params CIERRAPARENTESIS declaracion_compuesta'
     id = inc()
     t[0] = Funcion(id,t.lexer.lineno,t[1],str(t[2]),t[6],t[4].valor)
     dot.node(str(id),"Función: "+str(t[2]))
@@ -228,8 +228,8 @@ def p_instruccion_funcion_con_params(t):
         dot.edge(str(id),str(item.id_dot))
 
 #Sin parametros
-def p_instruccion_funcion_sin_params(t):
-    'instruccion_funcion        :   tipo IDENTIFICADOR ABREPARENTESIS CIERRAPARENTESIS declaracion_compuesta'
+def p_declarar_funcion_sin_params(t):
+    'declarar_funcion        :   tipo IDENTIFICADOR ABREPARENTESIS CIERRAPARENTESIS declaracion_compuesta'
     id = inc()
     t[0] = Funcion(id,t.lexer.lineno,t[1],str(t[2]),t[5])
     dot.node(str(id),"Función: "+str(t[2]))
@@ -273,8 +273,23 @@ def p_sentencia(t):
                                 |   sentencia_print
                                 |   sentencia_incremento PUNTOCOMA
                                 |   sentencia_decremento PUNTOCOMA
+                                |   sentencia_funcion
                                 '''
     t[0] = t[1]
+
+def p_sentencia_funcion(t):
+    'sentencia_funcion          :   IDENTIFICADOR ABREPARENTESIS CIERRAPARENTESIS PUNTOCOMA'
+    id = inc()
+    t[0] = LlamaFuncion(id,t.lexer.lineno,t[1],None)
+    dot.node(str(id),str("llamada: ")+str(t[1]))
+
+def p_sentencia_funcion_params(t):
+    'sentencia_funcion          :   IDENTIFICADOR ABREPARENTESIS params CIERRAPARENTESIS PUNTOCOMA'
+    id = inc()
+    t[0] = LlamaFuncion(id,t.lexer.lineno,t[1],t[3].valor)
+    dot.node(str(id),str("llamada: ")+str(t[1]))
+    for item in t[3].valor:
+        dot.edge(str(id),str(item.id_dot),"indice")
 
 def p_sentencias_for(t):
     '''sentencias_for           :   declaracion_variable
@@ -1019,8 +1034,16 @@ def p_asignacion_compuesta(t):
     dot.node(str(id),str(t[1]))
 
 def p_error(t):
-    print("Error sintáctico en '%s'" % t.value)
-    print(t.lexer.lineno)
+    if t:
+        error = Error("SINTACTICO","Error sintactico en: '%s'" % t.value ,t.lexer.lineno)
+        tablaerrores.agregar(error)
+        parser.errok()
+    else:
+        error = Error("SINTACTICO","Se esperaba el simbolo ';'",-1)
+        tablaerrores.agregar(error)
+        parser.restart()
+    # print("Error sintáctico en '%s'" % t.value)
+    # print(t.lexer.lineno)
 
 import ply.yacc as yacc
 parser = yacc.yacc()
@@ -1030,11 +1053,13 @@ dot.attr(splines="false")
 dot.node_attr.update(shape='circle')
 dot.edge_attr.update(color="blue4")
 
+tablaerrores = TablaDeErrores()
 # print(input)
 # g = parser.parse(input)
 # print(g)
 
 def parse(input):
     dot.clear()
+    tablaerrores.clear()
     resultado = parser.parse(input)
     return resultado

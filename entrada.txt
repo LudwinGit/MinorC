@@ -1,18 +1,35 @@
-struct punto{
-    int x,y;
-};
+int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
 
-struct punto mipunto[2];
+int arregloLength = 10;
 
-mipunto[0].x = 10;
-mipunto[0].x = 20;
-mipunto[0].x = 30;
+void burbuja10(a,b)
+{
+	int i, j, aux;
+	for( i = 0; i < arregloLength - 1; i++ )
+	{
+		for( j = 0; j < arregloLength - i - 1; j++ )
+		{
+			if(arreglo[ j + 1 ] < arreglo[ j ] )
+			{
+				aux = arreglo[ j + 1 ];
+				arreglo[ j + 1 ] = arreglo[ j ];
+                    				arreglo[ j ] = aux;
+			}
+		}
+	}
+}
 
-int a = mipunto[0].x;
+burbuja10("parametro1","parametro2");
+bu();
 
-// struct punto mipunto;
-// mipunto.x =20;
-// int a = mipunto.x;
+// void imprimirBurbuja10()
+// {
+// 	for( int i  = 0; i < arregloLength; i++)
+// 	{
+// 		printf("posicion %d: %i\n", i, arreglo[i]);
+// 	}
+// }
+
 // int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
 
 // int arregloLength = 10;

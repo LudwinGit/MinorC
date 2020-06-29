@@ -1,8 +1,9 @@
 import gramaticaC as gramatica
 from expresiones import *
 from instrucciones import *
+from tablaerrores import *
 import tablasimbolos as TS
-from ContenedorError import *
+import tablatraducciones as TT
 import sys
 
 
@@ -16,11 +17,13 @@ class Analizador:
         self.structs = {}
         self.funciones={}
         self.traducciones[len(self.traducciones)] = { "ambito":0,"traduccion":"main:"}
+        self.salida_funciones={}
         self.indice_temporal = 0
         self.indice_parametro = 0
         self.indice_etiqueta = 0
         self.indice_ambito = 0
         self.indice_ambito_max =0
+        self.indice_ra=0
         self.procesar_instrucciones(self.ast, self.ts_global,"main0")
         self.getTraduccion()
         # self.imprimir_tabla(self.ts_global)
@@ -57,7 +60,37 @@ class Analizador:
                 self.procesar_for(instruccion,ts,ambito)
             elif isinstance(instruccion,Print):
                 self.procesar_print(instruccion,ts,ambito)
+            elif isinstance(instruccion,LlamaFuncion):
+                self.procesar_llamada(instruccion,ts,ambito)
 
+    def procesar_llamada(self,instruccion,ts,ambito):
+        if instruccion.funcion in self.funciones:
+            funcion = self.funciones[instruccion.funcion]
+            etiquetaFin = "final"+str(self.indice_etiqueta)
+            self.indice_etiqueta+=1
+            for i in funcion['parametros']:
+                try:
+                    parametro = instruccion.parametros.pop(0)
+                    valor = self.resolver_expresion(parametro.identificador,ts,ambito)
+                    traduccion = str(funcion['parametros'][i])+"="+str(valor)
+                except :
+                    valor = 0
+                    traduccion = str(funcion['parametros'][i])+"="+str(valor)
+                    error = Error("SEMANTICO","PARAMETRO NO SUMINISTRADO",instruccion.linea)
+                    gramatica.tablaerrores.agregar(error)
+                self.agregarTraduccion(traduccion,False)
+            traduccion = "$ra="+str(self.indice_ra)+";"
+            self.agregarTraduccion(traduccion,False)
+            self.indice_ra += 1
+
+            traduccion = "goto "+funcion['etiqueta']+";"
+            self.agregarTraduccion(traduccion,False)
+            
+            traduccion = str(etiquetaFin)+":"
+            self.agregarTraduccion(traduccion,False)
+        else:
+            error = Error("SEMANTICO","la funcion \'"+str(instruccion.funcion)+"\' no existe",instruccion.linea)
+            gramatica.tablaerrores.agregar(error)
 
     def procesar_print(self,instruccion,ts,ambito):
         for index in instruccion.prints:
@@ -103,6 +136,7 @@ class Analizador:
                         simbolo = ts.obtener(variable.identificador)
                         error = Error(
                             "SEMANTICO", "La variable \'"+str(variable.identificador)+"\' ya ha sido declarada en el mismo ambito", instruccion.linea)
+                        gramatica.tablaerrores.agregar(error)
                     if traducir:
                         if valor != None:
                             traduccion = str(simbolo.referencia)+"="+str(valor)+";"
@@ -129,6 +163,7 @@ class Analizador:
                             simbolo = ts.obtener(id)
                             error = Error(
                                 "SEMANTICO", "La variable \'"+str(id)+"\' ya ha sido declarada en el mismo ambito", instruccion.linea)
+                            gramatica.tablaerrores.agregar(error)
                         if valor != None:
                             traduccion = str(simbolo.referencia)+ "[\'"+str(i)+"\']"+"="+str(valor)+";"
                         else:
@@ -207,6 +242,7 @@ class Analizador:
             simbolo = self.agregarSimbolo(simbolo,ts,ambito)
             if simbolo == None:
                 error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
+                gramatica.tablaerrores.agregar(error)
             if traducir:
                 traduccion = referencia + "=" + "array();"
                 self.agregarTraduccion(traduccion, False)
@@ -266,6 +302,7 @@ class Analizador:
             struct.setdefault(simbolo.id,{'valor':0,'tipo':tipo,'valor':simbolo.valor})
         if identificador in self.structs:
                 error = Error("SEMANTICO", "El struct \'"+identificador+"\' ya ha sido declarada ya ha sido definida", instruccion.linea)
+                gramatica.tablaerrores.agregar(error)
         else:self.structs.setdefault(identificador,struct)
         return None
 
@@ -373,7 +410,7 @@ class Analizador:
         if instruccion.parametros != None:
             for parametro in instruccion.parametros:
                 id =parametro.identificador.identificador
-                referencia = "a"+str(self.indice_parametro)
+                referencia = "$a"+str(self.indice_parametro)
                 self.indice_parametro += 1
                 simbolo = TS.Simbolo(id,referencia,instruccion.tipo.valor,0,etiqueta,TS.TIPO.PARAMETRO)
                 self.agregarSimbolo(simbolo,ts,instruccion.nombre)
@@ -383,6 +420,11 @@ class Analizador:
         traduccion = "\n"+str(etiqueta)+":"
         self.agregarTraduccion(traduccion)        
         self.procesar_instrucciones(instruccion.instrucciones,ts,etiqueta)
+        
+        #Agregamos goto para el bloque de salidas
+        traduccion = "goto finfuncion;"
+        self.agregarTraduccion(traduccion)        
+        
         self.funciones[funcion['nombre']] = funcion
         self.reordenar_traducciones(self.indice_ambito)
         self.indice_ambito -= 1
@@ -408,6 +450,7 @@ class Analizador:
                 simbolo = ts.obtener(id,TS.TIPO.ARRAY)
                 if simbolo == None:
                     error = Error("SEMANTICO", "La variable \'"+str(id)+"\' no existe", instruccion.linea)
+                    gramatica.tablaerrores.agregar(error)
                 else:
                     referencia = str(simbolo.referencia)+str(indices)
                     traduccion = referencia+"="+str(valor)+";"
@@ -425,6 +468,7 @@ class Analizador:
                 else:
                     error = Error(
                     "SEMANTICO", "La variable \'"+str(instruccion.identificador)+"\' no esta definida", instruccion.linea)
+                    gramatica.tablaerrores.agregar(error)
             else:
                 indices = ""
                 for i in instruccion.indices:
@@ -440,6 +484,7 @@ class Analizador:
                 else:
                     error = Error(
                     "SEMANTICO", "La variable \'"+str(instruccion.identificador)+"\' no esta definida", instruccion.linea)
+                    gramatica.tablaerrores.agregar(error)
 
     def procesar_simbolo_asignacion(self, simbolo, simbolo_asignacion, valor, ts):
         if simbolo_asignacion == "=":
@@ -526,6 +571,7 @@ class Analizador:
                 return simbolo.referencia
             error = Error(
                     "SEMANTICO", "La variable \'"+str(exp.identificador)+"\' no ha sido declarada.", exp.linea)
+            gramatica.tablaerrores.agregar(error)
         elif isinstance(exp, ExpArray):
             identificador = exp.identificador
             posiciones = ""
@@ -537,6 +583,7 @@ class Analizador:
                 return str(simbolo.referencia)+str(posiciones)
             error = Error(
                 "SEMANTICO", "La variable \'"+str(exp.identificador)+"\' no ha sido declarada.", exp.linea)
+            gramatica.tablaerrores.agregar(error)
         elif isinstance(exp, ExpresionAbsoluto):
             valor = self.resolver_expresion(exp.expresion,ts,ambito)
             return "abs("+str(valor)+")"
@@ -564,14 +611,14 @@ class Analizador:
             atributo = exp.atributo
             if simbolo == None:
                 error = Error("SEMANTICO","La variable \'"+str(exp.variable)+"\' de tipo struct no esta definida")
+                gramatica.tablaerrores.agregar(error)
             else:
                 if exp.indices !=None:
                     indices=""
                     for i in exp.indices:
                         indice = self.resolver_expresion(i,ts,ambito)
                         indices += "["+str(indice)+"]"
-            # identificador = self.resolver_expresion(exp.variable,ts,ambito)
-                return str(simbolo.referencia)+str(indices)+"[\'"+atributo+"\']"
+                return str(simbolo.referencia)+str(indices)+"[\'"+str(atributo)+"\']"
         return 0
 
     def resolver_aritmetica(self,exp,ts,ambito):

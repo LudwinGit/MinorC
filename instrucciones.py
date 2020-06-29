@@ -100,6 +100,12 @@ class Funcion(Instruccion):
         self.instrucciones = instrucciones
         self.parametros = parametros
     
+class LlamaFuncion(Instruccion):
+    def __init__(self,id_dot,linea,funcion,parametros):
+        self.id_dot = id_dot
+        self.linea = linea
+        self.funcion = funcion
+        self.parametros = parametros
 
 class If(Instruccion):
     'clase abstracta para if'

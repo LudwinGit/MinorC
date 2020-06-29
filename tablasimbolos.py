@@ -21,6 +21,13 @@ class TablaDeSimbolos() :
 
     def agregar(self, simbolo) :
         self.simbolos[len(self.simbolos)] = simbolo
+
+    def busquedaRef(self,referencia):
+        for indice in reversed(self.simbolos):
+            simbolo = self.simbolos[indice]
+            if simbolo.referencia == referencia:
+                return simbolo
+        return None
     
     def obtener(self, id,funcion=TIPO.VARIABLE) :
         for indice in reversed(self.simbolos):
