@@ -1,24 +1,62 @@
-int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
+struct punto{
+    int x,y;
+};
 
-int arregloLength = 10;
+struct punto mipunto[2];
 
-int i, j, aux;
-	for( i = 0; i <= arregloLength - 1; i++ )
-	{
-		for( j = 0; j < arregloLength - i - 1; j++ )
-		{
-			if(arreglo[ j + 1 ] < arreglo[ j ] )
-			{
-				aux = arreglo[ j + 1 ];
-				arreglo[ j + 1 ] = arreglo[ j ];
-                arreglo[ j ] = aux;
-			}
-		}
-	}
-for( int i  = 0; i < arregloLength; i++)
-	{
-		printf("posicion :", i,"\n", arreglo[i],"\n");
-	}
-printf("fin");
+mipunto[0].x = 10;
+mipunto[0].x = 20;
+mipunto[0].x = 30;
+
+int a = mipunto[0].x;
+
+// struct punto mipunto;
+// mipunto.x =20;
+// int a = mipunto.x;
+// int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
+
+// int arregloLength = 10;
+
+// void burbuja10(a,int b)
+// {
+// 	int i, j, aux;
+// 	for( i = 0; i < arregloLength - 1; i++ )
+// 	{
+// 		for( j = 0; j < arregloLength - i - 1; j++ )
+// 		{
+// 			if(arreglo[ j + 1 ] < arreglo[ j ] )
+// 			{
+// 				aux = arreglo[ j + 1 ];
+// 				arreglo[ j + 1 ] = arreglo[ j ];
+//                 arreglo[ j ] = aux;
+// 			}
+// 		}
+// 	}
+// }
+
+// printf("fin");
+
+// int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
+
+// int arregloLength = 10;
+
+// int i, j, aux;
+// 	for( i = 0; i <= arregloLength - 1; i++ )
+// 	{
+// 		for( j = 0; j < arregloLength - i - 1; j++ )
+// 		{
+// 			if(arreglo[ j + 1 ] < arreglo[ j ] )
+// 			{
+// 				aux = arreglo[ j + 1 ];
+// 				arreglo[ j + 1 ] = arreglo[ j ];
+//                 arreglo[ j ] = aux;
+// 			}
+// 		}
+// 	}
+// for( int i  = 0; i < arregloLength; i++)
+// 	{
+// 		printf("posicion :", i,"\n", arreglo[i],"\n");
+// 	}
+// printf("fin");
 
 

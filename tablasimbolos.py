@@ -4,6 +4,7 @@ class TIPO(Enum):
     ARRAY = 2
     FUNCION = 3
     ETIQUETA = 4
+    PARAMETRO = 5
 
 class Simbolo() :
     def __init__(self, id,referencia, tipo,valor,ambito,funcion) :

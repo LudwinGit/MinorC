@@ -135,26 +135,37 @@ class Analizador:
                             traduccion = str(simbolo.referencia)+ "[\'"+str(i)+"\']"+";"
                         self.agregarTraduccion(traduccion)
                     elif struct[i]['tipo'] == TS.TIPO.ARRAY:
+                        print("Aun no tipo.array dentro de los atributos")
                         #Aun no  arrays en struct
-                        referencia = "$t" + str(self.indice_temporal)
-                        id = str(instruccion.identificador)
-                        simbolo = TS.Simbolo(id, referencia, instruccion.struct, valor, ambito,TS.TIPO.VARIABLE)
-                        resultado = self.agregarSimbolo(simbolo, ts,ambito)
+                        # referencia = "$t" + str(self.indice_temporal)
+                        # id = str(instruccion.identificador)
+                        # simbolo = TS.Simbolo(id, referencia, instruccion.struct, valor, ambito,TS.TIPO.VARIABLE)
+                        # resultado = self.agregarSimbolo(simbolo, ts,ambito)
                         
-                        if resultado == None:
-                            simbolo = ts.obtener(id)
-                            error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
+                        # if resultado == None:
+                        #     simbolo = ts.obtener(id)
+                        #     error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
                         
-                        if valor!=None:
-                            traduccion = str(simbolo.referencia)+ "[\'"+str(id)+"\'] ="+str(valor)+";"
-                        else:
-                            traduccion = str(simbolo.referencia)+ "[\'"+str(id)+"\'];"
-                        self.agregarTraduccion(traduccion,False)
+                        # if valor!=None:
+                        #     traduccion = str(simbolo.referencia)+ "[\'"+str(id)+"\'] ="+str(valor)+";"
+                        # else:
+                        #     traduccion = str(simbolo.referencia)+ "[\'"+str(id)+"\'];"
+                        # self.agregarTraduccion(traduccion,False)
             self.indice_temporal += 1  # Para cambiar de variable al finalizar
         elif isinstance(instruccion,DeclaracionStructArray):
             if traducir:
-                traduccion = "$t" + str(self.indice_temporal) + "=" + "array();"
-                self.agregarTraduccion(traduccion, False)
+                struct = self.structs[instruccion.struct]
+                declarada = ts.obtener(str(instruccion.identificador))
+                if declarada == None:
+                    traduccion = "$t" + str(self.indice_temporal) + "=" + "array();"
+                    self.agregarTraduccion(traduccion, False)
+                    
+                    referencia = "$t" + str(self.indice_temporal)
+                    id = str(instruccion.identificador)
+                    simbolo = TS.Simbolo(id, referencia, instruccion.struct, 0, ambito,TS.TIPO.VARIABLE)
+                    validarSimbolo = self.agregarSimbolo(simbolo,ts,ambito)
+
+
             indices = self.resolver_expresion(instruccion.indices[0],ts,ambito)
             indice = 0
             while indice<indices:
@@ -164,29 +175,29 @@ class Analizador:
                         valor = struct[i]['valor']
                         if struct[i]['tipo'] == TS.TIPO.VARIABLE:
                             referencia = "$t" + str(self.indice_temporal)+"["+str(indice)+"]"+ "[\'"+str(i)+"\']"
-                            id = str(instruccion.identificador)+str(indice)+str(i)
-                            simbolo = TS.Simbolo(id, referencia, instruccion.struct, valor, ambito,TS.TIPO.VARIABLE)
-                            resultado = self.agregarSimbolo(simbolo, ts,ambito)
+                            # id = str(instruccion.identificador)+str(indice)+str(i)
+                            # simbolo = TS.Simbolo(id, referencia, instruccion.struct, valor, ambito,TS.TIPO.VARIABLE)
+                            # resultado = self.agregarSimbolo(simbolo, ts,ambito)
                             
-                            if resultado == None:
-                                error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
-                            else:
-                                if traducir:
-                                    traduccion = str(simbolo.referencia)+"="+str(valor)+";"
-                                    self.agregarTraduccion(traduccion,False)
+                            # if resultado == None:
+                            #     error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
+                            # else:
+                            if traducir:
+                                traduccion = str(referencia)+"="+str(valor)+";"
+                                self.agregarTraduccion(traduccion,False)
                         elif struct[i]['tipo'] == TS.TIPO.ARRAY:
                             ref = i.split(",")
                             referencia = "$t" + str(self.indice_temporal) +"["+str(indice)+"]"+ "[\'"+str(ref[0])+"\']" + str(ref[1])
-                            id = str(instruccion.identificador)+str(indice)+str(i)
-                            simbolo = TS.Simbolo(id, referencia, instruccion.struct, valor, ambito,TS.TIPO.VARIABLE)
-                            resultado = self.agregarSimbolo(simbolo, ts)
+                            # id = str(instruccion.identificador)+str(indice)+str(i)
+                            # simbolo = TS.Simbolo(id, referencia, instruccion.struct, valor, ambito,TS.TIPO.VARIABLE)
+                            # resultado = self.agregarSimbolo(simbolo, ts)
                             
-                            if resultado == None:
-                                error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
-                            else:
-                                if traducir:
-                                    traduccion = str(simbolo.referencia)+"="+str(valor)+";"
-                                    self.agregarTraduccion(traduccion,False)
+                            # if resultado == None:
+                            #     error = Error("SEMANTICO", "La variable ya ha sido declarada", instruccion.linea)
+                            # else:
+                            if traducir:
+                                traduccion = str(referencia)+"="+str(valor)+";"
+                                self.agregarTraduccion(traduccion,False)
                 indice +=1
             self.indice_temporal += 1  # Para cambiar de variable al finalizar
         elif isinstance(instruccion, DeclaracionArray):
@@ -354,16 +365,27 @@ class Analizador:
 
     def definir_funcion(self, instruccion,ts):
 
-        funcion = {"nombre":instruccion.nombre,"tipo":instruccion.tipo.valor,"parametros":{},"etiqueta":""}
-        print(funcion)
+        etiqueta = str(instruccion.nombre)+str(self.indice_etiqueta)
+        self.indice_etiqueta +=1
+        funcion = {"nombre":instruccion.nombre,"tipo":instruccion.tipo.valor,"parametros":{},"etiqueta":etiqueta}
+        simbolo = TS.Simbolo(instruccion.nombre,instruccion.nombre,instruccion.tipo.valor,0,etiqueta,TS.TIPO.FUNCION)
+        self.agregarSimbolo(simbolo,ts,etiqueta)
         if instruccion.parametros != None:
             for parametro in instruccion.parametros:
-                # identificador = self.resolver_expresion(parametro.identificador,ts,instruccion.nombre)
                 id =parametro.identificador.identificador
                 referencia = "a"+str(self.indice_parametro)
                 self.indice_parametro += 1
-                simbolo = TS.Simbolo(id,referencia,instruccion.tipo.valor,0,instruccion.nombre,TS.TIPO.FUNCION)
+                simbolo = TS.Simbolo(id,referencia,instruccion.tipo.valor,0,etiqueta,TS.TIPO.PARAMETRO)
                 self.agregarSimbolo(simbolo,ts,instruccion.nombre)
+                funcion['parametros'][len(funcion['parametros'])] = referencia
+        
+        self.indice_ambito += 1
+        traduccion = "\n"+str(etiqueta)+":"
+        self.agregarTraduccion(traduccion)        
+        self.procesar_instrucciones(instruccion.instrucciones,ts,etiqueta)
+        self.funciones[funcion['nombre']] = funcion
+        self.reordenar_traducciones(self.indice_ambito)
+        self.indice_ambito -= 1
 
     def procesar_asignacion(self, instruccion, ts, ambito):
         if isinstance(instruccion, AsignacionSimple):
@@ -383,7 +405,7 @@ class Analizador:
                     indice = self.resolver_expresion(i,ts,ambito)
                     indices += "["+str(indice)+"]"
                 id = instruccion.identificador
-                simbolo = ts.obtener(id)
+                simbolo = ts.obtener(id,TS.TIPO.ARRAY)
                 if simbolo == None:
                     error = Error("SEMANTICO", "La variable \'"+str(id)+"\' no existe", instruccion.linea)
                 else:
@@ -393,10 +415,13 @@ class Analizador:
         if isinstance(instruccion,AsignacionStruct):
             valor = self.resolver_expresion(instruccion.valor,ts,ambito)
             if instruccion.indices == None:
-                identificador = str(instruccion.identificador)+str(instruccion.atributo)
+                identificador = str(instruccion.identificador)
                 simbolo = ts.obtener(identificador)
                 if simbolo != None:
+                    referencia = str(simbolo.referencia)
+                    simbolo.referencia = referencia+"[\'"+str(instruccion.atributo)+"\']"
                     self.procesar_simbolo_asignacion(simbolo,instruccion.simbolo_asignacion, valor, ts)
+                    simbolo.referencia = referencia
                 else:
                     error = Error(
                     "SEMANTICO", "La variable \'"+str(instruccion.identificador)+"\' no esta definida", instruccion.linea)
@@ -404,11 +429,14 @@ class Analizador:
                 indices = ""
                 for i in instruccion.indices:
                     indice = self.resolver_expresion(i,ts,ambito)
-                    indices +=str(indice)
-                identificador = str(instruccion.identificador)+str(indices)+str(instruccion.atributo)
+                    indices += "["+str(indice)+"]"
+                identificador = str(instruccion.identificador)
                 simbolo = ts.obtener(identificador)
                 if simbolo != None:
+                    referencia = str(simbolo.referencia)
+                    simbolo.referencia = referencia+str(indices)+"[\'"+str(instruccion.atributo)+"\']"
                     self.procesar_simbolo_asignacion(simbolo,instruccion.simbolo_asignacion, valor, ts)
+                    simbolo.referencia = referencia
                 else:
                     error = Error(
                     "SEMANTICO", "La variable \'"+str(instruccion.identificador)+"\' no esta definida", instruccion.linea)
@@ -519,7 +547,8 @@ class Analizador:
             valor = self.resolver_expresion(exp.valor,ts,ambito)
             return "("+str(exp.tipo.valor)+")"+str(valor)
         elif isinstance(exp, ExpresionPuntero):
-            simbolo = ts.obtener(exp.identificador)
+            simbolo = ts.obtener(exp.identificador) 
+            simbolo = ts.obtener(exp.identificador,TS.TIPO.ARRAY) if simbolo==None else simbolo
             valor = 0 if simbolo == None else str(simbolo.referencia)
             return "&"+str(valor)
         elif isinstance(exp,ExpresionTernario):
@@ -530,6 +559,19 @@ class Analizador:
                 return self.resolver_expresion(exp.expFalsa,ts,ambito)
             return self.resolver_expresion(exp.expVerdadera,ts,ambito)
             # return self.resolver_expresion(exp.expVerdadera,ts,ambito)
+        elif isinstance(exp,ExpresionStruct):
+            simbolo = ts.obtener(exp.variable)
+            atributo = exp.atributo
+            if simbolo == None:
+                error = Error("SEMANTICO","La variable \'"+str(exp.variable)+"\' de tipo struct no esta definida")
+            else:
+                if exp.indices !=None:
+                    indices=""
+                    for i in exp.indices:
+                        indice = self.resolver_expresion(i,ts,ambito)
+                        indices += "["+str(indice)+"]"
+            # identificador = self.resolver_expresion(exp.variable,ts,ambito)
+                return str(simbolo.referencia)+str(indices)+"[\'"+atributo+"\']"
         return 0
 
     def resolver_aritmetica(self,exp,ts,ambito):
