@@ -93,6 +93,8 @@ class Analizador:
                 self.procesar_llamada(instruccion,ts,ambito)
             elif isinstance(instruccion,Return):
                 self.procesar_return(instruccion,ts,ambito)
+            elif isinstance(instruccion,While):
+                self.procesar_while(instruccion,ts,ambito)
 
     def procesar_return(self,instruccion,ts,ambito):
         simbolo = ts.buscarReturn(self.funcion_actual)
@@ -370,6 +372,27 @@ class Analizador:
         self.agregarTraduccion(traduccion)
         self.procesar_instrucciones(instruccion.instrucciones,ts_local,EtiquetaTrue)
         traduccion = TT.Traduccion("","goto "+str(etiquetaSalida),"","",";")
+        self.agregarTraduccion(traduccion)
+        self.reordenar_traducciones(self.indice_ambito)
+        self.indice_ambito -= 1
+
+    def procesar_while(self,instruccion,ts,ambito):
+        ts_local = TS.TablaDeSimbolos(ts.simbolos)
+        etiquetawhile = "while"+str(self.indice_etiqueta)
+        self.indice_etiqueta +=1
+        traduccion = TT.Traduccion("",etiquetawhile,"","",":")
+        self.agregarTraduccion(traduccion)
+        condicion = self.resolver_expresion(instruccion.expresion,ts,ambito)
+        EtiquetaTrue = "whileprocesa"+str(self.indice_etiqueta)
+        self.indice_etiqueta +=1
+        traduccion = TT.Traduccion("","if("+str(condicion)+")"," goto ",str(EtiquetaTrue),";")
+        self.agregarTraduccion(traduccion)
+        self.indice_ambito += 1
+
+        traduccion = TT.Traduccion("","\n"+str(EtiquetaTrue),"","",":")
+        self.agregarTraduccion(traduccion)
+        self.procesar_instrucciones(instruccion.instrucciones,ts_local,EtiquetaTrue)
+        traduccion = TT.Traduccion("","goto "+str(etiquetawhile),"","",";")
         self.agregarTraduccion(traduccion)
         self.reordenar_traducciones(self.indice_ambito)
         self.indice_ambito -= 1
