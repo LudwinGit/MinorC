@@ -23,7 +23,8 @@ class Analizador:
         self.indice_etiqueta = 0
         self.indice_ambito = 0
         self.indice_ambito_max =0
-        self.indice_ra=0
+        self.indice_ra=1
+        self.etiqueta_princial = "" #main
         self.procesar_instrucciones(self.ast, self.ts_global,"main0")
         self.getTraduccion()
         # self.imprimir_tabla(self.ts_global)
@@ -32,11 +33,19 @@ class Analizador:
         gramatica.dot.view()
 
     def getTraduccion(self):
+        self.indice_ra -= 1
+        while self.indice_ra >= 0:
+            traduccion = TT.Traduccion("","if ($ra == "+str(self.indice_ra)+")"," goto ","final"+str(self.indice_ra),";")
+            self.traducciones_salida[len(self.traducciones_salida)] = traduccion
+            self.indice_ra -= 1
+        self.traducciones_salida[len(self.traducciones_salida)] = TT.Traduccion("","\nfinfuncion","","",":")
+
         for traduccion in self.traducciones2:
             self.traducciones_salida[len(self.traducciones_salida)] = self.traducciones2[traduccion]['traduccion']
-            
-        # self.traducciones_salida[len(self.traducciones_salida)] = "goto main;" Pendiente
+        
         self.traducciones_salida[len(self.traducciones_salida)] = TT.Traduccion("","exit","","",";")
+        self.traducciones_salida[len(self.traducciones_salida)] = TT.Traduccion("","final0","","",":")
+        self.traducciones_salida[len(self.traducciones_salida)] =TT.Traduccion("","goto "+str(self.etiqueta_princial),"","",";")
         for traduccion in reversed(self.traducciones):
             self.traducciones_salida[len(self.traducciones_salida)] = self.traducciones[traduccion]['traduccion']
         for index in reversed(self.traducciones_salida):
@@ -59,7 +68,7 @@ class Analizador:
             elif isinstance(instruccion, Expresion):
                 self.resolver_expresion(instruccion, ts, ambito)
             elif isinstance(instruccion, If):
-                self.procesar_if(instruccion,ts,ambito)
+                self.procesar_ifelse(instruccion,ts,ambito)
             elif isinstance(instruccion,For):
                 self.procesar_for(instruccion,ts,ambito)
             elif isinstance(instruccion,Print):
@@ -69,8 +78,9 @@ class Analizador:
 
     def procesar_llamada(self,instruccion,ts,ambito):
         if instruccion.funcion in self.funciones:
+            valorrainicial = self.indice_ra
             funcion = self.funciones[instruccion.funcion]
-            etiquetaFin = "final"+str(self.indice_etiqueta)
+            etiquetaFin = "final"+str(self.indice_ra)
             self.indice_etiqueta+=1
             for i in funcion['parametros']:
                 try:
@@ -92,6 +102,9 @@ class Analizador:
             
             traduccion = TT.Traduccion("",str(etiquetaFin),"","",":")
             self.agregarTraduccion(traduccion,False)
+
+            # traduccion = TT.Traduccion("","goto finfuncion","-","",";")
+            # self.agregarTraduccion(traduccion,False)
         else:
             error = Error("SEMANTICO","la funcion \'"+str(instruccion.funcion)+"\' no existe",instruccion.linea)
             gramatica.tablaerrores.agregar(error)
@@ -115,7 +128,7 @@ class Analizador:
         elif isinstance(instruccion, Expresion):
             self.resolver_expresion(instruccion, ts, ambito)
         elif isinstance(instruccion, If):
-            self.procesar_if(instruccion,ts,ambito)
+            self.procesar_ifelse(instruccion,ts,ambito)
         elif isinstance(instruccion,For):
             self.procesar_for(instruccion,ts,ambito)
         elif isinstance(instruccion,Print):
@@ -297,40 +310,42 @@ class Analizador:
         else:self.structs.setdefault(identificador,struct)
         return None
 
-    def procesar_if(self,instruccion,ts,ambito):
+    def procesar_ifelse(self,instruccion,ts,ambito):
+        etiquetaSalida = "salidaif"+str(self.indice_etiqueta)
+        self.indice_etiqueta +=1
+        self.procesar_if(instruccion,ts,ambito,etiquetaSalida)
+        for indice in instruccion.elses:
+            ifelse = instruccion.elses[indice]
+            self.procesar_if(ifelse,ts,ambito,etiquetaSalida)
+        
+        if instruccion.instrucciones_else != None:
+            ts_local = TS.TablaDeSimbolos(ts.simbolos)
+            etiqueta = "else"+str(self.indice_etiqueta)
+            self.indice_etiqueta +=1
+            self.procesar_instrucciones(instruccion.instrucciones_else,ts_local,etiqueta)
+            self.indice_ambito += 1
+            self.reordenar_traducciones(self.indice_ambito)
+            self.indice_ambito -= 1
+        
+        traduccion = TT.Traduccion("",str(etiquetaSalida),"","",":")
+        self.agregarTraduccion(traduccion)
+
+    def procesar_if(self,instruccion,ts,ambito,etiquetaSalida):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
-        if isinstance(instruccion,Ifsimple):
-            EtiquetaTrue = "if"+str(self.indice_etiqueta)
-            self.indice_etiqueta +=1
-            EtiquetaSalida = "salidaif"+str(self.indice_etiqueta)
-            self.indice_etiqueta +=1
-            if instruccion.expresion != None: #No es un else
-                condicion = self.resolver_expresion(instruccion.expresion,ts_local,ambito)
-                # traduccion = "if ("+str(condicion)+") goto "+str(EtiquetaTrue)+";"
-                traduccion = TT.Traduccion("","if("+str(condicion)+")"," goto ",str(EtiquetaTrue),";")
-                self.agregarTraduccion(traduccion)
-                # traduccion = EtiquetaSalida+":"
-                traduccion = TT.Traduccion("",str(EtiquetaSalida),"","",":")
-                self.agregarTraduccion(traduccion)
-                self.indice_ambito += 1
-                # traduccion = "\n"+str(EtiquetaTrue)+":"
-                traduccion = TT.Traduccion("","\n"+str(EtiquetaTrue),"","",":")
-                self.agregarTraduccion(traduccion)
-                self.procesar_instrucciones(instruccion.instrucciones,ts_local,EtiquetaTrue)
-                # traduccion = "goto "+str(EtiquetaSalida) +";"
-                traduccion = TT.Traduccion("","goto "+str(EtiquetaSalida),"","",";")
-                self.agregarTraduccion(traduccion)
-                self.reordenar_traducciones(self.indice_ambito)
-                self.indice_ambito -= 1
-            else: 
-                print("Aun no > else")
-                # self.procesar_instrucciones(instruccion.instrucciones,ts_local,ambito)
-                # self.reordenar_traducciones(self.indice_ambito)
-        elif isinstance(instruccion,Ifelse):
-            for item in (instruccion.lista_if):
-                self.procesar_if(item,ts,ambito)
-        else:
-            print("If incorrecto....procesar_if")
+        EtiquetaTrue = "if"+str(self.indice_etiqueta)
+        self.indice_etiqueta +=1
+
+        condicion = self.resolver_expresion(instruccion.expresion,ts_local,ambito)
+        traduccion = TT.Traduccion("","if("+str(condicion)+")"," goto ",str(EtiquetaTrue),";")
+        self.agregarTraduccion(traduccion)
+        self.indice_ambito += 1
+        traduccion = TT.Traduccion("","\n"+str(EtiquetaTrue),"","",":")
+        self.agregarTraduccion(traduccion)
+        self.procesar_instrucciones(instruccion.instrucciones,ts_local,EtiquetaTrue)
+        traduccion = TT.Traduccion("","goto "+str(etiquetaSalida),"","",";")
+        self.agregarTraduccion(traduccion)
+        self.reordenar_traducciones(self.indice_ambito)
+        self.indice_ambito -= 1
 
     def procesar_for(self,instruccion,ts,ambito):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
@@ -384,8 +399,6 @@ class Analizador:
         self.indice_ambito -= 1
         # self.imprimir_tabla_traducciones(self.traducciones)
 
-        
-
     def reordenar_traducciones(self,ambito):
         temporal = self.traducciones.copy()
         for i in reversed(temporal):
@@ -403,9 +416,12 @@ class Analizador:
             print(tt[i])
 
     def definir_funcion(self, instruccion,ts):
-
-        etiqueta = str(instruccion.nombre)+str(self.indice_etiqueta)
-        self.indice_etiqueta +=1
+        # etiqueta = str(instruccion.nombre)+str(self.indice_etiqueta)
+        etiqueta = str(instruccion.nombre)
+        # self.indice_etiqueta +=1
+        if str(instruccion.nombre) == "main": 
+            etiqueta = str(instruccion.nombre)+"0"
+            self.etiqueta_princial = etiqueta
         funcion = {"nombre":instruccion.nombre,"tipo":instruccion.tipo.valor,"parametros":{},"etiqueta":etiqueta}
         simbolo = TS.Simbolo(instruccion.nombre,instruccion.nombre,instruccion.tipo.valor,0,etiqueta,TS.TIPO.FUNCION)
         self.agregarSimbolo(simbolo,ts,etiqueta)
@@ -424,6 +440,9 @@ class Analizador:
         self.agregarTraduccion(traduccion)        
         self.procesar_instrucciones(instruccion.instrucciones,ts,etiqueta)
         
+        if str(instruccion.nombre)=="main":
+            traduccion = TT.Traduccion("$ra","0","","",";")
+            self.agregarTraduccion(traduccion)
         #Agregamos goto para el bloque de salidas
         # traduccion = "goto finfuncion;"
         traduccion = TT.Traduccion("","goto finfuncion","","",";")

@@ -457,27 +457,30 @@ def p_sentencia_dowhile(t):
 def p_sentencia_if(t):
     'sentencia_if                   : if_list'
     t[0] =t[1]
-    for i in t[0]:
-        t[0] = i
+    # for i in t[0]:
+    #     t[0] = i
 
 def p_sententcia_if_else(t):
     'sentencia_if                   : if_list ELSE declaracion_compuesta'
     id = inc()
-    t[1].append(Ifsimple(id,t.lexer.lineno,None,t[3]))
-    id = inc()
-    t[0] = Ifelse(id,t.lexer.lineno,t[1])
-    dot.node(str(id),"IF-ELSE")
-    for item in t[1]:
-        dot.edge(str(id),str(item.id_dot))
+    t[1].instrucciones_else=t[3]
+    # print(type(t[1]),type(t[3]))
+    # t[1].append(Ifsimple(id,t.lexer.lineno,None,t[3]))
+    # id = inc()
+    t[0] = t[1]
+    # t[0] = Ifelse(id,t.lexer.lineno,t[1])
+    # dot.node(str(id),"IF-ELSE")
+    # for item in t[1]:
+    #     dot.edge(str(id),str(item.id_dot))
 
 def p_if_listado_k(t):
     'if_list                        : if_list ELSE if'
-    t[1].append(t[3])
+    t[1].agregarIf(t[3])
     t[0] = t[1]
 
 def p_if_listado(t):
     'if_list                        : if'
-    t[0] = [t[1]]
+    t[0] = t[1]
 
 def p_if(t):
     'if                             :   IF ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'

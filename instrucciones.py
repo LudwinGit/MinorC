@@ -111,11 +111,18 @@ class If(Instruccion):
     'clase abstracta para if'
 
 class Ifsimple(If):
-    def __init__(self,id_dot,linea,expresion,instrucciones):
+    def __init__(self,id_dot,linea,expresion,instrucciones,elses={},inst_else=None):
         self.id_dot = id_dot
         self.linea = linea
         self.expresion = expresion
         self.instrucciones = instrucciones
+        self.elses = elses
+        self.instrucciones_else = inst_else
+
+    def agregarIf(self,el):
+        self.elses[len(self.elses)] = el
+    
+
 
 class Ifelse(If):
     def __init__(self,id_dot,linea,lista_if):
