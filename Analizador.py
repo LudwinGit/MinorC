@@ -25,7 +25,9 @@ class Analizador:
         self.indice_ambito_max =0
         self.indice_ra=1
         self.etiqueta_princial = "" #main
-        self.procesar_instrucciones(self.ast, self.ts_global,"main0")
+        self.traducir_general = False
+        self.llenarFunciones(self.ast,self.ts_global,"main")
+        self.procesar_instrucciones(self.ast, self.ts_global,"main")
         self.getTraduccion()
         # self.imprimir_tabla(self.ts_global)
 
@@ -55,7 +57,14 @@ class Analizador:
             else:                
                 print(str(t.resultado)+"="+str(t.op1)+str(t.operador)+str(t.op2)+str(t.simbolofinaliza))
     
+
+    def llenarFunciones(self,instrucciones,ts,ambito):
+        self.traducir_general = False
+        for instruccion in instrucciones:
+            if isinstance(instruccion, Funcion):self.definir_funcion(instruccion,ts)
+
     def procesar_instrucciones(self,instrucciones,ts,ambito,traducir=True):
+        self.traducir_general = True
         for instruccion in instrucciones:
             if isinstance(instruccion, Declaracion):
                 self.procesar_declaracion(instruccion, ts, ambito,traducir)
@@ -409,7 +418,7 @@ class Analizador:
     def imprimir_tabla(self,ts):
         for i in ts.simbolos:
             simbolo = ts.simbolos[i]
-            print(simbolo.id,simbolo.referencia)
+            print(simbolo.id,simbolo.referencia,simbolo.ambito)
 
     def imprimir_tabla_traducciones(self,tt):
         for i in tt:
@@ -425,6 +434,7 @@ class Analizador:
         funcion = {"nombre":instruccion.nombre,"tipo":instruccion.tipo.valor,"parametros":{},"etiqueta":etiqueta}
         simbolo = TS.Simbolo(instruccion.nombre,instruccion.nombre,instruccion.tipo.valor,0,etiqueta,TS.TIPO.FUNCION)
         self.agregarSimbolo(simbolo,ts,etiqueta)
+        
         if instruccion.parametros != None:
             for parametro in instruccion.parametros:
                 id =parametro.identificador.identificador
@@ -434,6 +444,8 @@ class Analizador:
                 self.agregarSimbolo(simbolo,ts,instruccion.nombre)
                 funcion['parametros'][len(funcion['parametros'])] = referencia
         
+        if not self.traducir_general:
+            return
         self.indice_ambito += 1
         # traduccion = "\n"+str(etiqueta)+":"
         traduccion = TT.Traduccion("","\n"+str(etiqueta),"","",":")
@@ -458,7 +470,7 @@ class Analizador:
             simbolo = ts.obtener(instruccion.identificador)
             if simbolo == None:
                 simbolo = TS.Simbolo(instruccion.identificador, "$t"+str(self.indice_temporal), None, 0, ambito,TS.TIPO.VARIABLE)
-                self.agregarSimbolo(simbolo, ts)
+                self.agregarSimbolo(simbolo, ts,ambito)
                 # traduccion = str(simbolo.referencia)+"=0;"
                 traduccion = TT.Traduccion(str(simbolo.referencia),"0","","",";")
                 self.agregarTraduccion(traduccion)
@@ -549,13 +561,15 @@ class Analizador:
         self.agregarTraduccion(traduccion, False)
 
     def agregarSimbolo(self, simbolo, ts,ambito):
-        temporal = ts.obtenerConAmbito(simbolo.id,ambito)
+        temporal = ts.obtenerConAmbito(simbolo.id,ambito,simbolo.funcion)
         if (temporal == None):
             ts.agregar(simbolo)
             return simbolo
         return None
 
     def agregarTraduccion(self, traduccion, incrementar=True):
+        if not self.traducir_general:
+            return
         t = {'ambito':self.indice_ambito,'traduccion': traduccion}
         self.traducciones[len(self.traducciones)] = t
         if incrementar:
@@ -616,7 +630,10 @@ class Analizador:
             return "abs("+str(valor)+")"
         elif isinstance(exp, ExpresionNegativo):
             valor = self.resolver_expresion(exp.expresion,ts,ambito)
-            return "-"+str(valor)
+            referencia = "$t"+str(self.indice_temporal)
+            traduccion = TT.Traduccion(str(referencia),"","-",str(valor),";")
+            self.agregarTraduccion(traduccion)
+            return str(referencia)
         elif isinstance(exp, ExpresionCasteo):
             valor = self.resolver_expresion(exp.valor,ts,ambito)
             return "("+str(exp.tipo.valor)+")"+str(valor)
