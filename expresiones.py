@@ -100,10 +100,10 @@ class ExpresionRelacional(Expresion):
         self.expresion2 = expresion2
 
 class ExpFuncion(Expresion):
-    def __init__(self,id_dot,linea,nombre,parametros=None):
+    def __init__(self,id_dot,linea,funcion,parametros=None):
         self.id_dot = id_dot
         self.linea = linea
-        self.nombre = nombre
+        self.funcion = funcion
         self.parametros = parametros
 
 class ExpresionLogica(Expresion):

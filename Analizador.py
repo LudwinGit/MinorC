@@ -19,11 +19,15 @@ class Analizador:
         self.traducciones[len(self.traducciones)] = { "ambito":0,"traduccion":TT.Traduccion("","main","","",":")}
         self.salida_funciones={}
         self.indice_temporal = 0
+        self.indice_retorno = 0
         self.indice_parametro = 0
         self.indice_etiqueta = 0
         self.indice_ambito = 0
         self.indice_ambito_max =0
         self.indice_ra=1
+        self.indice_pila = 0
+        self.pila_funciones = []
+        self.pila_funciones.append(0)
         self.etiqueta_princial = "" #main
         self.traducir_general = False
         self.llenarFunciones(self.ast,self.ts_global,"main")
@@ -48,6 +52,8 @@ class Analizador:
         self.traducciones_salida[len(self.traducciones_salida)] = TT.Traduccion("","exit","","",";")
         self.traducciones_salida[len(self.traducciones_salida)] = TT.Traduccion("","final0","","",":")
         self.traducciones_salida[len(self.traducciones_salida)] =TT.Traduccion("","goto "+str(self.etiqueta_princial),"","",";")
+        self.traducciones_salida[len(self.traducciones_salida)] =TT.Traduccion("$ra","0","","",";")
+        self.traducciones_salida[len(self.traducciones_salida)] =TT.Traduccion("$s0","array()","","",";")
         for traduccion in reversed(self.traducciones):
             self.traducciones_salida[len(self.traducciones_salida)] = self.traducciones[traduccion]['traduccion']
         for index in reversed(self.traducciones_salida):
@@ -85,9 +91,8 @@ class Analizador:
             elif isinstance(instruccion,LlamaFuncion):
                 self.procesar_llamada(instruccion,ts,ambito)
 
-    def procesar_llamada(self,instruccion,ts,ambito):
+    def procesar_llamada(self,instruccion,ts,ambito):        
         if instruccion.funcion in self.funciones:
-            valorrainicial = self.indice_ra
             funcion = self.funciones[instruccion.funcion]
             etiquetaFin = "final"+str(self.indice_ra)
             self.indice_etiqueta+=1
@@ -117,6 +122,7 @@ class Analizador:
         else:
             error = Error("SEMANTICO","la funcion \'"+str(instruccion.funcion)+"\' no existe",instruccion.linea)
             gramatica.tablaerrores.agregar(error)
+            print("funcion no encontrada: ",instruccion.funcion)
 
     def procesar_print(self,instruccion,ts,ambito):
         for index in instruccion.prints:
@@ -431,7 +437,7 @@ class Analizador:
         if str(instruccion.nombre) == "main": 
             etiqueta = str(instruccion.nombre)+"0"
             self.etiqueta_princial = etiqueta
-        funcion = {"nombre":instruccion.nombre,"tipo":instruccion.tipo.valor,"parametros":{},"etiqueta":etiqueta}
+        funcion = {"nombre":instruccion.nombre,"tipo":instruccion.tipo.valor,"parametros":{},"etiqueta":etiqueta,"retorno":0}
         simbolo = TS.Simbolo(instruccion.nombre,instruccion.nombre,instruccion.tipo.valor,0,etiqueta,TS.TIPO.FUNCION)
         self.agregarSimbolo(simbolo,ts,etiqueta)
         
@@ -440,27 +446,38 @@ class Analizador:
                 id =parametro.identificador.identificador
                 referencia = "$a"+str(self.indice_parametro)
                 self.indice_parametro += 1
-                simbolo = TS.Simbolo(id,referencia,instruccion.tipo.valor,0,etiqueta,TS.TIPO.PARAMETRO)
+                simbolo = TS.Simbolo(id,referencia,instruccion.tipo.valor,0,etiqueta,TS.TIPO.VARIABLE)
                 self.agregarSimbolo(simbolo,ts,instruccion.nombre)
                 funcion['parametros'][len(funcion['parametros'])] = referencia
         
-        if not self.traducir_general:
+        if not self.traducir_general: #Bandera para indicar si estamos llenando la tabla o ejecutando
+            funcion['retorno'] = "$v"+str(self.indice_retorno)
+            self.indice_retorno+=1
+            self.funciones[funcion['nombre']] = funcion
             return
         self.indice_ambito += 1
         # traduccion = "\n"+str(etiqueta)+":"
         traduccion = TT.Traduccion("","\n"+str(etiqueta),"","",":")
-        self.agregarTraduccion(traduccion)        
+        self.agregarTraduccion(traduccion)
+
+        traduccion = TT.Traduccion("$s0["+str(self.indice_pila)+"]","$ra","","",";")
+        self.agregarTraduccion(traduccion)
+        
+        self.indice_pila +=1
+
         self.procesar_instrucciones(instruccion.instrucciones,ts,etiqueta)
         
-        if str(instruccion.nombre)=="main":
-            traduccion = TT.Traduccion("$ra","0","","",";")
-            self.agregarTraduccion(traduccion)
+        # self.indice_pila -=1
+        # if str(instruccion.nombre)=="main":
+            # traduccion = TT.Traduccion("$sp","$sp","-","1",";")
+            # self.agregarTraduccion(traduccion)
+        traduccion = TT.Traduccion("$ra","$s0["+str(self.indice_pila-1)+"]","","",";")
+        self.agregarTraduccion(traduccion)
         #Agregamos goto para el bloque de salidas
         # traduccion = "goto finfuncion;"
         traduccion = TT.Traduccion("","goto finfuncion","","",";")
         self.agregarTraduccion(traduccion)        
         
-        self.funciones[funcion['nombre']] = funcion
         self.reordenar_traducciones(self.indice_ambito)
         self.indice_ambito -= 1
 
@@ -663,6 +680,11 @@ class Analizador:
                         indice = self.resolver_expresion(i,ts,ambito)
                         indices += "["+str(indice)+"]"
                 return str(simbolo.referencia)+str(indices)+"[\'"+str(atributo)+"\']"
+        elif isinstance(exp,ExpFuncion):
+            self.procesar_llamada(exp,ts,ambito)
+            if exp.funcion in self.funciones:
+                funcion = self.funciones[exp.funcion]
+                return funcion['retorno']
         return 0
 
     def resolver_aritmetica(self,exp,ts,ambito):

@@ -860,7 +860,7 @@ def p_exp_funcion(t):
 def p_exp_funcion_con_parametros(t):
     'exp                        :   IDENTIFICADOR ABREPARENTESIS params CIERRAPARENTESIS'
     id = inc()
-    t[0] = ExpFuncion(id,t.lexer.lineno,t[1],t[3])
+    t[0] = ExpFuncion(id,t.lexer.lineno,t[1],t[3].valor)
     dot.node(str(id),str(t[1])+"()")
     dot.edge(str(id),str(t[3].id_dot))
 

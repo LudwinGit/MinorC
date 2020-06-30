@@ -122,8 +122,6 @@ class Ifsimple(If):
     def agregarIf(self,el):
         self.elses[len(self.elses)] = el
     
-
-
 class Ifelse(If):
     def __init__(self,id_dot,linea,lista_if):
         self.id_dot = id_dot
