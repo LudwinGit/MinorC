@@ -5,6 +5,7 @@ class TIPO(Enum):
     FUNCION = 3
     ETIQUETA = 4
     PARAMETRO = 5
+    RETURN = 6
 
 class Simbolo() :
     def __init__(self, id,referencia, tipo,valor,ambito,funcion) :
@@ -29,6 +30,13 @@ class TablaDeSimbolos() :
                 return simbolo
         return None
     
+    def buscarReturn(self,ambito):
+        for indice in reversed(self.simbolos):
+            simbolo = self.simbolos[indice]
+            if simbolo.ambito == ambito and simbolo.funcion == TIPO.RETURN:
+                return simbolo
+        return None
+
     def obtener(self, id,funcion=TIPO.VARIABLE) :
         for indice in reversed(self.simbolos):
             simbolo = self.simbolos[indice]

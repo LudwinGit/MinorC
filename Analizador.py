@@ -16,6 +16,7 @@ class Analizador:
         self.traducciones_salida = {}
         self.structs = {}
         self.funciones={}
+        self.funcion_actual = ""
         self.traducciones[len(self.traducciones)] = { "ambito":0,"traduccion":TT.Traduccion("","main","","",":")}
         self.salida_funciones={}
         self.indice_temporal = 0
@@ -90,6 +91,17 @@ class Analizador:
                 self.procesar_print(instruccion,ts,ambito)
             elif isinstance(instruccion,LlamaFuncion):
                 self.procesar_llamada(instruccion,ts,ambito)
+            elif isinstance(instruccion,Return):
+                self.procesar_return(instruccion,ts,ambito)
+
+    def procesar_return(self,instruccion,ts,ambito):
+        simbolo = ts.buscarReturn(self.funcion_actual)
+        if simbolo != None:
+            valor = self.resolver_expresion(instruccion.expresion,ts,ambito)
+            traduccion = TT.Traduccion(str(simbolo.id),str(valor),"","",";")
+            self.agregarTraduccion(traduccion)
+            traduccion = TT.Traduccion("","goto return"+str(self.funcion_actual),"","",";")
+            self.agregarTraduccion(traduccion)
 
     def procesar_llamada(self,instruccion,ts,ambito):        
         if instruccion.funcion in self.funciones:
@@ -452,9 +464,12 @@ class Analizador:
         
         if not self.traducir_general: #Bandera para indicar si estamos llenando la tabla o ejecutando
             funcion['retorno'] = "$v"+str(self.indice_retorno)
+            simbolo = TS.Simbolo("$v"+str(self.indice_retorno),"$v"+str(self.indice_retorno),instruccion.tipo.valor,0,etiqueta,TS.TIPO.RETURN)
+            self.agregarSimbolo(simbolo,ts,etiqueta)
             self.indice_retorno+=1
             self.funciones[funcion['nombre']] = funcion
             return
+        self.funcion_actual = etiqueta
         self.indice_ambito += 1
         # traduccion = "\n"+str(etiqueta)+":"
         traduccion = TT.Traduccion("","\n"+str(etiqueta),"","",":")
@@ -467,10 +482,14 @@ class Analizador:
 
         self.procesar_instrucciones(instruccion.instrucciones,ts,etiqueta)
         
+        self.funcion_actual = etiqueta
         # self.indice_pila -=1
-        # if str(instruccion.nombre)=="main":
+        # if str(etiqueta)=="main":
             # traduccion = TT.Traduccion("$sp","$sp","-","1",";")
             # self.agregarTraduccion(traduccion)
+
+        traduccion = TT.Traduccion("","return"+str(etiqueta),"","",":")
+        self.agregarTraduccion(traduccion)
         traduccion = TT.Traduccion("$ra","$s0["+str(self.indice_pila-1)+"]","","",";")
         self.agregarTraduccion(traduccion)
         #Agregamos goto para el bloque de salidas
