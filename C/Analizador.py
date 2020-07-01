@@ -184,8 +184,12 @@ class Analizador:
             valor = valor.replace("%c","")
             valor = valor.replace("%i","")
             valor = valor.replace("%s","")
+            valor = valor.replace(str("\\")+str("n")," ")
+            valor = valor.replace(str("\\")+str("t"),"  ")
             traduccion = TT.Traduccion("","print("+str(valor)+")","","",";")
             self.agregarTraduccion(traduccion)
+        traduccion = TT.Traduccion("","print('\\n')","","",";")
+        self.agregarTraduccion(traduccion)
             
     def procesar_instruccion(self,instruccion,ts,ambito,traducir=True):
         if isinstance(instruccion, Declaracion):
