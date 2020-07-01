@@ -64,7 +64,6 @@ class Analizador:
             else:                
                 print(str(t.resultado)+"="+str(t.op1)+str(t.operador)+str(t.op2)+str(t.simbolofinaliza))
     
-
     def llenarFunciones(self,instrucciones,ts,ambito):
         self.traducir_general = False
         for instruccion in instrucciones:
@@ -99,6 +98,16 @@ class Analizador:
                 self.procesar_switch(instruccion,ts,ambito)
             elif isinstance(instruccion,DoWhile):
                 self.procesar_dowhile(instruccion,ts,ambito)
+            elif isinstance(instruccion,Etiqueta):
+                etiqueta = "E"+str(instruccion.nombre)
+                self.indice_etiqueta +=1
+                traduccion = TT.Traduccion("","\n"+str(etiqueta),"","",":")
+                self.agregarTraduccion(traduccion)
+            elif isinstance(instruccion,Goto):
+                etiqueta = "E"+str(instruccion.etiqueta)
+                self.indice_etiqueta +=1
+                traduccion = TT.Traduccion("","goto "+str(etiqueta),"","",";")
+                self.agregarTraduccion(traduccion)
 
     def procesar_dowhile(self,instruccion,ts,ambito):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
