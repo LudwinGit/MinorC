@@ -1,16 +1,9 @@
 // int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
 
 void main(){
-    int a = '10';
-    switch(a){
-        case '1':
-            printf("caso 1");            
-        case '2':
-            printf("caso 1");
-        case 10:
-            printf("caso 10");
-        default:
-            printf("Default");
-    }
-       
+    int a = 10;
+    do{
+        printf(a,"\n");
+        a--;
+    }while(a > 0);
 }
