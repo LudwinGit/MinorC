@@ -3,7 +3,7 @@
 #201314001
 #
 from graphviz import Graph
-from tablaerrores import *
+from C.tablaerrores import *
 
 i=0
 def inc():
@@ -184,8 +184,8 @@ precedence = (
     ('left','ABREPARENTESIS','CIERRAPARENTESIS','ABRELLAVE','CIERRALLAVE','INCREMENT','DECREMENT')
     )
 
-from instrucciones import *
-from expresiones import *
+from C.instrucciones import *
+from C.expresiones import *
 
 def p_inicio(t):
     'inicio                     :   lista_instrucciones'

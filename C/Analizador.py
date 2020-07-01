@@ -1,11 +1,11 @@
-import gramaticaC as gramatica
-from expresiones import *
-from instrucciones import *
-from tablaerrores import *
-import tablasimbolos as TS
-import tablatraducciones as TT
+import C.gramaticaC as gramatica
+from C.expresiones import *
+from C.instrucciones import *
+from C.tablaerrores import *
+import C.tablasimbolos as TS
+import C.tablatraducciones as TT
 import sys
-
+import re
 
 class Analizador:
     def __init__(self, entrada):
@@ -33,7 +33,7 @@ class Analizador:
         self.traducir_general = False
         self.llenarFunciones(self.ast,self.ts_global,"main")
         self.procesar_instrucciones(self.ast, self.ts_global,"main")
-        self.getTraduccion()
+        # self.getTraduccion()
         # self.imprimir_tabla(self.ts_global)
 
     def generarView(self):
@@ -57,12 +57,14 @@ class Analizador:
         self.traducciones_salida[len(self.traducciones_salida)] =TT.Traduccion("$s0","array()","","",";")
         for traduccion in reversed(self.traducciones):
             self.traducciones_salida[len(self.traducciones_salida)] = self.traducciones[traduccion]['traduccion']
-        for index in reversed(self.traducciones_salida):
-            t = self.traducciones_salida[index]
-            if t.resultado == "":
-                print(str(t.resultado)+str(t.op1)+str(t.operador)+str(t.op2)+str(t.simbolofinaliza))
-            else:                
-                print(str(t.resultado)+"="+str(t.op1)+str(t.operador)+str(t.op2)+str(t.simbolofinaliza))
+        # for index in reversed(self.traducciones_salida):
+        #     t = self.traducciones_salida[index]
+        #     if t.resultado == "":
+        #         print(str(t.resultado)+str(t.op1)+str(t.operador)+str(t.op2)+str(t.simbolofinaliza))
+        #     else:                
+        #         print(str(t.resultado)+"="+str(t.op1)+str(t.operador)+str(t.op2)+str(t.simbolofinaliza))
+
+        return self.traducciones_salida
     
     def llenarFunciones(self,instrucciones,ts,ambito):
         self.traducir_general = False
@@ -177,7 +179,11 @@ class Analizador:
 
     def procesar_print(self,instruccion,ts,ambito):
         for index in instruccion.prints:
-            valor = self.resolver_expresion(index.valor,ts,ambito)
+            valor = str(self.resolver_expresion(index.valor,ts,ambito))
+            valor = valor.replace("%d","")
+            valor = valor.replace("%c","")
+            valor = valor.replace("%i","")
+            valor = valor.replace("%s","")
             traduccion = TT.Traduccion("","print("+str(valor)+")","","",";")
             self.agregarTraduccion(traduccion)
             
@@ -296,11 +302,12 @@ class Analizador:
                                 traduccion = TT.Traduccion(str(referencia),str(valor),"","",";")
                                 self.agregarTraduccion(traduccion,False)
                         elif struct[i]['tipo'] == TS.TIPO.ARRAY:
-                            ref = i.split(",")
-                            referencia = "$t" + str(self.indice_temporal) +"["+str(indice)+"]"+ "[\'"+str(ref[0])+"\']" + str(ref[1])
-                            if traducir:
-                                traduccion = TT.Traduccion(str(referencia),str(valor),"","",";")
-                                self.agregarTraduccion(traduccion,False)
+                            print("Aun si funcionar array ")
+                            # ref = i.split(",")
+                            # referencia = "$t" + str(self.indice_temporal) +"["+str(indice)+"]"+ "[\'"+str(ref[0])+"\']" + str(ref[1])
+                            # if traducir:
+                            #     traduccion = TT.Traduccion(str(referencia),str(valor),"","",";")
+                            #     self.agregarTraduccion(traduccion,False)
                 indice +=1
             self.indice_temporal += 1  # Para cambiar de variable al finalizar
         elif isinstance(instruccion, DeclaracionArray):

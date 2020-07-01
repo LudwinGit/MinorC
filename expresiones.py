@@ -1,169 +1,129 @@
 from enum import Enum
 
-class TIPO_DATO(Enum):
-    INT = 1
-    VOID = 2
-    CHAR = 3
-    DOUBLE=4
-    FLOAT=5
-    IDENTIFICADOR=6
-
-class OPERACION(Enum):
-    SUMA = 1
-    RESTA = 2
-    MULTIPLICACION = 3
-    DIVISION =4
+class OPERACION_ARITMETICA(Enum) :
+    MAS = 1
+    MENOS = 2
+    MULTI = 3
+    DIVIDIDO = 4
     RESIDUO = 5
 
-class RELACIONAL(Enum):
-    COMPARACION = 1
-    DIFERENTE =2
-    MAYORIGUAL = 3
-    MENORIGUAL = 4
-    MAYOR = 5
-    MENOR = 6
-
-class LOGICO(Enum):
-    AND =1
-    OR = 2
-    XOR = 3
-    NEGACION = 4
-
-class BIT(Enum):
+class OPERACION_LOGICA(Enum) :
     AND = 1
     OR = 2
     XOR = 3
-    SHIFTIZQUIERDA = 4
-    SHIFTDERECHA = 5
-    NOT = 6
+
+class OPERACION_RELACIONAL(Enum) :
+    IGUALQUE = 1
+    DISTINTO = 2
+    MAYORIGUAL = 3
+    MENORIGUAL = 4
+    MAYORQUE = 5
+    MENORQUE = 6
+
+class OPERACION_BIT_A_BIT(Enum) :
+    AND = 1
+    OR = 2
+    XOR = 3
+    SHIFT_IZQ = 4
+    SHIFT_DER = 5
+    
+class TIPO_VARIABLE(Enum) :
+    TEMPORAL = 1 
+    PARAMETRO = 2
+    VALOR_DEV_FUN = 3
+    RA = 4
+    STACK = 5
+    SP = 6
+
+class TIPO_DATO(Enum) :
+    ENTERO = 1
+    FLOTANTE = 2
+    CADENA = 3
+    ARREGLO = 4
+    CHAR = 5
+
+
+
+
+#------------------------------------------------------------------------
+
+class Casteo() :
+    def __init__(self,tipo_dato,variable) :
+        self.tipo_dato = tipo_dato
+        self.variable = variable
+
+#------------------------------------------------------------------------
+
+class UnitariaNegAritmetica() :
+    def __init__(self, exp) :
+        self.exp = exp
+
+class UnitariaLogicaNOT() :
+    def __init__(self, expresion):
+        self.expresion=expresion
+
+class UnitariaNotBB() :
+    def __init__(self, expresion):
+        self.expresion=expresion
+
+class UnariaReferencia() :
+    def __init__(self,tipoVar):
+        self.tipoVar=tipoVar
+
+#------------------------------------------------------------------------
 
 class Expresion:
     '''Clase abstracta'''
 
-class ExpNum(Expresion):
-    def __init__(self,id_dot,linea,valor):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.valor = valor
+class Parametro(Expresion) :
+    def __init__(self, expresion) :
+        self.expresion=expresion
 
-class ExpIdentificador(Expresion):
-    def __init__(self,id_dot,linea,identificador):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.identificador = identificador
-
-class ExpArray(Expresion):
-    def __init__(self,id_dot,linea,identificador,indices):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.identificador = identificador
-        self.indices = indices
-
-class ExpresionAritmetica(Expresion):
-    def __init__(self,id_dot,linea,expresion1,operador,expresion2):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.expresion1 = expresion1
-        self.operador = operador
-        self.expresion2 = expresion2
-
-class ExpresionAbsoluto(Expresion):
-    def __init__(self,id_dot,linea,expresion):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.expresion = expresion
-
-class ExpresionNegativo(Expresion):
-    def __init__(self,id_dot,linea,expresion):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.expresion = expresion
-
-class ExpresionPuntero(Expresion):
-    def __init__(self,id_dot,linea,identificador):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.identificador = identificador
-
-class ExpresionCadena(Expresion):
-    def __init__(self,id_dot,linea,valor):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.valor = valor
-
-class ExpresionRelacional(Expresion):
-    def __init__(self,id_dot,linea,expresion1,operador,expresion2):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.expresion1 = expresion1
-        self.operador = operador
-        self.expresion2 = expresion2
-
-class ExpFuncion(Expresion):
-    def __init__(self,id_dot,linea,funcion,parametros=None):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.funcion = funcion
-        self.parametros = parametros
-
-class ExpresionLogica(Expresion):
-    def __init__(self,id_dot,linea,expresion1,operador,expresion2):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.expresion1 = expresion1
-        self.operador = operador
-        self.expresion2 = expresion2
-
-class ExpresionBit(Expresion):
-    def __init__(self,id_dot,linea,expresion1,operador,expresion2):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.expresion1 = expresion1
-        self.operador = operador
-        self.expresion2 = expresion2
-
-class ExpresionStruct(Expresion):
-    def __init__(self,id_dot,linea,variable,atributo,indices=None):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.variable = variable
-        self.atributo = atributo
-        self.indices = indices
-
-class ExpresionDecremento(Expresion):
-    def __init__(self,id_dot,linea,variable):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.variable = variable
-
-class ExpresionIncremento(Expresion):
-    def __init__(self,id_dot,linea,variable):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.variable = variable
-
-class ExpresionSizeof(Expresion):
-    def __init__(self,id_dot,linea,valor):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.valor = valor
-
-class ExpresionCasteo(Expresion):
-    def __init__(self,id_dot,linea,tipo,valor):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.tipo = tipo
-        self.valor = valor
-
-class ExpresionTernario(Expresion):
-    def __init__(self,id_dot,linea,condicion,expVerdadera,expFalsa):
-        self.id_dot = id_dot
-        self.linea = linea
-        self.condicion = condicion
-        self.expVerdadera = expVerdadera
-        self.expFalsa = expFalsa
+class Variable(Expresion) :
     
-class ExpresionScanf(Expresion):
-    def __init__(self,id_dot,linea):
-        self.id_dot = id_dot
-        self.linea = linea
+    def __init__(self, id, tipoVar) :
+        self.id=id
+        self.tipoVar=tipoVar
+
+class ExpresionValor(Expresion) :
+
+    def __init__(self, val = 0) :
+        self.val = val
+
+class AccesoArray(Expresion) :
+    def __init__(self,tipoVar,params=[]) :
+        self.tipoVar=tipoVar
+        self.params=params
+#------------------------------------------------------
+
+class ExpresionAritmetica(Expresion) :
+   
+    def __init__(self, exp1, exp2, operador) :
+        self.exp1 = exp1
+        self.exp2 = exp2
+        self.operador = operador
+
+#------------------------------------------------------
+
+class ExpresionLogica(Expresion) :
+    
+    def __init__(self, exp1, exp2, operador) :
+        self.exp1 = exp1
+        self.exp2 = exp2
+        self.operador = operador
+
+#------------------------------------------------------
+class ExpresionRelacional(Expresion) :
+
+    def __init__(self,exp1,exp2,operador) :
+        self.exp1=exp1
+        self.exp2=exp2
+        self.operador=operador
+
+#------------------------------------------------------
+class ExpresionBitABit(Expresion) :
+
+    def __init__(self,exp1,exp2,operador) :
+        self.exp1=exp1
+        self.exp2=exp2
+        self.operador=operador

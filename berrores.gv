@@ -1,0 +1,10 @@
+digraph g {
+	node [height=.1 shape=plaintext]
+	table [label=<<TABLE>
+                            <TR>
+                                <TD>No</TD>
+                                <TD>Tipo Error</TD>
+                                <TD>Descripcion</TD>
+                                <TD>Linea</TD>
+                            </TR><TR><TD>1</TD><TD>Sintactico</TD><TD>Error de sintaxis en ;</TD><TD>25</TD></TR><TR><TD>2</TD><TD>Semantico</TD><TD>No se encontro la etiqueta returnsuma</TD><TD>22</TD></TR></TABLE>>]
+}
