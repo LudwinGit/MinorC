@@ -805,6 +805,8 @@ class Analizador:
             if exp.funcion in self.funciones:
                 funcion = self.funciones[exp.funcion]
                 return funcion['retorno']
+        elif isinstance(exp,ExpresionScanf):
+                return "read()"
         return 0
 
     def resolver_aritmetica(self,exp,ts,ambito):

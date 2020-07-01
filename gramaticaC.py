@@ -918,6 +918,12 @@ def p_exp_decremento_d(t):
     t[0] = ExpresionDecremento(id,t.lexer.lineno,t[1])
     dot.node(str(id),str(t[1])+"--")
 
+def p_exp_scanf(t):
+    'exp                        :   SCANF ABREPARENTESIS CIERRAPARENTESIS'
+    id = inc()
+    t[0] = ExpresionScanf(id,t.lexer.lineno)
+    dot.node(str(id),"scanf")
+
 def p_params(t):
     'params                     :   param_list'
     id = inc()

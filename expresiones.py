@@ -162,3 +162,8 @@ class ExpresionTernario(Expresion):
         self.condicion = condicion
         self.expVerdadera = expVerdadera
         self.expFalsa = expFalsa
+    
+class ExpresionScanf(Expresion):
+    def __init__(self,id_dot,linea):
+        self.id_dot = id_dot
+        self.linea = linea

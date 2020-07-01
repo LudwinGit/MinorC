@@ -1,8 +1,8 @@
 // int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
 
 void main(){
-    int a = 10;
-
+    int a;
+    a = scanf();
     if(a == 10){
         goto etiqueta1;
     }else{
