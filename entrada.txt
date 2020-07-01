@@ -1,25 +1,16 @@
-int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
-
-void imprimirArreglo(int i){
-    if (i <= 5){
-        while(i > 0){
-            printf("Primer if:",arreglo[i],"\n");
-            i--;
-        }
-    }
-    else if(i >5 && i<10){
-        while(i > 0){
-            printf("Segundo if:",arreglo[i],"\n");
-            i--;
-        }
-    }
-    else{
-        printf("NO SE PUEDE PROCESAR UN NUMERO MAYOR A 10","\n");
-    }
-}
+// int arreglo[10] = { 658, 245, 654, 956, 5, 754, 100, 89, 98, 120};
 
 void main(){
-    printf("Comienza main","\n");
-    imprimirArreglo(10);
-    printf("Finaliza main");
+    int a = '10';
+    switch(a){
+        case '1':
+            printf("caso 1");            
+        case '2':
+            printf("caso 1");
+        case 10:
+            printf("caso 10");
+        default:
+            printf("Default");
+    }
+       
 }

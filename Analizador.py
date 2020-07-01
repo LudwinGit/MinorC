@@ -95,6 +95,8 @@ class Analizador:
                 self.procesar_return(instruccion,ts,ambito)
             elif isinstance(instruccion,While):
                 self.procesar_while(instruccion,ts,ambito)
+            elif isinstance(instruccion,Switch):
+                self.procesar_switch(instruccion,ts,ambito)  
 
     def procesar_return(self,instruccion,ts,ambito):
         simbolo = ts.buscarReturn(self.funcion_actual)
@@ -144,7 +146,6 @@ class Analizador:
             traduccion = TT.Traduccion("","print("+str(valor)+")","","",";")
             self.agregarTraduccion(traduccion)
             
-
     def procesar_instruccion(self,instruccion,ts,ambito,traducir=True):
         if isinstance(instruccion, Declaracion):
             self.procesar_declaracion(instruccion, ts, ambito,traducir)
@@ -376,6 +377,48 @@ class Analizador:
         self.reordenar_traducciones(self.indice_ambito)
         self.indice_ambito -= 1
 
+    def procesar_switch(self,instruccion,ts,ambito):
+        ts_local = TS.TablaDeSimbolos(ts.simbolos)
+        etiqueta = "switch"+str(self.indice_etiqueta)
+        self.indice_etiqueta +=1
+        etiquetafin = "finswitch"+str(self.indice_etiqueta)
+        self.indice_etiqueta +=1
+        condicion = self.resolver_expresion(instruccion.expresion,ts,etiqueta)
+
+        traduccion = TT.Traduccion("","goto "+str(etiqueta),"","",";")
+        self.agregarTraduccion(traduccion)
+
+        traduccion = TT.Traduccion("",str(etiquetafin),"","",":")
+        self.agregarTraduccion(traduccion)
+        
+        self.indice_ambito += 1
+        
+        traduccion = TT.Traduccion("","\n"+str(etiqueta),"","",":")
+        self.agregarTraduccion(traduccion)
+
+        #---------------------Procesamos todos los cases
+        for case in instruccion.casos:
+            if case.expresion != None:
+                caso = str(condicion) +"=="+ str(self.resolver_expresion(case.expresion,ts,etiqueta))
+                etiquetacase = "if"+str(self.indice_etiqueta)
+                self.indice_etiqueta+=1
+                traduccion = TT.Traduccion("","if("+str(caso)+")"," goto ",str(etiquetacase),";")
+                self.agregarTraduccion(traduccion)
+                self.indice_ambito += 1
+                traduccion = TT.Traduccion("","\n"+str(etiquetacase),"","",":")
+                self.agregarTraduccion(traduccion)
+                self.procesar_instrucciones(case.instrucciones,ts,etiquetacase)
+                traduccion = TT.Traduccion("","goto "+str(etiquetafin),"","",";")
+                self.agregarTraduccion(traduccion)
+                self.reordenar_traducciones(self.indice_ambito)
+                self.indice_ambito -= 1
+            else:
+                self.procesar_instrucciones(case.instrucciones,ts,etiquetacase)
+        traduccion = TT.Traduccion("","goto "+str(etiquetafin),"","",";")
+        self.agregarTraduccion(traduccion)
+        self.reordenar_traducciones(self.indice_ambito)
+        self.indice_ambito -= 1
+      
     def procesar_while(self,instruccion,ts,ambito):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
         etiquetawhile = "while"+str(self.indice_etiqueta)
