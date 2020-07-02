@@ -14,6 +14,8 @@ class Analizador:
         self.traducciones = {}
         self.traducciones2 = {}
         self.traducciones_salida = {}
+        self.pila_control = {} #Para llegar a la profundidad de while,for,switch,etc para usar break,continue
+        self.indice_pila_control = 0
         self.structs = {}
         self.funciones={}
         self.funcion_actual = ""
@@ -136,6 +138,11 @@ class Analizador:
                 self.indice_etiqueta +=1
                 traduccion = TT.Traduccion("","goto "+str(etiqueta),"","",";")
                 self.agregarTraduccion(traduccion)
+            elif isinstance(instruccion,Break):
+                indice = len(self.pila_control)-1
+                if indice>=0:
+                    traduccion = TT.Traduccion("","goto "+str(self.pila_control[indice]),"","",";")
+                    self.agregarTraduccion(traduccion)
 
     def procesar_dowhile(self,instruccion,ts,ambito):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
@@ -147,6 +154,7 @@ class Analizador:
         self.indice_etiqueta +=1
 
         etiquetasalida = "dowhilefin"+str(self.indice_etiqueta)
+        self.pila_control.setdefault(len(self.pila_control),str(etiquetasalida))
         self.indice_etiqueta +=1
 
         traduccion = TT.Traduccion("",str(etiqueta),"","",":")
@@ -169,6 +177,8 @@ class Analizador:
         self.agregarTraduccion(traduccion)
         self.reordenar_traducciones(self.indice_ambito)
         self.indice_ambito -= 1
+        
+        self.pila_control.pop(len(self.pila_control)-1)
 
     def procesar_return(self,instruccion,ts,ambito):
         simbolo = ts.buscarReturn(self.funcion_actual)
@@ -463,6 +473,7 @@ class Analizador:
         etiqueta = "switch"+str(self.indice_etiqueta)
         self.indice_etiqueta +=1
         etiquetafin = "finswitch"+str(self.indice_etiqueta)
+        self.pila_control.setdefault(len(self.pila_control),str(etiquetafin))
         self.indice_etiqueta +=1
         condicion = self.resolver_expresion(instruccion.expresion,ts,etiqueta)
 
@@ -499,11 +510,19 @@ class Analizador:
         self.agregarTraduccion(traduccion)
         self.reordenar_traducciones(self.indice_ambito)
         self.indice_ambito -= 1
+        self.pila_control.pop(len(self.pila_control)-1)
       
     def procesar_while(self,instruccion,ts,ambito):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
+        
         etiquetawhile = "while"+str(self.indice_etiqueta)
         self.indice_etiqueta +=1
+
+        etiquetaSalida = "salidawhile"+str(self.indice_etiqueta)
+        self.indice_etiqueta +=1
+
+        self.pila_control.setdefault(len(self.pila_control),str(etiquetaSalida))
+
         traduccion = TT.Traduccion("",etiquetawhile,"","",":")
         self.agregarTraduccion(traduccion)
         condicion = self.resolver_expresion(instruccion.expresion,ts,ambito)
@@ -521,19 +540,26 @@ class Analizador:
         self.reordenar_traducciones(self.indice_ambito)
         self.indice_ambito -= 1
 
+        traduccion = TT.Traduccion("",str(etiquetaSalida),"","",":")
+        self.agregarTraduccion(traduccion)
+        
+        self.pila_control.pop(len(self.pila_control)-1)
+
     def procesar_for(self,instruccion,ts,ambito):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
         
         etiqueta =str("for")+str(self.indice_etiqueta)
         self.indice_etiqueta+=1
 
-        self.procesar_instruccion(instruccion.inicializacion,ts_local,etiqueta)
-
         etiquetaIngresa =str("ingresafor")+str(self.indice_etiqueta)
         self.indice_etiqueta+=1
         
         etiquetaSalida =str("salidafor")+str(self.indice_etiqueta)
         self.indice_etiqueta+=1
+
+        self.pila_control.setdefault(len(self.pila_control),str(etiquetaSalida))
+
+        self.procesar_instruccion(instruccion.inicializacion,ts_local,etiqueta)
         
         # traduccion = "goto "+str(etiqueta)+";"
         traduccion = TT.Traduccion("","goto "+str(etiqueta),"","",";")
@@ -572,6 +598,7 @@ class Analizador:
         self.reordenar_traducciones(self.indice_ambito)
         self.indice_ambito -= 1
         # self.imprimir_tabla_traducciones(self.traducciones)
+        self.pila_control.pop(len(self.pila_control)-1)
 
     def reordenar_traducciones(self,ambito):
         temporal = self.traducciones.copy()
