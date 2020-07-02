@@ -1,0 +1,11 @@
+graph {
+	1 [label=int]
+	2 [label=10]
+	3 [label=entero]
+	3 -- 2
+	4 [label="Declaración"]
+	4 -- 1
+	4 -- 3
+	5 [label=Inicio]
+	5 -- 4
+}

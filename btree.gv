@@ -1,0 +1,9 @@
+digraph g {
+	node [height=.1 shape=plaintext]
+	table [label=<<TABLE>
+                                <TR>
+                                    <TD>TIPO</TD>
+                                    <TD>DESCRIPCION</TD>
+                                    <TD>LINEA</TD>
+                                </TR><TR><TD>SINTACTICO</TD><TD>Se esperaba el simbolo ';'</TD><TD>-1</TD></TR></TABLE>>]
+}
