@@ -86,10 +86,9 @@ def pintar_TS_IDE():
 
 def ejec_minorc():
     contenido=editor.get("1.0",END)
-    analizador = Analisis.Analizador(contenido)
     contenedorEditor.Editor().delete(1.0,'end-1c')
-
-    traducciones= analizador.getTraduccion()
+    analizadorC.run(contenido)
+    traducciones= analizadorC.getTraduccion()
     for index in reversed(traducciones):
         t = traducciones[index]
         if t.resultado == "":
@@ -233,6 +232,10 @@ def draw_instruction(indexDeb):
     
 def ast_grafica():
     Inter.generarReporteAST()
+
+def ast_minorc():
+    # if analizadorC != None:
+    analizadorC.generarView()
 
 def gram_asc(): 
     Inter.generarReporteGramaticalAsc()
@@ -495,7 +498,7 @@ ejecutarMinorC = Menu(menubar, tearoff=0)
 ejecutarMinorC.add_command(label="Analisis", command=ejec_minorc)
 ejecutarMinorC.add_command(label="Gramatica",command=gram_asc)
 ejecutarMinorC.add_separator()
-ejecutarMinorC.add_command(label="AST", command=ast_grafica)
+ejecutarMinorC.add_command(label="AST", command=ast_minorc)
 ejecutarMinorC.add_command(label="Tabla de Simbolos", command=rep_tablasimbolos)
 ejecutarMinorC.add_command(label="Reporte Errores", command=rep_errores)
 
@@ -620,7 +623,7 @@ scroll2.pack(side=RIGHT, fill=Y)
 #mtexto=Text(cajaLateral)
 #mtexto.config(width=30, height=26)
 #mtexto.pack(side=BOTTOM)
-
+analizadorC = Analisis.Analizador()
 debugger =Treeview(leftBOTTOM)
 debugger["columns"]=("valor")
 debugger.column("#0", width=70, minwidth=30)

@@ -8,8 +8,8 @@ import sys
 import re
 
 class Analizador:
-    def __init__(self, entrada):
-        self.ast = gramatica.parse(entrada)
+    def __init__(self):
+        self.ast = {}
         self.ts_global = TS.TablaDeSimbolos()
         self.traducciones = {}
         self.traducciones2 = {}
@@ -35,6 +35,32 @@ class Analizador:
         self.procesar_instrucciones(self.ast, self.ts_global,"main")
         # self.getTraduccion()
         # self.imprimir_tabla(self.ts_global)
+
+    def run(self,entrada):
+        self.ast = gramatica.parse(entrada)
+        self.ts_global = TS.TablaDeSimbolos()
+        self.traducciones = {}
+        self.traducciones2 = {}
+        self.traducciones_salida = {}
+        self.structs = {}
+        self.funciones={}
+        self.funcion_actual = ""
+        self.traducciones[len(self.traducciones)] = { "ambito":0,"traduccion":TT.Traduccion("","main","","",":")}
+        self.salida_funciones={}
+        self.indice_temporal = 0
+        self.indice_retorno = 0
+        self.indice_parametro = 0
+        self.indice_etiqueta = 0
+        self.indice_ambito = 0
+        self.indice_ambito_max =0
+        self.indice_ra=1
+        self.indice_pila = 0
+        self.pila_funciones = []
+        self.pila_funciones.append(0)
+        self.etiqueta_princial = "" #main
+        self.traducir_general = False
+        self.llenarFunciones(self.ast,self.ts_global,"main")
+        self.procesar_instrucciones(self.ast, self.ts_global,"main")
 
     def generarView(self):
         gramatica.dot.view()
@@ -113,20 +139,29 @@ class Analizador:
 
     def procesar_dowhile(self,instruccion,ts,ambito):
         ts_local = TS.TablaDeSimbolos(ts.simbolos)
+        
         etiqueta = "dowhile"+str(self.indice_etiqueta)
         self.indice_etiqueta +=1
+
+        etiquetacond = "docondicion"+str(self.indice_etiqueta)
+        self.indice_etiqueta +=1
+
         etiquetasalida = "dowhilefin"+str(self.indice_etiqueta)
         self.indice_etiqueta +=1
-        traduccion = TT.Traduccion("","goto "+etiqueta,"","",";")
+
+        traduccion = TT.Traduccion("",str(etiqueta),"","",":")
         self.agregarTraduccion(traduccion)
         self.procesar_instrucciones(instruccion.instrucciones,ts_local,etiqueta)
+        traduccion = TT.Traduccion("","goto "+str(etiquetacond),"","",";")
+        self.agregarTraduccion(traduccion)
+        
         traduccion = TT.Traduccion("",str(etiquetasalida),"","",":")
         self.agregarTraduccion(traduccion)
 
         self.indice_ambito += 1
-        traduccion = TT.Traduccion("","\n"+str(etiqueta),"","",":")
+        traduccion = TT.Traduccion("","\n"+str(etiquetacond),"","",":")
         self.agregarTraduccion(traduccion)
-        self.procesar_instrucciones(instruccion.instrucciones,ts_local,etiqueta)
+        # self.procesar_instrucciones(instruccion.instrucciones,ts_local,etiqueta)
         condicion = self.resolver_expresion(instruccion.expresion,ts,ambito)
         traduccion = TT.Traduccion("","if("+str(condicion)+")"," goto ",str(etiqueta),";")
         self.agregarTraduccion(traduccion)

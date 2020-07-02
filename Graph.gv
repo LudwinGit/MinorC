@@ -1,0 +1,213 @@
+graph {
+	106 [label=int]
+	107 [label="Etiqueta: inicio"]
+	108 [label="\"Ingrese el primer numero:\n\""]
+	109 [label=Valor]
+	109 -- 108
+	110 [label=Print]
+	110 -- 109
+	111 [label=int]
+	112 [label=scanf]
+	113 [label=primer_numero]
+	113 -- 112
+	114 [label="Declaración"]
+	114 -- 111
+	114 -- 113
+	115 [label="\"\n\""]
+	116 [label=Valor]
+	116 -- 115
+	117 [label=Print]
+	117 -- 116
+	118 [label="\"Ingrese el segundo numero:\n\""]
+	119 [label=Valor]
+	119 -- 118
+	120 [label=Print]
+	120 -- 119
+	121 [label=int]
+	122 [label=scanf]
+	123 [label=segundo_numero]
+	123 -- 122
+	124 [label="Declaración"]
+	124 -- 121
+	124 -- 123
+	125 [label="\"\n\""]
+	126 [label=Valor]
+	126 -- 125
+	127 [label=Print]
+	127 -- 126
+	128 [label="\"Que opcion desea realizar?\n\""]
+	129 [label=Valor]
+	129 -- 128
+	130 [label=Print]
+	130 -- 129
+	131 [label="\"+, -, *, /\n\""]
+	132 [label=Valor]
+	132 -- 131
+	133 [label=Print]
+	133 -- 132
+	134 [label=char]
+	135 [label=scanf]
+	136 [label=signo]
+	136 -- 135
+	137 [label="Declaración"]
+	137 -- 134
+	137 -- 136
+	138 [label="\"\n\""]
+	139 [label=Valor]
+	139 -- 138
+	140 [label=Print]
+	140 -- 139
+	141 [label=signo]
+	142 [label="\"+\""]
+	143 -- 141
+	143 [label="=="]
+	143 -- 142
+	144 [label="\"El resultado de la suma es: %d\n\""]
+	145 [label=Valor]
+	145 -- 144
+	146 [label=primer_numero]
+	147 [label=segundo_numero]
+	148 -- 146
+	148 [label="+"]
+	148 -- 147
+	149 [label=Valor]
+	149 -- 148
+	150 [label=Print]
+	150 -- 145
+	150 -- 149
+	151 [label=If]
+	151 -- 143
+	151 -- 150
+	152 [label=signo]
+	153 [label="\"-\""]
+	154 -- 152
+	154 [label="=="]
+	154 -- 153
+	155 [label="\"El resultado de la resta es: %d\n\""]
+	156 [label=Valor]
+	156 -- 155
+	157 [label=primer_numero]
+	158 [label=segundo_numero]
+	159 -- 157
+	159 [label="-"]
+	159 -- 158
+	160 [label=Valor]
+	160 -- 159
+	161 [label=Print]
+	161 -- 156
+	161 -- 160
+	162 [label=If]
+	162 -- 154
+	162 -- 161
+	151 [label=IF]
+	151 -- 162
+	163 [label=signo]
+	164 [label="\"*\""]
+	165 -- 163
+	165 [label="=="]
+	165 -- 164
+	166 [label="\"El resultado de la multiplicacion es: %d\n\""]
+	167 [label=Valor]
+	167 -- 166
+	168 [label=primer_numero]
+	169 [label=segundo_numero]
+	170 -- 168
+	170 [label="*"]
+	170 -- 169
+	171 [label=Valor]
+	171 -- 170
+	172 [label=Print]
+	172 -- 167
+	172 -- 171
+	173 [label=If]
+	173 -- 165
+	173 -- 172
+	151 [label=IF]
+	151 -- 162
+	151 -- 173
+	174 [label=signo]
+	175 [label="\"/\""]
+	176 -- 174
+	176 [label="=="]
+	176 -- 175
+	177 [label="\"El resultado de la division es: %d\n\""]
+	178 [label=Valor]
+	178 -- 177
+	179 [label=primer_numero]
+	180 [label=segundo_numero]
+	181 -- 179
+	181 [label="/"]
+	181 -- 180
+	182 [label=Valor]
+	182 -- 181
+	183 [label=Print]
+	183 -- 178
+	183 -- 182
+	184 [label=If]
+	184 -- 176
+	184 -- 183
+	151 [label=IF]
+	151 -- 162
+	151 -- 173
+	151 -- 184
+	185 [label="\"¿Deseas continuar? Y/N\n\""]
+	186 [label=Valor]
+	186 -- 185
+	187 [label=Print]
+	187 -- 186
+	188 [label=char]
+	189 [label=scanf]
+	190 [label=respuesta]
+	190 -- 189
+	191 [label="Declaración"]
+	191 -- 188
+	191 -- 190
+	192 [label=respuesta]
+	193 [label="\"Y\""]
+	194 -- 192
+	194 [label="=="]
+	194 -- 193
+	195 [label=respuesta]
+	196 [label="\"y\""]
+	197 -- 195
+	197 [label="=="]
+	197 -- 196
+	198 -- 194
+	198 [label="||"]
+	198 -- 197
+	199 [label="\"\n\""]
+	200 [label=Valor]
+	200 -- 199
+	201 [label=Print]
+	201 -- 200
+	202 [label="Goto: inicio"]
+	203 [label=If]
+	203 -- 198
+	203 -- 201
+	203 -- 202
+	204 [label="\"Adios\n\""]
+	205 [label=Valor]
+	205 -- 204
+	206 [label=Print]
+	206 -- 205
+	203 -- 206
+	207 [label="Función: main"]
+	207 -- 106
+	207 -- 107
+	207 -- 110
+	207 -- 114
+	207 -- 117
+	207 -- 120
+	207 -- 124
+	207 -- 127
+	207 -- 130
+	207 -- 133
+	207 -- 137
+	207 -- 140
+	207 -- 151
+	207 -- 187
+	207 -- 191
+	207 -- 203
+	208 [label=Inicio]
+	208 -- 207
+}
