@@ -246,6 +246,9 @@ def gram_desc():
 def rep_tablasimbolos():
     Inter.generarReporteTS()
 
+def rep_tablasimbolos_minor():
+    analizadorC.generarRepSimbolos()
+
 def rep_errores():
     Inter.reporte_errores()
 
@@ -499,7 +502,7 @@ ejecutarMinorC.add_command(label="Analisis", command=ejec_minorc)
 ejecutarMinorC.add_command(label="Gramatica",command=gram_asc)
 ejecutarMinorC.add_separator()
 ejecutarMinorC.add_command(label="AST", command=ast_minorc)
-ejecutarMinorC.add_command(label="Tabla de Simbolos", command=rep_tablasimbolos)
+ejecutarMinorC.add_command(label="Tabla de Simbolos", command=rep_tablasimbolos_minor)
 ejecutarMinorC.add_command(label="Reporte Errores", command=rep_errores)
 
 editarmenu = Menu(menubar, tearoff=0)

@@ -6,6 +6,7 @@ import C.tablasimbolos as TS
 import C.tablatraducciones as TT
 import sys
 import re
+from graphviz import Graph,Digraph, nohtml
 
 class Analizador:
     def __init__(self):
@@ -66,6 +67,34 @@ class Analizador:
 
     def generarView(self):
         gramatica.dot.view()
+
+    def generarRepSimbolos(self):
+        SymbolT = Digraph('g', filename='btree.gv',
+                node_attr={'shape': 'plaintext', 'height': '.1'})        
+        cadena=''
+        for item in self.ts_global.simbolos:
+            print(item)
+            # sim=ts.obtener(item,1)
+            sim = self.ts_global.simbolos[item]
+            cadena+='<TR><TD>'+str(sim.id)+'</TD>'+'<TD>'+str(sim.referencia)+'</TD>'+'<TD>'+str(sim.tipo)+'</TD>'+'<TD>'+str(sim.valor)+'</TD>'+'<TD>'+str(sim.ambito)+'</TD>'+'<TD>'+str(sim.funcion)+'</TD></TR>'
+
+        # for fn in ts.funciones:
+        #     fun=ts.obtenerFuncion(fn)
+        #     cadena+='<TR><TD>'+str(fun.id)+'</TD>'+'<TD>'+str(fun.tipo)+'</TD>'+'<TD>'+str(fun.parametros)+'</TD>'+'<TD></TD>'+'<TD></TD>'+'<TD>'+str(fun.referencia)+'</TD></TR>'
+
+        SymbolT.node('table','''<<TABLE>
+                                <TR>
+                                    <TD>ID</TD>
+                                    <TD>TRADUCCION</TD>
+                                    <TD>TIPO</TD>
+                                    <TD>VALOR</TD>
+                                    <TD>DECLARADA EN</TD>
+                                    <TD>USO</TD>
+                                </TR>'''
+                                +cadena+
+                            '''</TABLE>>''')
+
+        SymbolT.view()
 
     def getTraduccion(self):
         self.indice_ra -= 1
