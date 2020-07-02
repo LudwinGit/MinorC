@@ -73,7 +73,6 @@ class Analizador:
                 node_attr={'shape': 'plaintext', 'height': '.1'})        
         cadena=''
         for item in self.ts_global.simbolos:
-            print(item)
             # sim=ts.obtener(item,1)
             sim = self.ts_global.simbolos[item]
             cadena+='<TR><TD>'+str(sim.id)+'</TD>'+'<TD>'+str(sim.referencia)+'</TD>'+'<TD>'+str(sim.tipo)+'</TD>'+'<TD>'+str(sim.valor)+'</TD>'+'<TD>'+str(sim.ambito)+'</TD>'+'<TD>'+str(sim.funcion)+'</TD></TR>'
@@ -90,6 +89,25 @@ class Analizador:
                                     <TD>VALOR</TD>
                                     <TD>DECLARADA EN</TD>
                                     <TD>USO</TD>
+                                </TR>'''
+                                +cadena+
+                            '''</TABLE>>''')
+
+        SymbolT.view()
+
+    def generarRepErrores(self):
+        SymbolT = Digraph('g', filename='btree.gv',
+                node_attr={'shape': 'plaintext', 'height': '.1'})        
+        cadena=''
+        for item in gramatica.tablaerrores.errores:
+            sim = gramatica.tablaerrores.errores[item]
+            cadena+='<TR><TD>'+str(sim.tipo)+'</TD>'+'<TD>'+str(sim.descripcion)+'</TD>'+'<TD>'+str(sim.linea)+'</TD></TR>'
+
+        SymbolT.node('table','''<<TABLE>
+                                <TR>
+                                    <TD>TIPO</TD>
+                                    <TD>DESCRIPCION</TD>
+                                    <TD>LINEA</TD>
                                 </TR>'''
                                 +cadena+
                             '''</TABLE>>''')

@@ -252,6 +252,9 @@ def rep_tablasimbolos_minor():
 def rep_errores():
     Inter.reporte_errores()
 
+def rep_errores_minor():
+    analizadorC.generarRepErrores()
+
 def ejec_descendente():
     global ts_debug, no_instruccion, waitForCommand, ejecucion_automatica
     ejecucion_automatica=2
@@ -503,7 +506,7 @@ ejecutarMinorC.add_command(label="Gramatica",command=gram_asc)
 ejecutarMinorC.add_separator()
 ejecutarMinorC.add_command(label="AST", command=ast_minorc)
 ejecutarMinorC.add_command(label="Tabla de Simbolos", command=rep_tablasimbolos_minor)
-ejecutarMinorC.add_command(label="Reporte Errores", command=rep_errores)
+ejecutarMinorC.add_command(label="Reporte Errores", command=rep_errores_minor)
 
 editarmenu = Menu(menubar, tearoff=0)
 editarmenu.add_command(label="Copiar", \
