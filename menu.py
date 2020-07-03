@@ -98,6 +98,20 @@ def ejec_minorc():
         contenedorEditor.Editor().insert("end",str(salida)+"\n")
     ejec_ascendente()
 
+def optimizar():
+    editor.delete(1.0,'end-1c')
+    traducciones= analizadorC.optimizar()
+    for index in reversed(traducciones):
+        t = traducciones[index]
+        if t.resultado == "":
+            salida =str(t.resultado)+str(t.op1)+str(t.operador)+str(t.op2)+str(t.simbolofinaliza)
+        else:                
+            salida =str(t.resultado)+"="+str(t.op1)+str(t.operador)+str(t.op2)+str(t.simbolofinaliza)
+        editor.insert("end",str(salida)+"\n")
+    
+def repOptimizar():
+    analizadorC.generarRepOptimizacion()
+
 def ejec_ascendente():
     global ts_debug, no_instruccion, waitForCommand, ejecucion_automatica
     consola.delete("1.0",END)
@@ -510,6 +524,9 @@ ejecutarMinorC.add_separator()
 ejecutarMinorC.add_command(label="AST", command=ast_minorc)
 ejecutarMinorC.add_command(label="Tabla de Simbolos", command=rep_tablasimbolos_minor)
 ejecutarMinorC.add_command(label="Reporte Errores", command=rep_errores_minor)
+ejecutarMinorC.add_separator()
+ejecutarMinorC.add_command(label="Optimizar", command=optimizar)
+ejecutarMinorC.add_command(label="Reporte Optimizacion",command=repOptimizar)
 
 editarmenu = Menu(menubar, tearoff=0)
 editarmenu.add_command(label="Copiar", \

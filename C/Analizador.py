@@ -20,6 +20,7 @@ class Analizador:
         self.structs = {}
         self.funciones={}
         self.funcion_actual = ""
+        self.cadena_rep_optimizacion = ""
         self.traducciones[len(self.traducciones)] = { "ambito":0,"traduccion":TT.Traduccion("","main","","",":")}
         self.salida_funciones={}
         self.indice_temporal = 0
@@ -45,6 +46,7 @@ class Analizador:
         self.traducciones = {}
         self.traducciones2 = {}
         self.traducciones_salida = {}
+        self.traducciones_optimizada={}
         self.structs = {}
         self.funciones={}
         self.funcion_actual = ""
@@ -65,11 +67,227 @@ class Analizador:
         self.llenarFunciones(self.ast,self.ts_global,"main")
         self.procesar_instrucciones(self.ast, self.ts_global,"main")
 
+    def optimizar(self):
+        self.regla1()
+        self.regla8()
+        self.regla9()
+        self.regla10()
+        self.regla11()
+        self.regla12()
+        self.regla13()
+        self.regla14()
+        self.regla15()
+        self.regla16()
+        self.regla17()
+        self.regla18()
+        return self.traducciones_optimizada
+    
+    def regla1(self):
+        for index in self.traducciones_salida:
+            traduccion = self.traducciones_salida[index]
+            if index+1 < len(self.traducciones_salida):
+                traduccion2 = self.traducciones_salida[index+1]
+                if traduccion.resultado == traduccion2.op1 and traduccion.op1==traduccion2.resultado and str(traduccion.resultado) != str(traduccion.op1):
+                    cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+str(traduccion.simbolofinaliza)+\
+                                "<BR/>"+str(traduccion2.resultado)+"="+str(traduccion2.op1)+str(traduccion2.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 1")+"</TD>"+\
+                                "<TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+str(traduccion2.simbolofinaliza)+"</TD>"+"</TR>"
+                    self.cadena_rep_optimizacion += cadena
+                    traduccion2.resultado = traduccion.resultado
+                    traduccion2.op1 = traduccion.op1
+                    continue
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
+    def regla8(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "+":
+                if str(traduccion.resultado) == str(traduccion.op1) and str(traduccion.op2) == "0":
+                    cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"+0"+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 8")+"</TD>"+\
+                                "<TD>#SE ELIMINA LA INSTRUCCIÓN</TD>"+"</TR>"
+                    self.cadena_rep_optimizacion += cadena
+                    continue
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
+    def regla9(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "-":
+                if str(traduccion.resultado) == str(traduccion.op1) and str(traduccion.op2) == "0":
+                    cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"-0"+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 9")+"</TD>"+\
+                                "<TD>#SE ELIMINA LA INSTRUCCIÓN</TD>"+"</TR>"
+                    self.cadena_rep_optimizacion += cadena
+                    continue
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
+    def regla10(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "*":
+                if str(traduccion.resultado) == str(traduccion.op1) and str(traduccion.op2) == "1":
+                    cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"*1"+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 10")+"</TD>"+\
+                                "<TD>#SE ELIMINA LA INSTRUCCIÓN</TD>"+"</TR>"
+                    self.cadena_rep_optimizacion += cadena
+                    continue
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
+    def regla11(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "/":
+                if str(traduccion.resultado) == str(traduccion.op1) and str(traduccion.op2) == "1":
+                    cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"/1"+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 11")+"</TD>"+\
+                                "<TD>#SE ELIMINA LA INSTRUCCIÓN</TD>"+"</TR>"
+                    self.cadena_rep_optimizacion += cadena
+                    continue
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
+    def regla12(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "+":
+                if str(traduccion.resultado) != str(traduccion.op1) and str(traduccion.op2) == "0":
+                    cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"+0"+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 12")+"</TD>"+\
+                                "<TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+str(traduccion.simbolofinaliza)+"</TD>"+"</TR>"
+                    self.cadena_rep_optimizacion += cadena
+                    traduccion.operador = ""
+                    traduccion.op2 = ""
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
+    def regla13(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "-":
+                if str(traduccion.resultado) != str(traduccion.op1) and str(traduccion.op2) == "0":
+                    cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"-0"+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 13")+"</TD>"+\
+                                "<TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+str(traduccion.simbolofinaliza)+"</TD>"+"</TR>"
+                    self.cadena_rep_optimizacion += cadena
+                    traduccion.operador = ""
+                    traduccion.op2 = ""
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
+    def regla14(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "*":
+                if str(traduccion.resultado) != str(traduccion.op1) and str(traduccion.op2) == "1":
+                    cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"*1"+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 14")+"</TD>"+\
+                                "<TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+str(traduccion.simbolofinaliza)+"</TD>"+"</TR>"
+                    self.cadena_rep_optimizacion += cadena
+                    traduccion.operador = ""
+                    traduccion.op2 = ""
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+    
+    def regla15(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "/":
+                if str(traduccion.resultado) != str(traduccion.op1) and str(traduccion.op2) == "1":
+                    cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"/1"+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 15")+"</TD>"+\
+                                "<TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+str(traduccion.simbolofinaliza)+"</TD>"+"</TR>"
+                    self.cadena_rep_optimizacion += cadena
+                    traduccion.operador = ""
+                    traduccion.op2 = ""
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
+    def regla16(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "*" and str(traduccion.op2) == "2":
+                cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"*2"+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 16")+"</TD>"+\
+                                "<TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"+"+str(traduccion.op1)+str(traduccion.simbolofinaliza)+"</TD>"+"</TR>"
+                self.cadena_rep_optimizacion += cadena
+                traduccion.operador = "+"
+                traduccion.op2 = traduccion.op1
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
+    def regla17(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "*" and str(traduccion.op2) == "0":
+                cadena = "<TR><TD>"+str(traduccion.resultado)+"="+str(traduccion.op1)+"*0"+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 17")+"</TD>"+\
+                                "<TD>"+str(traduccion.resultado)+"=0"+"</TD>"+"</TR>"
+                self.cadena_rep_optimizacion += cadena
+                traduccion.op1 = ""
+                traduccion.operador = ""
+                traduccion.op2 = "0"
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
+    def regla18(self):
+        copia = self.traducciones_optimizada.copy()
+        self.traducciones_optimizada = {}
+
+        for index in copia:
+            traduccion = copia[index]
+            if str(traduccion.operador) == "/" and str(traduccion.op1) == "0":
+                cadena = "<TR><TD>"+str(traduccion.resultado)+"="+"0/"+str(traduccion.op1)+str(traduccion.simbolofinaliza)+"</TD>"+\
+                                "<TD>"+str("REGLA 18")+"</TD>"+\
+                                "<TD>"+str(traduccion.resultado)+"=0"+"</TD>"+"</TR>"
+                self.cadena_rep_optimizacion += cadena
+                traduccion.op1 = ""
+                traduccion.operador = ""
+                traduccion.op2 = "0"
+            self.traducciones_optimizada[len(self.traducciones_optimizada)] = traduccion
+
     def generarView(self):
         gramatica.dot.view()
     
     def generarRepGramatical(self):
         gramatica.dotgramatica.view()
+
+    def generarRepOptimizacion(self):
+        SymbolT = Digraph('g', filename='gram_minor.gv', format='png',node_attr={'shape': 'plaintext', 'height': '.1'})
+
+        SymbolT.node('table','''<<TABLE>
+                                <TR>
+                                    <TD>CASO</TD>
+                                    <TD>REGLA</TD>
+                                    <TD>OPTIMIZACION</TD>
+                                </TR>'''
+                                +self.cadena_rep_optimizacion+
+                            '''</TABLE>>''')
+
+        SymbolT.view()
 
     def generarRepSimbolos(self):
         SymbolT = Digraph('g', filename='btree.gv',
