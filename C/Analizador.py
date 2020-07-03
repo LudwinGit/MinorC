@@ -67,6 +67,9 @@ class Analizador:
 
     def generarView(self):
         gramatica.dot.view()
+    
+    def generarRepGramatical(self):
+        gramatica.dotgramatica.view()
 
     def generarRepSimbolos(self):
         SymbolT = Digraph('g', filename='btree.gv',

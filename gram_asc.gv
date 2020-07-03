@@ -1,11 +1,4 @@
 digraph g {
-	node [height=.1 shape=plaintext]
-	table [label=<<TABLE><TR><TD>PRODUCCION</TD><TD>REGLAS SEMANTICAS</TD></TR><TR> 
- <TD>def_etiqueta_instr → main : </TD> 
- <TD>  def_etiqueta_instr=Etiqueta(t[0]) </TD> 
- </TR> 
-
- <TR><TD> instrucciones → instruccion </TD><TD> instrucciones=t[1] </TD></TR>
- <TR><TD> valor → 3 </TD><TD> t[0] = ExpresionValor(t[1]) </TD> </TR> 
- <TR><TD> print_instr → = PRINT ( valor ) ;</TD><TD>  t[0] = Print(t[3]) </TD> </TR> <TR><TD> instrucciones → instrucciones instruccion </TD><TD> instrucciones=t[1].append(t[2]) <BR/> instrucciones=t[1] </TD></TR></TABLE>>]
+	table [label=<<TABLE><TR><TD>PRODUCCION</TD><TD>REGLAS SEMANTICAS</TD></TR>
+ <TR><TD> instrucciones → instruccion </TD><TD> instrucciones=t[1] </TD></TR></TABLE>>]
 }

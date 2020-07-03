@@ -2,14 +2,19 @@
 #LUDWIN ROMARIO BURRIÓN IMUCHAC
 #201314001
 #
-from graphviz import Graph
+from graphviz import Graph,Digraph,escape,nohtml
 from C.tablaerrores import *
 
 i=0
+cadena = ''
 def inc():
     global i
     i += 1
     return i
+
+def concat(cad):
+    global cadena
+    cadena+=cad
 
 reservadas = {
     'auto'  :   'AUTO',
@@ -199,10 +204,12 @@ def p_lista_instrucciones(t):
     'lista_instrucciones        :   lista_instrucciones instruccion'
     t[1].append(t[2])
     t[0] = t[1]
+    concat('<TR><TD> instrucciones → instrucciones instruccion </TD><TD> instrucciones=t[1].append(t[2]) <BR/> instrucciones=t[1] </TD></TR>')
 
 def p_lista_instrucciones_instruccion(t):
     'lista_instrucciones        :   instruccion'
     t[0] = [t[1]]
+    concat('\n <TR><TD> instrucciones → instruccion </TD><TD> instrucciones=t[1] </TD></TR>')
 
 def p_instruccion(t):
     '''instruccion              :   declarar_funcion
@@ -217,6 +224,8 @@ def p_definir_struct(t):
     for item in t[3]:
         dot.edge(str(id),str(item.id_dot))
 
+    concat('\n <TR><TD> definir_struct → IDENTIFICADOR { declaraciones } ;  </TD><TD> t[0] = Struct(id,t.lexer.lineno,t[2],t[3]) </TD></TR>')
+
 def p_declarar_funcion_con_params(t):
     'declarar_funcion        :   tipo IDENTIFICADOR ABREPARENTESIS params CIERRAPARENTESIS declaracion_compuesta'
     id = inc()
@@ -226,6 +235,7 @@ def p_declarar_funcion_con_params(t):
     dot.edge(str(id),str(t[4].id_dot))
     for item in t[6]:
         dot.edge(str(id),str(item.id_dot))
+    concat('\n <TR><TD> declarar_funcion → IDENTIFICADOR (params) { declaraciones } ;  </TD><TD> t[0] = Funcion(id,t.lexer.lineno,t[1],str(t[2]),t[6],t[4].valor) </TD></TR>')
 
 #Sin parametros
 def p_declarar_funcion_sin_params(t):
@@ -236,6 +246,7 @@ def p_declarar_funcion_sin_params(t):
     dot.edge(str(id),str(t[1].id_dot))
     for item in t[5]:
         dot.edge(str(id),str(item.id_dot))
+    concat('\n <TR><TD> declarar_funcion → IDENTIFICADOR () { declaraciones } ;  </TD><TD> t[0] = Funcion(id,t.lexer.lineno,t[1],str(t[2]),t[5]) </TD></TR>')
 
 def p_declaracion_compuesta(t):
     'declaracion_compuesta      :   ABRELLAVE lista_sentencias CIERRALLAVE'
@@ -249,10 +260,12 @@ def p_lista_sentencias(t):
     'lista_sentencias           :   lista_sentencias sentencia'
     t[1].append(t[2])
     t[0] = t[1]
+    concat('<TR><TD> lista_sentencias → lista_sentencias sentencia </TD><TD> lista_sentencias=t[1].append(t[2]) <BR/> instrucciones=t[1] </TD></TR>')
 
 def p_lista_sentencias_sentencia(t):
     'lista_sentencias           :   sentencia'
     t[0] = [t[1]]
+    concat('<TR><TD> lista_sentencias → sentencia </TD><TD> sentencia = [t[1]]</TD></TR>')
 
 def p_sentencia(t):
     '''sentencia                :   declaracion_variable PUNTOCOMA
@@ -282,6 +295,7 @@ def p_sentencia_funcion(t):
     id = inc()
     t[0] = LlamaFuncion(id,t.lexer.lineno,t[1],None)
     dot.node(str(id),str("llamada: ")+str(t[1]))
+    concat('<TR><TD> sentencia_funcion → IDENTIFICADOR (); </TD><TD> t[0] = LlamaFuncion(id,t.lexer.lineno,t[1],None)</TD></TR>')
 
 def p_sentencia_funcion_params(t):
     'sentencia_funcion          :   IDENTIFICADOR ABREPARENTESIS params CIERRAPARENTESIS PUNTOCOMA'
@@ -290,6 +304,7 @@ def p_sentencia_funcion_params(t):
     dot.node(str(id),str("llamada: ")+str(t[1]))
     for item in t[3].valor:
         dot.edge(str(id),str(item.id_dot),"indice")
+    concat('<TR><TD> sentencia_funcion → IDENTIFICADOR (params); </TD><TD> t[0] = LlamaFuncion(id,t.lexer.lineno,t[1],t[3].valor)</TD></TR>')
 
 def p_sentencias_for(t):
     '''sentencias_for           :   declaracion_variable
@@ -303,26 +318,28 @@ def p_sentencia_incremento_i(t):
     id = inc()
     t[0] = ExpresionIncremento(id,t.lexer.lineno,t[2])
     dot.node(str(id),str("++")+str(t[2]))
+    concat('<TR><TD> sentencia_incremento → ++ IDENTIFICADOR; </TD><TD> t[0] = ExpresionIncremento(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_sentencia_incremento_d(t):
     'sentencia_incremento       :   IDENTIFICADOR INCREMENT'
     id = inc()
     t[0] = ExpresionIncremento(id,t.lexer.lineno,t[1])
     dot.node(str(id),str(t[1])+str("++"))
+    concat('<TR><TD> sentencia_incremento → IDENTIFICADOR ++; </TD><TD> t[0] = ExpresionIncremento(id,t.lexer.lineno,t[1]) </TD></TR>')
 
 def p_sentencia_decremento_i(t):
     'sentencia_decremento       :   DECREMENT IDENTIFICADOR'
     id = inc()
     t[0] = ExpresionDecremento(id,t.lexer.lineno,t[2])
     dot.node(str(id),str("--")+str(t[2]))
+    concat('<TR><TD> sentencia_decremento → -- IDENTIFICADOR; </TD><TD> t[0] = ExpresionDecremento(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_sentencia_decremento_d(t):
     'sentencia_decremento       :   IDENTIFICADOR DECREMENT'
     id = inc()
     t[0] = ExpresionDecremento(id,t.lexer.lineno,t[1])
     dot.node(str(id),str(t[1])+str("--"))
-
-
+    concat('<TR><TD> sentencia_decremento → IDENTIFICADOR --; </TD><TD> t[0] = ExpresionDecremento(id,t.lexer.lineno,t[1]) </TD></TR>')
 
 # def p_declaracion_variable_array(t):
 #     'declaracion_variable       :   tipo IDENTIFICADOR ABRECORCHETE CIERRACORCHETE PUNTOCOMA'
@@ -336,6 +353,7 @@ def p_declaracion_variable_array_empty(t):
     dot.edge(str(id),str(t[1].id_dot),"variable")
     for item in t[3]:
         dot.edge(str(id),str(item.id_dot),"indice")
+    concat('<TR><TD> declaracion_variable → tipo IDENTIFICADOR indices </TD><TD> t[0] = DeclaracionArray(id,t.lexer.lineno,t[1].valor,t[2],t[3]) </TD></TR>')
 
 def p_declaracion_variable_array(t):
     'declaracion_variable       :   tipo IDENTIFICADOR indices IGUAL exp'
@@ -347,6 +365,7 @@ def p_declaracion_variable_array(t):
     dot.edge(str(id),str(t[5].id_dot),"valor")
     for item in t[3]:
         dot.edge(str(id),str(item.id_dot),"indice")
+    concat('<TR><TD> declaracion_variable → tipo IDENTIFICADOR indices = expresion </TD><TD> t[0] = DeclaracionArray(id,t.lexer.lineno,t[1].valor,t[2],t[3],t[5]) </TD></TR>')
 
 def p_declaracion_variable_array_inicializado(t):
     'declaracion_variable       :   tipo IDENTIFICADOR indices IGUAL ABRELLAVE lista_expresiones CIERRALLAVE'
@@ -359,6 +378,7 @@ def p_declaracion_variable_array_inicializado(t):
         dot.edge(str(id),str(item.id_dot),"indice")
     for item in t[6]:
         dot.edge(str(id),str(item.id_dot),"valor")
+    concat('<TR><TD> declaracion_variable → tipo IDENTIFICADOR indices = { lista_expresiones } </TD><TD> t[0] = DeclaracionArray(id,t.lexer.lineno,t[1].valor,t[2],t[3],t[6]) </TD></TR>')
 
 def p_multiple_declaracion(t):
     'declaracion_variable       :   tipo identificadores'
@@ -368,6 +388,7 @@ def p_multiple_declaracion(t):
     dot.edge(str(id),str(t[1].id_dot))
     for item in t[2]:
         dot.edge(str(id),str(item.id_dot))
+    concat('<TR><TD> declaracion_variable → tipo identificadores </TD><TD> t[0] = DeclaracionSimple(id,t.lexer.lineno,t[1].valor,t[2]) </TD></TR>')
 
 def p_identificadores(t):
     'identificadores            :   lista_identificadores'
@@ -377,16 +398,19 @@ def p_lista_identificadores(t):
     'lista_identificadores      :   lista_identificadores COMA declaracion_identificador'
     t[1].append(t[3])
     t[0] = t[1]
+    concat('<TR><TD> lista_identificadores → lista_identificadores , declaracion_identificador </TD><TD> t[1].append(t[3]) <BR/> t[0] = t[1] </TD></TR>')
 
 def p_lista_identificadores_identificador(t):
     'lista_identificadores      :   declaracion_identificador'
     t[0] = [t[1]]
+    concat('<TR><TD> lista_identificadores → declaracion_identificador </TD><TD> t[0] = [t[1]]</TD></TR>')
 
 def p_declaracion_identificador(t):
     'declaracion_identificador    :   IDENTIFICADOR'
     id = inc()
     t[0] = Variable(id,t.lexer.lineno,str(t[1]))
     dot.node(str(id),str(t[1]))
+    concat('<TR><TD> lista_identificadores → IDENTIFICADOR </TD><TD> t[0] = Variable(id,t.lexer.lineno,str(t[1]))</TD></TR>')
 
 def p_declaracion_identificador_inicializado(t):
     'declaracion_identificador    :   IDENTIFICADOR IGUAL exp'
@@ -394,6 +418,7 @@ def p_declaracion_identificador_inicializado(t):
     t[0] = Variable(id,t.lexer.lineno,str(t[1]),t[3])
     dot.node(str(id),str(t[1]))
     dot.edge(str(id),str(t[3].id_dot))
+    concat('<TR><TD> declaracion_identificador → IDENTIFICADOR = expresion </TD><TD> t[0] = Variable(id,t.lexer.lineno,str(t[1]),t[3])</TD></TR>')
 
 def p_declaracion_identificador_array_inicializado(t):
     'declaracion_identificador    :   IDENTIFICADOR indices IGUAL exp'
@@ -403,19 +428,7 @@ def p_declaracion_identificador_array_inicializado(t):
     for item in t[2]:
         dot.edge(str(id),str(item.id_dot),"indice")
     dot.edge(str(id),str(t[4].id_dot),"valor")
-
-# def p_declaracion_identificador_array_inicializado_llaves(t):
-#     'declaracion_identificador    :   IDENTIFICADOR indices IGUAL ABRELLAVE lista_expresiones CIERRALLAVE PUNTOCOMA'
-#     id = inc()
-#     t[0] = DeclaracionArray(id,t.lexer.lineno,None,t[1],t[2],t[5])
-#     dot.node(str(id),str(t[1]))
-#     for item in t[2]:
-#         dot.edge(str(id),str(item.id_dot),"indice")
-#     for item in t[5]:
-#         dot.edge(str(id),str(item.id_dot),"valor")
-# def p_declaracion_identificador_puntero(t):
-#     '''declaracion_identificador    :   MUL IDENTIFICADOR
-#                                     |   MUL MUL IDENTIFICADOR'''     
+    concat('<TR><TD> declaracion_identificador → IDENTIFICADOR indices = expresion </TD><TD> t[0] = DeclaracionArray(id,t.lexer.lineno,None,t[1],t[2],t[4]) </TD></TR>')
 
 def p_sentencia_asignacion(t):
     'sentencia_asignacion       :   IDENTIFICADOR asignacion_compuesta exp'
@@ -424,6 +437,7 @@ def p_sentencia_asignacion(t):
     dot.node(str(id),"Asignación: "+str(t[1]))
     dot.edge(str(id),str(t[2].id_dot))
     dot.edge(str(id),str(t[3].id_dot))
+    concat('<TR><TD> sentencia_asignacion → IDENTIFICADOR asignacion_compuesta exp </TD><TD> t[0] = AsignacionSimple(id,t.lexer.lineno,t[1],t[2].valor,t[3]) </TD></TR>')
 
 def p_sentencia_asignacion_arreglo(t):
     'sentencia_asignacion       :   IDENTIFICADOR indices asignacion_compuesta exp'
@@ -434,6 +448,7 @@ def p_sentencia_asignacion_arreglo(t):
         dot.edge(str(id),str(item.id_dot))
     dot.edge(str(id),str(t[3].id_dot))
     dot.edge(str(id),str(t[4].id_dot))
+    concat('<TR><TD> sentencia_asignacion → IDENTIFICADOR indices asignacion_compuesta exp </TD><TD> t[0] = AsignacionArray(id,t.lexer.lineno,t[1],t[3].valor,t[2],t[4]) </TD></TR>')
 
 def p_sentencia_while(t):
     'sentencia_while            :   WHILE ABREPARENTESIS exp CIERRAPARENTESIS declaracion_compuesta'
@@ -443,6 +458,7 @@ def p_sentencia_while(t):
     dot.edge(str(id),str(t[3].id_dot))
     for item in t[5]:
         dot.edge(str(id),str(item.id_dot))
+    concat('<TR><TD> sentencia_while → WHILE (expresion) { declaraciones } </TD><TD> t[0] = While(id,t.lexer.lineno,t[3],t[5]) </TD></TR>')
 
 def p_sentencia_dowhile(t):
     'sentencia_dowhile          :   DO declaracion_compuesta WHILE ABREPARENTESIS exp CIERRAPARENTESIS PUNTOCOMA'
@@ -452,7 +468,7 @@ def p_sentencia_dowhile(t):
     dot.edge(str(id),str(t[5].id_dot))
     for item in t[2]:
         dot.edge(str(id),str(item.id_dot))
-
+    concat('<TR><TD> sentencia_dowhile → DO { declaraciones } WHILE (expresion)</TD><TD> t[0] = DoWhile(id,t.lexer.lineno,t[5],t[2]) </TD></TR>')
 
 def p_sentencia_if(t):
     'sentencia_if                   : if_list'
@@ -465,6 +481,7 @@ def p_sententcia_if_else(t):
     t[0] = t[1]
     for ifelse in t[3]:
         dot.edge(str(t[0].id_dot),str(ifelse.id_dot))
+    concat('<TR><TD> sentencia_if → if_list else { declaraciones }</TD><TD> t[1].instrucciones_else=t[3] </TD></TR>')
 
 def p_if_listado_k(t):
     'if_list                        : if_list ELSE if'
@@ -474,6 +491,8 @@ def p_if_listado_k(t):
     for i in t[0].elses:
         ifelse = t[0].elses[i]
         dot.edge(str(t[0].id_dot),str(ifelse.id_dot))
+
+    concat('<TR><TD> sentencia_if → if_list else { declaraciones }</TD><TD> t[1].agregarIf(t[3]) <BR/> t[0] = t[1] </TD></TR>')
 
 def p_if_listado(t):
     'if_list                        : if'
@@ -487,6 +506,7 @@ def p_if(t):
     dot.edge(str(id),str(t[3].id_dot))
     for item in t[5]:
         dot.edge(str(id),str(item.id_dot))
+    concat('<TR><TD> if → if(expresiones) { declaraciones }</TD><TD> t[0] = Ifsimple(id,t.lexer.lineno,t[3],t[5]) </TD></TR>')
 
 def p_sentencia_for(t):
     'sentencia_for              :   FOR ABREPARENTESIS sentencias_for PUNTOCOMA exp PUNTOCOMA sentencias_for CIERRAPARENTESIS declaracion_compuesta'
@@ -498,7 +518,7 @@ def p_sentencia_for(t):
     dot.edge(str(id),str(t[7].id_dot))
     for item in t[9]:
         dot.edge(str(id),str(item.id_dot))
-
+    concat('<TR><TD> sentencia_for → for(expresion;expresion;expresion) { declaraciones }</TD><TD> t[0] = For(id,t.lexer.lineno,t[3],t[5],t[7],t[9]) </TD></TR>')
 
 def p_declaracion_struct(t):
     'declaracion_struct         :   STRUCT IDENTIFICADOR IDENTIFICADOR'
@@ -507,6 +527,7 @@ def p_declaracion_struct(t):
     dot.node(str(id),"Asignacion Struct")
     dot.edge(str(id),str(t[2]))
     dot.edge(str(id),str(t[3]))
+    concat('<TR><TD> declaracion_struct → STRUCT IDENTIFICADOR IDENTIFICADOR</TD><TD> t[0] = DeclaracionStruct(id,t.lexer.lineno,t[3],t[2]) </TD></TR>')
 
 def p_declaracion_struct_arreglo(t):
     'declaracion_struct         :   STRUCT IDENTIFICADOR IDENTIFICADOR indices'
@@ -517,6 +538,7 @@ def p_declaracion_struct_arreglo(t):
     dot.edge(str(id),str(t[3]))
     for item in t[4]:
         dot.edge(str(id),str(item.id_dot))
+    concat('<TR><TD> declaracion_struct → STRUCT IDENTIFICADOR IDENTIFICADOR indices</TD><TD> t[0] = DeclaracionStruct(id,t.lexer.lineno,t[3],t[2]) </TD></TR>')
 
 def p_sentencia_asignacion_struct(t):
     'sentencia_asignacion_struct    :   IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp'
@@ -526,6 +548,7 @@ def p_sentencia_asignacion_struct(t):
     dot.edge(str(id),str(t[4].id_dot))
     dot.node(str(id),"Asignacion struct")
     dot.edge(str(id),"["+str(id)+"]"+str(t[1])+"."+str(t[3]),"variable")
+    concat('<TR><TD> sentencia_asignacion_struct → IDENTIFICADOR PUNTO IDENTIFICADOR asignacion_compuesta exp</TD><TD> t[0] = AsignacionStruct(id,t.lexer.lineno,t[1],t[3],t[4].valor,t[5]) </TD></TR>')
 
 def p_sentencia_asignacion_struct_arreglo(t):
     'sentencia_asignacion_struct    :   IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp'
@@ -537,18 +560,21 @@ def p_sentencia_asignacion_struct_arreglo(t):
     dot.edge(str(id),"["+str(id)+"]"+str(t[1])+"."+str(t[4]),"variable")
     for item in t[2]:
         dot.edge(str(id),str(item.id_dot),"indice")
+    concat('<TR><TD> sentencia_asignacion_struct → IDENTIFICADOR indices PUNTO IDENTIFICADOR asignacion_compuesta exp</TD><TD> t[0] = AsignacionStruct(id,t.lexer.lineno,t[1],t[4],t[5].valor,t[6],t[2]) </TD></TR>')
 
 def p_sentencia_etiqueta(t):
     'sentencia_etiqueta         :   IDENTIFICADOR DOSPUNTOS'
     id = inc()
     t[0] = Etiqueta(id,t.lexer.lineno,t[1])
     dot.node(str(id),"Etiqueta: "+str(t[1]))
+    concat('<TR><TD> sentencia_etiqueta → IDENTIFICADOR :</TD><TD> t[0] = Etiqueta(id,t.lexer.lineno,t[1]) </TD></TR>')
 
 def p_sentencia_goto(t):
     'sentencia_goto             :   GOTO IDENTIFICADOR PUNTOCOMA'
     id = inc()
     t[0] = Goto(id,t.lexer.lineno,t[2])
     dot.node(str(id),"Goto: "+str(t[2]))
+    concat('<TR><TD> sentencia_goto → goto IDENTIFICADOR;</TD><TD> t[0] = Goto(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_sentencia_switch(t):
     'sentencia_switch           :   SWITCH ABREPARENTESIS exp CIERRAPARENTESIS ABRELLAVE cases CIERRALLAVE'
@@ -557,18 +583,21 @@ def p_sentencia_switch(t):
     dot.node(str(id),"Switch")
     for item in t[6]:
         dot.edge(str(id),str(item.id_dot))
+    concat('<TR><TD> sentencia_switch → switch(expresion){ casos };</TD><TD> t[0] = Switch(id,t.lexer.lineno,t[3],t[6]) </TD></TR>')
 
 def p_sentencia_break(t):
     'sentencia_break            :   BREAK PUNTOCOMA'
     id = inc()
     t[0] = Break(id,t.lexer.lineno)
     dot.node(str(id),"Break")
+    concat('<TR><TD> sentencia_break → BREAK PUNTOCOMA</TD><TD> t[0] = Break(id,t.lexer.lineno) </TD></TR>')
 
 def p_sentencia_continue(t):
     'sentencia_continue         :   CONTINUE PUNTOCOMA'
     id = inc()
     t[0] = Continue(id,t.lexer.lineno)
     dot.node(str(id),"Continue")
+    concat('<TR><TD> sentencia_continue → CONTINUE PUNTOCOMA</TD><TD> t[0] = Continue(id,t.lexer.lineno) </TD></TR>')
 
 def p_sentencia_return(t):
     'sentencia_return           :   RETURN exp PUNTOCOMA'
@@ -576,12 +605,14 @@ def p_sentencia_return(t):
     t[0] = Return(id,t.lexer.lineno,t[2])
     dot.node(str(id),"Return")
     dot.edge(str(id),str(t[2].id_dot))
+    concat('<TR><TD> sentencia_return → RETURN expresion;</TD><TD> t[0] = Return(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_sentencia_return_empty(t):
     'sentencia_return           :   RETURN PUNTOCOMA'
     id = inc()
     t[0] = Return(id,t.lexer.lineno,None)
     dot.node(str(id),"Return")
+    concat('<TR><TD> sentencia_return → RETURN ;</TD><TD> t[0] = Return(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_sentencia_print(t):
     'sentencia_print            :   PRINTF ABREPARENTESIS prints CIERRAPARENTESIS PUNTOCOMA'
@@ -590,6 +621,7 @@ def p_sentencia_print(t):
     dot.node(str(id),"Print")
     for item in t[3]:
         dot.edge(str(id),str(item.id_dot))
+    concat('<TR><TD> sentencia_print → printf (expresiones);</TD><TD> t[0] = Print(id,t.lexer.lineno,t[3]) </TD></TR>')
 
 def p_prints(t):
     'prints                     :   print_list'
@@ -641,6 +673,7 @@ def p_case(t):
     dot.edge(str(id),str(t[2].id_dot))
     for item in t[4]:
         dot.edge(str(id),str(item.id_dot))
+    concat('<TR><TD> case → case: declaraciones;</TD><TD> t[0] = Case(id,t.lexer.lineno,t[2],t[4]) </TD></TR>')
 
 def p_default_case(t):
     'default_case               :   DEFAULT DOSPUNTOS lista_sentencias'
@@ -649,6 +682,7 @@ def p_default_case(t):
     dot.node(str(id),"Default")
     for item in t[3]:
         dot.edge(str(id),str(item.id_dot))
+    concat('<TR><TD> default_case → default: declaraciones;</TD><TD> t[0] = Case(id,t.lexer.lineno,t[2],t[4]) </TD></TR>')
 
 def p_exp(t):
     '''exp                      :   exp MAS         exp
@@ -721,6 +755,7 @@ def p_exp(t):
     dot.edge(str(id),str(t[1].id_dot))
     dot.node(str(id),str(t[2]))
     dot.edge(str(id),str(t[3].id_dot))
+    concat('<TR><TD> expresiones → expresion1 op expresion2 </TD><TD> t[0] = Expresion(id,t.lexer.lineno,t[1],OPERACION,t[3]) </TD></TR>')
 
 def p_exp_negativo(t):
     'exp                        :   MENOS exp %prec NEGATIVO'
@@ -728,6 +763,7 @@ def p_exp_negativo(t):
     t[0] = ExpresionNegativo(id,t.lexer.lineno,t[2])
     dot.node(str(id),str("-"))
     dot.edge(str(id),str(t[2].id_dot))
+    concat('<TR><TD> expresiones → -expresion </TD><TD> t[0] = ExpresionNegativo(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_exp_absoluto(t):
     'exp                        :   ABS ABREPARENTESIS exp CIERRAPARENTESIS %prec ABSOLUTO'
@@ -735,6 +771,7 @@ def p_exp_absoluto(t):
     t[0] = ExpresionAbsoluto(id,t.lexer.lineno,t[3])
     dot.node(str(id),str("ABS"))
     dot.edge(str(id),str(t[3].id_dot))
+    concat('<TR><TD> expresiones → abs(expresion) </TD><TD> t[0] = ExpresionAbsoluto(id,t.lexer.lineno,t[3]) </TD></TR>')
 
 def p_exp_not(t):
     'exp                        :   NOT exp'''
@@ -742,6 +779,7 @@ def p_exp_not(t):
     t[0] = ExpresionLogica(id,t.lexer.lineno,t[2],LOGICO.NEGACION,None)
     dot.node(str(id),"Not")
     dot.edge(str(id),str(t[2].id_dot))
+    concat('<TR><TD> expresiones → not expresion </TD><TD> t[0] = ExpresionLogica(id,t.lexer.lineno,t[2],LOGICO.NEGACION,None) </TD></TR>')
 
 def p_exp_not_bit(t):
     'exp                        :   NOTBIT exp'''
@@ -749,6 +787,7 @@ def p_exp_not_bit(t):
     t[0] = ExpresionBit(id,t.lexer.lineno,t[2],BIT.NOT,None)
     dot.node(str(id),str(t[1]))
     dot.edge(str(id),str(t[2].id_dot))
+    concat('<TR><TD> expresiones → notbit expresion </TD><TD> t[0] = ExpresionBit(id,t.lexer.lineno,t[2],BIT.NOT,None) </TD></TR>')
 
 def p_exp_parentesis(t):
     'exp                        :   ABREPARENTESIS exp CIERRAPARENTESIS'
@@ -761,12 +800,14 @@ def p_exp_num(t):
     id = inc()
     t[0] = ExpNum(id,t.lexer.lineno,t[1])
     dot.node(str(id),str(t[1]))
+    concat('<TR><TD> expresion → ENTERO | DECIMAL </TD><TD> t[0] = ExpNum(id,t.lexer.lineno,t[1]) </TD></TR>')
 
 def p_exp_variable(t):
     '''exp                      :   IDENTIFICADOR'''
     id = inc()
     t[0] = ExpIdentificador(id,t.lexer.lineno,t[1])
     dot.node(str(id),t[1])
+    concat('<TR><TD> expresion → IDENTIFICADOR </TD><TD> t[0] = ExpIdentificador(id,t.lexer.lineno,t[1]) </TD></TR>')
 
 def p_exp_puntero(t):
     '''exp                      :   AMPERSAN IDENTIFICADOR'''
@@ -774,6 +815,7 @@ def p_exp_puntero(t):
     t[0] = ExpresionPuntero(id,t.lexer.lineno,t[2])
     dot.node(str(id),str(t[1]))
     dot.edge(str(id),str(t[2]))
+    concat('<TR><TD> expresion → & IDENTIFICADOR </TD><TD> t[0] = ExpresionPuntero(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_exp_array_index(t):
     'exp                        :   IDENTIFICADOR indices'
@@ -782,6 +824,7 @@ def p_exp_array_index(t):
     dot.node(str(id),"Array: "+str(t[1]))
     for item in t[2]:
         dot.edge(str(id),str(item.id_dot))
+    concat('<TR><TD> expresion → IDENTIFICADOR indices </TD><TD> t[0] = ExpresionPuntero(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_exp_sizeof(t):
     'exp                        :   SIZEOF ABREPARENTESIS exp CIERRAPARENTESIS'
@@ -789,6 +832,7 @@ def p_exp_sizeof(t):
     t[0] = ExpresionSizeof(id,t.lexer.lineno,t[3])
     dot.node(str(id),"Sizeof")
     dot.edge(str(id),str(t[3].id_dot))
+    concat('<TR><TD> expresion → sizeof(expresion) </TD><TD> t[0] = ExpresionSizeof(id,t.lexer.lineno,t[3]) </TD></TR>')
 
 def p_exp_casteo(t):
     'exp                        :   ABREPARENTESIS tipo_variable CIERRAPARENTESIS exp'
@@ -797,12 +841,14 @@ def p_exp_casteo(t):
     dot.node(str(id),"Casteo")
     dot.edge(str(id),str(t[2].id_dot))
     dot.edge(str(id),str(t[4].id_dot))
+    concat('<TR><TD> expresion → (TIPO_VARIABLE) EXPRESION </TD><TD> t[0] = ExpresionCasteo(id,t.lexer.lineno,t[2],t[4]) </TD></TR>')
 
 def p_exp_funcion(t):
     'exp                        :   IDENTIFICADOR ABREPARENTESIS CIERRAPARENTESIS'
     id = inc()
     t[0] = ExpFuncion(id,t.lexer.lineno,t[1])
     dot.node(str(id),str(t[1])+"()")
+    concat('<TR><TD> expresion → IDENTIFICADOR() </TD><TD> t[0] = ExpFuncion(id,t.lexer.lineno,t[1]) </TD></TR>')
 
 def p_exp_funcion_con_parametros(t):
     'exp                        :   IDENTIFICADOR ABREPARENTESIS params CIERRAPARENTESIS'
@@ -810,6 +856,7 @@ def p_exp_funcion_con_parametros(t):
     t[0] = ExpFuncion(id,t.lexer.lineno,t[1],t[3].valor)
     dot.node(str(id),str(t[1])+"()")
     dot.edge(str(id),str(t[3].id_dot))
+    concat('<TR><TD> expresion → IDENTIFICADOR(parametros) </TD><TD> t[0] = ExpFuncion(id,t.lexer.lineno,t[1],t[3].valor) </TD></TR>')
 
 def p_exp_ternario(t):
     'exp                        :   exp TERNARIO exp DOSPUNTOS exp'
@@ -819,18 +866,21 @@ def p_exp_ternario(t):
     dot.edge(str(id),str(t[1].id_dot),"condición")
     dot.edge(str(id),str(t[3].id_dot),"verdadero")
     dot.edge(str(id),str(t[5].id_dot),"falso")
+    concat('<TR><TD> expresion → expresion ? expresion : expresion </TD><TD> t[0] = ExpresionTernario(id,t.lexer.lineno,t[1],t[3],t[5]) </TD></TR>')
 
 def p_exp_cadena(t):
     'exp                        :   CADENA'
     id = inc()
     t[0] = ExpresionCadena(id,t.lexer.lineno,t[1])
     dot.node(str(id),str(t[1]))
+    concat('<TR><TD> expresion → CADENA </TD><TD> t[0] = ExpresionCadena(id,t.lexer.lineno,t[1]) </TD></TR>')
 
 def p_exp_struct(t):
     'exp                        :   IDENTIFICADOR PUNTO IDENTIFICADOR'
     id = inc()
     t[0] = ExpresionStruct(id,t.lexer.lineno,t[1],t[3])
     dot.node(str(id),str(t[1])+"."+str(t[3]))
+    concat('<TR><TD> expresion → IDENTIFICADOR.IDENTIFICADOR </TD><TD> t[0] = ExpresionStruct(id,t.lexer.lineno,t[1],t[3]) </TD></TR>')
 
 def p_exp_struct_arreglo(t):
     'exp                        :   IDENTIFICADOR indices PUNTO IDENTIFICADOR'
@@ -839,18 +889,21 @@ def p_exp_struct_arreglo(t):
     dot.node(str(id),str(t[1])+"."+str(t[4]))
     for item in t[2]:
         dot.edge(str(id),str(item.id_dot),"indice")
+    concat('<TR><TD> expresion → IDENTIFICADOR indices .IDENTIFICADOR </TD><TD> t[0] = ExpresionStruct(id,t.lexer.lineno,t[1],t[4],t[2]) </TD></TR>')
 
 def p_exp_incremento_i(t):
     'exp                        :   INCREMENT IDENTIFICADOR'
     id = inc()
     t[0] = ExpresionIncremento(id,t.lexer.lineno,t[2])
     dot.node(str(id),"++"+str(t[2]))
+    concat('<TR><TD> expresion → ++ IDENTIFICADOR </TD><TD> t[0] = ExpresionIncremento(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_exp_incremento_d(t):
     'exp                        :   IDENTIFICADOR INCREMENT'
     id = inc()
     t[0] = ExpresionIncremento(id,t.lexer.lineno,t[1])
     dot.node(str(id),str(t[1])+"++")
+    concat('<TR><TD> expresion → IDENTIFICADOR ++ </TD><TD> t[0] = ExpresionIncremento(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 
 def p_exp_decremento_i(t):
@@ -858,18 +911,21 @@ def p_exp_decremento_i(t):
     id = inc()
     t[0] = ExpresionDecremento(id,t.lexer.lineno,t[2])
     dot.node(str(id),"--"+str(t[2]))
+    concat('<TR><TD> expresion → -- IDENTIFICADOR </TD><TD> t[0] = ExpresionDecremento(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_exp_decremento_d(t):
     'exp                        :   IDENTIFICADOR DECREMENT'
     id = inc()
     t[0] = ExpresionDecremento(id,t.lexer.lineno,t[1])
     dot.node(str(id),str(t[1])+"--")
+    concat('<TR><TD> expresion → IDENTIFICADOR -- </TD><TD> t[0] = ExpresionDecremento(id,t.lexer.lineno,t[2]) </TD></TR>')
 
 def p_exp_scanf(t):
     'exp                        :   SCANF ABREPARENTESIS CIERRAPARENTESIS'
     id = inc()
     t[0] = ExpresionScanf(id,t.lexer.lineno)
     dot.node(str(id),"scanf")
+    concat('<TR><TD> expresion → scanf() </TD><TD> t[0] = ExpresionScanf(id,t.lexer.lineno) </TD></TR>')
 
 def p_params(t):
     'params                     :   param_list'
@@ -1004,10 +1060,16 @@ def p_error(t):
 import ply.yacc as yacc
 parser = yacc.yacc()
 
-dot = Graph()
-dot.attr(splines="false")
-dot.node_attr.update(shape='circle')
-dot.edge_attr.update(color="blue4")
+# dot = Graph()
+# dot.attr(splines="false")
+# dot.node_attr.update(shape='circle')
+# dot.edge_attr.update(color="blue4")
+
+dot = Digraph('g', filename='gram_minor.gv', format='png',
+            node_attr={'shape': 'plaintext', 'height': '.1'})
+
+dotgramatica = Digraph('g', filename='gram_minor.gv', format='png',
+            node_attr={'shape': 'plaintext', 'height': '.1'})
 
 tablaerrores = TablaDeErrores()
 # print(input)
@@ -1016,6 +1078,8 @@ tablaerrores = TablaDeErrores()
 
 def parse(input):
     dot.clear()
+    dotgramatica.clear()
     tablaerrores.clear()
     resultado = parser.parse(input)
+    dotgramatica.node('table','<<TABLE><TR><TD>PRODUCCION</TD><TD>REGLAS SEMANTICAS</TD></TR>'+cadena+'</TABLE>>')
     return resultado

@@ -237,6 +237,9 @@ def ast_minorc():
     # if analizadorC != None:
     analizadorC.generarView()
 
+def gram_minor():
+    analizadorC.generarRepGramatical()
+
 def gram_asc(): 
     Inter.generarReporteGramaticalAsc()
 
@@ -502,7 +505,7 @@ ejecutarmenu.add_command(label="Siguiente Paso", command=ejec_debug)
 #ejecutarMinorC
 ejecutarMinorC = Menu(menubar, tearoff=0)
 ejecutarMinorC.add_command(label="Analisis", command=ejec_minorc)
-ejecutarMinorC.add_command(label="Gramatica",command=gram_asc)
+ejecutarMinorC.add_command(label="Gramatica",command=gram_minor)
 ejecutarMinorC.add_separator()
 ejecutarMinorC.add_command(label="AST", command=ast_minorc)
 ejecutarMinorC.add_command(label="Tabla de Simbolos", command=rep_tablasimbolos_minor)

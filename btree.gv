@@ -2,8 +2,11 @@ digraph g {
 	node [height=.1 shape=plaintext]
 	table [label=<<TABLE>
                                 <TR>
+                                    <TD>ID</TD>
+                                    <TD>TRADUCCION</TD>
                                     <TD>TIPO</TD>
-                                    <TD>DESCRIPCION</TD>
-                                    <TD>LINEA</TD>
-                                </TR><TR><TD>SINTACTICO</TD><TD>Se esperaba el simbolo ';'</TD><TD>-1</TD></TR></TABLE>>]
+                                    <TD>VALOR</TD>
+                                    <TD>DECLARADA EN</TD>
+                                    <TD>USO</TD>
+                                </TR><TR><TD>main</TD><TD>main</TD><TD>TIPO_DATO.INT</TD><TD>0</TD><TD>main0</TD><TD>TIPO.FUNCION</TD></TR><TR><TD>$v0</TD><TD>$v0</TD><TD>TIPO_DATO.INT</TD><TD>0</TD><TD>main0</TD><TD>TIPO.RETURN</TD></TR><TR><TD>op</TD><TD>$t2</TD><TD>TIPO_DATO.CHAR</TD><TD>0</TD><TD>main0</TD><TD>TIPO.VARIABLE</TD></TR><TR><TD>a</TD><TD>$t3</TD><TD>TIPO_DATO.DOUBLE</TD><TD>0</TD><TD>main0</TD><TD>TIPO.VARIABLE</TD></TR><TR><TD>b</TD><TD>$t4</TD><TD>TIPO_DATO.DOUBLE</TD><TD>0</TD><TD>main0</TD><TD>TIPO.VARIABLE</TD></TR></TABLE>>]
 }
