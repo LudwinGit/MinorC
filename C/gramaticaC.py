@@ -162,7 +162,7 @@ def t_newline(t):
 
 def t_error(t):
     error = Error("LEXICO","Caracter no reconocido '%s'" % t.value[0],t.lexer.lineno)
-    errores.agregar(error)
+    tablaerrores.agregar(error)
     t.lexer.skip(1)
 
 import ply.lex as lex

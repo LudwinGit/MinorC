@@ -1140,7 +1140,7 @@ class Analizador:
                     for i in exp.indices:
                         indice = self.resolver_expresion(i,ts,ambito)
                         indices += "["+str(indice)+"]"
-                return str(simbolo.referencia)+str(indices)+"[\'"+str(atributo)+"\']"
+                    return str(simbolo.referencia)+str(indices)+"[\'"+str(atributo)+"\']"
         elif isinstance(exp,ExpFuncion):
             self.procesar_llamada(exp,ts,ambito)
             if exp.funcion in self.funciones:
